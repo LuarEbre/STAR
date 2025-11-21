@@ -5,7 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Vehicle;
 
 public class Main {
-    public static void main(String[] args) {
+    static void main(String[] args) {
 
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
         String sumoBinary = Util.getOSType().equals("Windows")
@@ -31,7 +31,7 @@ public class Main {
             connection.do_timestep();
 
             VehicleWrap[] cars = new VehicleWrap[50];
-            VehicleWrap v = null;
+            //VehicleWrap v = null;
 
             connection.do_timestep();
 
