@@ -1,18 +1,17 @@
 package sumo.sim;
 
-import de.tudresden.sumo.cmd.Simulation;
 import de.tudresden.sumo.cmd.Vehicle;
 import it.polito.appeal.traci.SumoTraciConnection;
 //import java.awt.Color;
 
 
-public class Vehicle2 {
+public class VehicleWrap {
     private String id;
     private String type;
     private SumoTraciConnection con;
     private boolean marked;
 
-    public Vehicle2(String id , SumoTraciConnection con) {
+    public VehicleWrap(String id , SumoTraciConnection con) {
         this.id = id;
         this.con = con;
     }

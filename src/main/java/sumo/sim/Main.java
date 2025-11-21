@@ -1,7 +1,6 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Simulation;
-import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Vehicle;
 
@@ -31,8 +30,8 @@ public class Main {
             int step = 0;
             connection.do_timestep();
 
-            Vehicle2[] cars = new Vehicle2[50];
-            Vehicle2 v = null;
+            VehicleWrap[] cars = new VehicleWrap[50];
+            VehicleWrap v = null;
 
             connection.do_timestep();
 
@@ -43,7 +42,7 @@ public class Main {
                         "current", "max", "current", "",
                         "", "", 0, 0)
                 );
-                cars[i] = new Vehicle2("v" + i, connection);
+                cars[i] = new VehicleWrap("v" + i, connection);
                 cars[i].setSpeed();
             }
 
