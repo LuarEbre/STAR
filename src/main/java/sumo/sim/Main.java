@@ -14,7 +14,7 @@ public class Main {
                 : "src/main/resources/Binaries/sumo-gui";
 
         // config knows both .rou and .net XMLs
-        String configFile = "src/main/resources/Map 1/test5.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map 1/test5.sumocfg";
 
         // create new connection with the binary and map config file
         SumoTraciConnection connection = new SumoTraciConnection(sumoBinary, configFile);
