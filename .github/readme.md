@@ -48,8 +48,6 @@ The road network is rendered in the JavaFX GUI providing live visual feedback on
 #### Analytics: <br>
 Metrics such as average speed, vehicle density, and travel times, are displayed live, as well as exported to CSV and PDF for detailed reports.
 
-
-
 ## Features
 ### Current Features
 - 1 simple, temporary map for test purposes
@@ -63,9 +61,12 @@ Metrics such as average speed, vehicle density, and travel times, are displayed 
 - 2 fleshed out maps – 1 very detailed, 1 a bit simpler
 - Run only sumo, visualisation now being rendered in a JavaFX GUI
 - Full wrapper classes for all classes essential to project scope
-* JavaFX UI featuring:
-  * Map Select
-  * Simulation Dashboard
+
+- Map Select
+  <p align="center">
+    <img src="mapselect.png" width="700" alt="Map Select GUI" />
+  </p>
+* Simulation Dashboard
     * Inject Vehicle button
     * Stop / Start button
     * Single step button
@@ -74,9 +75,15 @@ Metrics such as average speed, vehicle density, and travel times, are displayed 
   * Rendered map based on telemetry data of vehicles 
     * Allows for zooming, panning, and camera rotation
   * Statistical output of selected elements (vehicle / traffic light)
+  <p align="center">
+    <img src="dashboard.png" width="700" alt="Map Select GUI" />
+  </p>
 - Traffic light manipulation
 - Filter vehicles by attributes (color, speed, route, etc.)
 - Live statistical analysis as well as output as .csv
+  <p align="center">
+    <img src="analytics.png" width="700" alt="Map Select GUI" />
+  </p>
 ## Prerequisites
 - JDK 17+
 - [SUMO 1.24](https://sourceforge.net/projects/sumo/files/sumo/version%201.24.0/sumo-win64extra-1.24.0.msi/download) (Windows 64 Extra version)
