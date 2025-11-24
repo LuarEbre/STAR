@@ -4,6 +4,9 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Vehicle;
 
+import java.awt.geom.Point2D;
+import java.util.Locale;
+
 public class Main {
     static void main(String[] args) {
 
@@ -14,7 +17,7 @@ public class Main {
                 : "src/main/resources/Binaries/sumo-gui";
 
         // config knows both .rou and .net XMLs
-        String configFile = "src/main/resources/Map 1/test5.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map 1/test5.sumocfg";
 
         // create new connection with the binary and map config file
         SumoTraciConnection connection = new SumoTraciConnection(sumoBinary, configFile);
@@ -31,9 +34,10 @@ public class Main {
             connection.do_timestep();
 
             VehicleWrap[] cars = new VehicleWrap[50];
-            //VehicleWrap v = null;
+            VehicleWrap v = null;
 
-            connection.do_timestep();
+            // do a single step so vehicles can be created
+            // connection.do_timestep();
 
             // spawn 50 vehicles
             for (int i = 0; i < 50; i++) {
@@ -43,15 +47,28 @@ public class Main {
                         "", "", 0, 0)
                 );
                 cars[i] = new VehicleWrap("v" + i, connection);
-                cars[i].setSpeed();
+                cars[i].setSpeed(10);
             }
 
             // run simulation for 200 steps = 200 seconds
-            while (step < 200) {
+            while (step < 36) {
                 // get speed while v_0 exists
                 if (step < 36 && step > 0) {
                     if (cars[0] != null) {
-                        System.out.println(cars[0].getID() + "'s speed is: " + cars[0].getSpeed());
+                        // will not be replaced by a procedure, as it is only used temporarily
+                        // getPosition returns a 2D point which later has to be split into X and Y coordinates
+                        Point2D.Double pos = cars[0].getPosition();
+                        System.out.printf(
+                            // forces US locale, making double values be separated via period, rather than comma
+                            Locale.US,
+                            // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
+                            "%s: speed = %05.2f, position = (%06.2f, %06.2f), angle = %06.2f%n",
+                            cars[0].getID(),
+                            cars[0].getSpeed(),
+                            pos.x,
+                            pos.y,
+                            cars[0].getAngle()
+                        );
                     }
                 }
                 // print out current time in seconds
