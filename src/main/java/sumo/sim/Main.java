@@ -8,7 +8,7 @@ import java.awt.geom.Point2D;
 import java.util.Locale;
 
 public class Main {
-    public static void main(String[] args) {
+    static void main(String[] args) {
 
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
         String sumoBinary = Util.getOSType().equals("Windows")

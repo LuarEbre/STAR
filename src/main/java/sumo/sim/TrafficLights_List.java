@@ -8,15 +8,15 @@ import java.util.LinkedList;
 
 
 public class TrafficLights_List {
-    private final List<TrafficWrap> TL_list = new LinkedList<>();
-    private final SumoTraciConnection con;
+    private final List<TrafficWrap> TrafficLight_list = new LinkedList<>(); // List of TrafficLights
+    private final SumoTraciConnection con; // main connection created in main wrapper
 
     public TrafficLights_List(SumoTraciConnection con) {
         this.con = con;
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Trafficlight.getIDList()); // returns string array
             for (String id : list) {
-                TL_list.add(new TrafficWrap(id, con));
+                TrafficLight_list.add(new TrafficWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
             }
 
         } catch (Exception e) {
@@ -26,12 +26,12 @@ public class TrafficLights_List {
 
     public TrafficWrap getTL_action(String id) {
         int i = 0;
-        for (TrafficWrap tl : TL_list) {
-            if (tl.getId().equals(id)) {
-                return tl; // sofort zurückgeben
+        for (TrafficWrap tl : TrafficLight_list) {
+            if (tl.getId().equals(id)) { // searching for TrafficLight object
+                return tl;
             }
         }
-        return null;
+        return null; // if not existent
     }
 
     public void printIDs() {
