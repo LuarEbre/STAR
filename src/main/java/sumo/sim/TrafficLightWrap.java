@@ -3,19 +3,19 @@ package sumo.sim;
 import de.tudresden.sumo.cmd.Trafficlight;
 import it.polito.appeal.traci.SumoTraciConnection;
 
-public class TrafficWrap {
+public class TrafficLightWrap {
     SumoTraciConnection conn;
     private String id;
     private String state; // color switch e.g. "GGGrrrrr"
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
 
-    public TrafficWrap(String id, SumoTraciConnection conn){
+    public TrafficLightWrap(String id, SumoTraciConnection conn){
         this.id = id;
         this.conn = conn;
     }
 
-    public TrafficWrap(){
+    public TrafficLightWrap(){
     }
 
     public int getPhaseNumber() {
@@ -42,8 +42,6 @@ public class TrafficWrap {
         }
     }
 
-    public String getId() {
-        return id;
-    }
+    public String getId() {return id;}
 
 }

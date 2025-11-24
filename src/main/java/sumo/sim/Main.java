@@ -17,7 +17,8 @@ public class Main {
                 : "src/main/resources/Binaries/sumo-gui";
 
         // config knows both .rou and .net XMLs
-        String configFile = "src/main/resources/SumoConfig/Map 1/test5.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Test_Map/test.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
 
         // create new connection with the binary and map config file
         SumoTraciConnection connection = new SumoTraciConnection(sumoBinary, configFile);
@@ -34,10 +35,9 @@ public class Main {
             connection.do_timestep();
 
             VehicleWrap[] cars = new VehicleWrap[50];
-            VehicleWrap v = null;
+            TrafficLights_List t1 = new TrafficLights_List(connection);
 
             // do a single step so vehicles can be created
-            // connection.do_timestep();
 
             // spawn 50 vehicles
             for (int i = 0; i < 50; i++) {
@@ -51,9 +51,9 @@ public class Main {
             }
 
             // run simulation for 200 steps = 200 seconds
-            while (step < 36) {
+            while (step < 200) {
                 // get speed while v_0 exists
-                if (step < 36 && step > 0) {
+                if (step > 0 && step < 36) {
                     if (cars[0] != null) {
                         // will not be replaced by a procedure, as it is only used temporarily
                         // getPosition returns a 2D point which later has to be split into X and Y coordinates
@@ -74,13 +74,14 @@ public class Main {
                 // print out current time in seconds
                 double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
                 System.out.println("Time: " + timeSeconds);
-
                 step++;
                 connection.do_timestep();
             }
+            t1.printIDs(); // prints all existing trafficlights
         } catch (Exception e) {
             System.out.println("Connection failed: " + e.getMessage());
         } finally {
+
             connection.close();
         }
     }
