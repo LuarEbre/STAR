@@ -7,7 +7,7 @@ import de.tudresden.sumo.cmd.Vehicle;
 import java.awt.geom.Point2D;
 import java.util.Locale;
 
-public class Main {
+public class WrapperController {
     static void main(String[] args) {
 
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -36,6 +36,7 @@ public class Main {
 
             VehicleWrap[] cars = new VehicleWrap[50];
             TrafficLights_List t1 = new TrafficLights_List(connection);
+            Vehicle_List v1 = new Vehicle_List(connection);
 
             // do a single step so vehicles can be created
 
@@ -49,6 +50,7 @@ public class Main {
                 cars[i] = new VehicleWrap("v" + i, connection);
                 cars[i].setSpeed(10);
             }
+
 
             // run simulation for 200 steps = 200 seconds
             while (step < 200) {
