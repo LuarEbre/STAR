@@ -47,8 +47,8 @@ public class WrapperController {
             // spawn 50 vehicles
             v1.addVehicle(50, "t_0"); // type t_0 (can be chosen)
 
-            // run simulation for 200 steps = 200 seconds
-            while (step < 200) { // short demo
+            // run simulation for 360 steps = 360 seconds
+            while (step < 360) { // short demo
                 for (int i = 0; i < v1.getCount(); i++) { // for all vehicles in the list, later via gui without this loop
                     if (v1.exists("v"+i)) {
                         Point2D.Double pos = v1.getVehicle("v"+i).getPosition();
@@ -65,18 +65,15 @@ public class WrapperController {
                         );
                     }
                 }
-                for (int i = 0; i < t1.getCount(); i++) {
-                   System.out.println(""); // later for printing tl data
-                }
                 double timeSeconds = (double) connection.do_job_get(Simulation.getTime()); // later in a SumoTraciConnection class
                 System.out.println(RED + "Time: " + timeSeconds + RESET);
                 step++;
                 connection.do_timestep();
             }
+            t1.printALL(); // all traffic light data printed (later incoming edges and outgoing)
         } catch (Exception e) {
             System.out.println("Connection failed: " + e.getMessage());
         } finally {
-
             connection.close();
         }
     }

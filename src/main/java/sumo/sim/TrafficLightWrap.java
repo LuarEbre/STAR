@@ -2,12 +2,17 @@ package sumo.sim;
 
 import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.cmd.Trafficlight;
+import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoPosition2D;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class TrafficLightWrap {
+public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private final SumoTraciConnection con;
     private String id;
     private String state; // color switch e.g. "GGGrrrrr"
@@ -15,6 +20,10 @@ public class TrafficLightWrap {
     private int duration; // time
     private final Point2D.Double position; // position as a junction
 
+    // list of street objects
+    private List<Street> incomingStreets;
+    private List<Street> outgoingStreets;
+    //private List<List<SumoLink>> controlledLinks; later used for defining incoming/outgoing streets
 
     public TrafficLightWrap(String id, SumoTraciConnection con){
         this.id = id;
@@ -25,7 +34,6 @@ public class TrafficLightWrap {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public int getPhaseNumber() {
@@ -53,5 +61,6 @@ public class TrafficLightWrap {
     }
 
     public String getId() {return id;}
+    public Point2D.Double getPosition() {return position;}
 
 }
