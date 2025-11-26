@@ -13,6 +13,15 @@ public class VehicleWrap {
     private final SumoTraciConnection con;
     private boolean marked;
 
+    private double speed;
+    private double maxspeed;
+    private double minspeed;
+    private double accel;
+    private double decel;
+    private int posX;
+    private int posY;
+    private int routeId; // which route is assigned
+
     public VehicleWrap(String id , SumoTraciConnection con) {
         this.id = id;
         this.con = con;
@@ -55,5 +64,4 @@ public class VehicleWrap {
         }
     }
 
-    // boolean exists(?)
 }

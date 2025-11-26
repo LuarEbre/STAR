@@ -15,7 +15,8 @@ public class HelloApplication extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/Gui/gui.fxml"));
         Scene scene = new Scene(root);
         stage.setTitle("SUMO");
-        stage.setResizable(false);
+        //stage.setResizable(false);
+        stage.setFullScreen(true);
         stage.setScene(scene);
         stage.show();
     }
