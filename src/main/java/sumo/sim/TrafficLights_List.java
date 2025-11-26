@@ -10,6 +10,7 @@ import java.util.LinkedList;
 public class TrafficLights_List {
     private final List<TrafficLightWrap> TrafficLight_list = new LinkedList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
+    private int count;
 
     public TrafficLights_List(SumoTraciConnection con) {
         this.con = con;
@@ -17,6 +18,7 @@ public class TrafficLights_List {
             SumoStringList list = (SumoStringList) con.do_job_get(Trafficlight.getIDList()); // returns string array
             for (String id : list) {
                 TrafficLight_list.add(new TrafficLightWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
+                count++;
             }
 
         } catch (Exception e) {
@@ -24,8 +26,7 @@ public class TrafficLights_List {
         }
     }
 
-    public TrafficLightWrap getTL_action(String id) {
-        int i = 0;
+    public TrafficLightWrap getTL(String id) {
         for (TrafficLightWrap tl : TrafficLight_list) {
             if (tl.getId().equals(id)) { // searching for TrafficLight object
                 return tl;
@@ -34,9 +35,15 @@ public class TrafficLights_List {
         return null; // if not existent
     }
 
+    public int getCount() {
+        return count;
+    }
+
     public void printIDs() {
+        int counter = 0;
         for (TrafficLightWrap tl : TrafficLight_list) {
-            System.out.println("Alle Ampeln: "+ tl.getId());
+            System.out.println("Traffic lights "+  counter + ": " + tl.getId());
+            counter++;
         }
     }
 
