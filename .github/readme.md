@@ -105,6 +105,9 @@ git clone https://github.com/LuarEbre/Real-Time-Traffic-Simulation-with-Java.git
 - Allow sumo to bypass the firewall (otherwise problems might occur when trying to run the server clientside)
 ## Architecture & Technology Stack
 <p align="center">
+    <img src="architecture.png" width="470" alt="Architecture Diagram" />
+</p>
+<p align="center">
     <img src="technologystack.png" width="470" alt="Technology Stack" />
 </p>
 
