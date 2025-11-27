@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 import java.util.Locale;
 
 public class WrapperController {
-    // Colors for printing , removed later
+    // Colors for printing , to be removed later
     public static final String RED = "\u001B[31m";
     public static final String RESET = "\u001B[0m"; // white
     public static final String GREEN = "\u001B[32m";
@@ -22,58 +22,51 @@ public class WrapperController {
                 : "src/main/resources/Binaries/sumo-gui";
 
         // config knows both .rou and .net XMLs
-        String configFile = "src/main/resources/SumoConfig/Test_Map/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
 
         // create new connection with the binary and map config file
         SumoTraciConnection connection = new SumoTraciConnection(sumoBinary, configFile);
 
         try {
-            // Connection has been established
+            // add various connection options
             connection.addOption("delay", "50");
             connection.addOption("start", "true");
             connection.addOption("quit-on-end", "true");
             connection.runServer(8813);
+            // Connection has been established
             System.out.println("Connected to Sumo.");
-
-            int step = 0;
-            // do a single step so vehicles can be created
-            connection.do_timestep();
 
             // initialize list with all existing vehicles and traffic lights from .rou / .net xml files
             TrafficLights_List t1 = new TrafficLights_List(connection);
             Vehicle_List v1 = new Vehicle_List(connection);
 
-            // spawn 50 vehicles
+            // spawn 50 vehicles of type "t_0"
             v1.addVehicle(50, "t_0"); // type t_0 (can be chosen)
 
-            // run simulation for 360 steps = 360 seconds
-            while (step < 360) { // short demo
-                for (int i = 0; i < v1.getCount(); i++) { // for all vehicles in the list, later via gui without this loop
-                    if (v1.exists("v"+i)) {
-                        Point2D.Double pos = v1.getVehicle("v"+i).getPosition();
-                        System.out.printf(
-                                // forces US locale, making double values be separated via period, rather than comma
-                                Locale.US,
-                                // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
-                                "%s: speed = %05.2f, position = (%06.2f, %06.2f), angle = %06.2f%n",
-                                v1.getVehicle("v"+i).getID(),
-                                v1.getVehicle("v"+i).getSpeed(),
-                                pos.x,
-                                pos.y,
-                                v1.getVehicle("v"+i).getAngle()
-                        );
-                    }
-                }
-                double timeSeconds = (double) connection.do_job_get(Simulation.getTime()); // later in a SumoTraciConnection class
+            // iterator for steps
+            int step = 0;
+            // run simulation for 400 steps = 400 seconds
+            while (step <= 400) { // short demo
+
+                // get current time
+                double timeSeconds = (double) connection.do_job_get(Simulation.getTime()); // to be replaced by SumoTraciConnectionWrapper method
+                // print out current time
                 System.out.println(RED + "Time: " + timeSeconds + RESET);
-                step++;
+                // print out all vehicles currently on screen
+                v1.printVehicles();
+
+                // do a single step through the simulation
                 connection.do_timestep();
+                step++;
             }
-            t1.printALL(); // all traffic light data printed (later incoming edges and outgoing)
+            // print all traffic light data (later featuring phases of incoming edges)
+            t1.printALL();
         } catch (Exception e) {
             System.out.println("Connection failed: " + e.getMessage());
         } finally {
+            // Close the simulation in any case
             connection.close();
         }
     }

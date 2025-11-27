@@ -4,8 +4,10 @@ import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
+import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class Vehicle_List {
     private final List<VehicleWrap> vehicles = new LinkedList<>(); // List of Vehicles
@@ -76,6 +78,28 @@ public class Vehicle_List {
             throw new RuntimeException(e);
         }
         return false; // if despawned , delete from list?
+    }
+
+    public void printVehicles() {
+        for (int i = 0; i < this.getCount(); i++) { // for all vehicles in the list, later via gui without this loop
+            if (this.exists("v"+i)) {
+
+                VehicleWrap currVehicle = this.getVehicle("v"+i);
+                Point2D.Double pos = currVehicle.getPosition();
+
+                System.out.printf(
+                        // forces US locale, making double values be separated via period, rather than comma
+                        Locale.US,
+                        // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
+                        "            %s: speed = %05.2f, position = (%06.2f | %06.2f), angle = %06.2f%n",
+                        currVehicle.getID(),
+                        currVehicle.getSpeed(),
+                        pos.x,
+                        pos.y,
+                        currVehicle.getAngle()
+                );
+            }
+        }
     }
 
     public int getCount() {

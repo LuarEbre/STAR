@@ -51,13 +51,14 @@ public class TrafficLights_List {
     }
 
     public void printALL() { // for the demo
+        System.out.println("");
         for (TrafficLightWrap tl : trafficlights) {
             Point2D.Double pos = tl.getPosition();
             System.out.printf(
                     // forces US locale, making double values be separated via period, rather than comma
                     Locale.US,
                     // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
-                    "%s: position = (%06.2f, %06.2f)%n",
+                    "Traffic Light %s: position = (%06.2f | %06.2f)%n",
                     tl.getId(),
                     pos.x,
                     pos.y
