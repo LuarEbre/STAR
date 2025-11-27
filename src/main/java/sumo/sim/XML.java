@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.List;
 
 public class XML {
-
+// XML file read/write class
     private static File file;
     private static SAXBuilder saxBuilder;
     private static Document document;
