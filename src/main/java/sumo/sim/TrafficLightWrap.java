@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private final SumoTraciConnection con;
-    private String id;
+    private final String id;
     private String state; // color switch e.g. "GGGrrrrr"
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
