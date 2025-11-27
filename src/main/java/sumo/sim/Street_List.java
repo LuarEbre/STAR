@@ -16,7 +16,7 @@ public class Street_List {
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array
             for (String id : list) {
-                streets.add(new Street(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
+                streets.add(new Street(id, con));
                 count++;
             }
 
