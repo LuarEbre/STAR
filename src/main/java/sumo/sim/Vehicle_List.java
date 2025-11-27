@@ -12,36 +12,24 @@ import java.util.Locale;
 public class Vehicle_List {
     private final List<VehicleWrap> vehicles = new LinkedList<>(); // List of Vehicles
     private final SumoTraciConnection con; // main connection created in main wrapper
-    private int ids; // latest car id
-    private int count; // vehicles in list
+    private int count; // vehicles in list, latest car number: "v"+ count
     // needs possible routes maybe? for car creation
 
     public Vehicle_List(SumoTraciConnection con) {
-        this.ids = 0;
+        this.count = 0;
         this.con = con;
-        try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList()); // returns string array
-            for (String id : list) {
-                vehicles.add(new VehicleWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
-                count += 1;
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void addVehicle(int n, String type) { // more arguments later? maybe overloaded methods with different args.
         try {
             for (int i=0; i<n; i++) {
-                con.do_job_set(Vehicle.addFull("v" + ids, "r1", type, // ids -> latest car id
+                con.do_job_set(Vehicle.addFull("v" + count, "r1", type, // ids -> latest car id
                         "now", "0", "0", "0",
                         "current", "max", "current", "",
                         "", "", 0, 0)
                 );
-                vehicles.add(new VehicleWrap("v" + ids, con)); // adds new vehicle
-                ids++; // increment to prevent identical car ids
-                count += 1;
+                vehicles.add(new VehicleWrap("v" + count, con, type)); // adds new vehicle
+                count++; // increment to prevent identical car ids
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -80,8 +68,16 @@ public class Vehicle_List {
         return false; // if despawned , delete from list?
     }
 
+    public void updateAllVehicles() {
+        for (int i = 0; i < this.count; i++) {
+            if (this.exists("v"+i)) { // if still exists
+                getVehicle("v"+i).updateVehicle();
+            }
+        }
+    }
+
     public void printVehicles() {
-        for (int i = 0; i < this.getCount(); i++) { // for all vehicles in the list, later via gui without this loop
+        for (int i = 0; i < this.count; i++) { // for all vehicles in the list, later via gui without this loop
             if (this.exists("v"+i)) {
 
                 VehicleWrap currVehicle = this.getVehicle("v"+i);

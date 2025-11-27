@@ -6,6 +6,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import java.awt.geom.Point2D;
 import java.util.Locale;
 
+// Main Controller class connecting everything and running the sim.
 public class WrapperController {
     // Colors for printing , to be removed later
     public static final String RED = "\u001B[31m";
@@ -55,6 +56,7 @@ public class WrapperController {
                 // print out current time
                 System.out.println(RED + "Time: " + timeSeconds + RESET);
                 // print out all vehicles currently on screen
+                v1.updateAllVehicles();
                 v1.printVehicles();
 
                 // do a single step through the simulation
