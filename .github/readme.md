@@ -22,7 +22,7 @@ Developed for the **Object-Oriented Programming in Java - Advanced Course** modu
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Running](#running)
-- [Architecture](#architecture)
+- [Architecture & Technology Stack](#architecture--technology-stack)
 - [Team Members](#team-members)
 
 ## Project Description
@@ -50,10 +50,10 @@ Metrics such as average speed, vehicle density, and travel times, are displayed 
 
 ## Features
 ### Current Features
-- 1 simple, temporary map for test purposes
+- 3 simple, temporary maps for test purposes
 - Run an instance of sumo / sumo-gui (only used for visualisation until we develop our own GUI)
-- Run simulation for 200 seconds / ticks
-- Inject vehicles into a pre-determined route (from .rou.xml file)
+- Run simulation for 400 seconds / ticks
+- Inject vehicles of pre-determined type "t_0" into a pre-determined route (from .rou.xml file)
 - Print out specific cars attributes (velocity, position, angle, etc.)
 - Cleanly close simulation
 ---
@@ -97,9 +97,9 @@ Metrics such as average speed, vehicle density, and travel times, are displayed 
 ```bash
 git clone https://github.com/LuarEbre/Real-Time-Traffic-Simulation-with-Java.git Real-Time-Traffic-Simulation-with-Java
 ```
-##### 2. Run Main
+##### 2. Run WrapperController
 - Open an IDE of your choosing (IntelliJ, Eclipse, VSCode)
-- Run the class Main.java (contains public static void main(String[] args))
+- Run the class WrapperController.java (contains public static void main(String[] args))
 ##### 3. Windows Users only:
 - Allow elevator.exe to bypass Windows Defender (only if using IntelliJ)
 - Allow sumo to bypass the firewall (otherwise problems might occur when trying to run the server clientside)
