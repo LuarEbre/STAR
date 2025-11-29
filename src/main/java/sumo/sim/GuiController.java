@@ -1,16 +1,22 @@
 package sumo.sim;
 
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 public class GuiController {
+    @FXML
+    private AnchorPane dataPane;
+    @FXML
+    private AnchorPane root;
+    @FXML
+    private AnchorPane middlePane;
     // attributes from FXML to communicate with objects
     @FXML
-    public AnchorPane addMenue;
+    private AnchorPane addMenue;
     @FXML
     private ToggleButton playButton;
     @FXML
@@ -21,8 +27,6 @@ public class GuiController {
     private Label timeLabel;
     @FXML
     private Spinner <Integer> delaySelect;
-    @FXML
-    private VBox selectMenue;
 
     @FXML
     public void initialize() {
@@ -30,6 +34,9 @@ public class GuiController {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 500, 50); //min,max, start
         delaySelect.setValueFactory(valueFactory);
+
+        // scales data field
+        dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
 
     }
 
@@ -65,6 +72,11 @@ public class GuiController {
             fade.play();
             addMenue.setVisible(false);
         }
+    }
+
+    @FXML
+    protected void closeApplication() {
+        Platform.exit();
     }
 
 }

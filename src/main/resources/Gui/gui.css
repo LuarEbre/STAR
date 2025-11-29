@@ -1,4 +1,4 @@
-#frame {
+#root {
     -fx-background-color: #282828;
 }
 #menuTop {
@@ -7,6 +7,24 @@
 
 #menuTop1 {
     -fx-text-fill: white;
+}
+
+#listData {
+    -fx-background-color: #282828
+}
+
+#middlePane {
+    -fx-background-color: #282828;
+}
+
+#dataPane {
+    -fx-background-color: #282828;
+}
+
+#dataSep .line {
+    -fx-background-color: #202020;
+    -fx-border-color: #202020;
+    -fx-border-width: 2
 }
 
 #topSep .line {
@@ -54,13 +72,72 @@
 }
 
 #selectButton {
-    -fx-graphic: url("pointer.png");
+    -fx-background-image: url("pointer3.png");
+    -fx-background-size: 50px 50px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
 }
 
-#addMenue {
+#selectButton:hover {
+    -fx-background-image: url("pointer2.png");
+    -fx-background-size: 48px 48px;
+}
+#selectButton:selected {
+    -fx-background-image: url("pointer2.png");
+    -fx-background-size: 48px 48px;
+}
+
+
+#addButton {
+    -fx-background-image: url("plus.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#addButton:hover{
+    -fx-background-image: url("plus.png");
+    -fx-background-size: 62px 62px;
+}
+
+#playButton {
+    -fx-background-image: url("play.png");
+    -fx-background-size: 48px 48px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#playButton:hover {
+    -fx-background-image: url("play.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+#playButton:selected {
+    -fx-background-image: url("pause.png");
+    -fx-background-size: 64px 64px;
+}
+
+#stressTestButton {
+    -fx-background-image: url("stressTest.png");
+    -fx-background-size: 48px 48px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#stressTestButton:hover {
+    -fx-background-image: url("carIcon.png");
+}
+#stressTestButton:selected {
+    -fx-background-image: url("carIcon.png");
+}
+
+#addMenue { /* add button */
     -fx-background-color: #383838;
     -fx-border-color: #EE82EE, #720e9e;
     -fx-border-width: 3, 2;
     -fx-border-insets: 0, 3;
     -fx-border-style: solid, solid;
+    -fx-border-radius: 30;
+    -fx-background-radius: 30;
 }

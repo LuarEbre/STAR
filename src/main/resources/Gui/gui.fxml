@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -13,11 +14,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane fx:id="frame" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
       <MenuBar fx:id="menuTop" layoutX="675.0" layoutY="1.0" prefHeight="29.0" prefWidth="265.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
-          <Menu fx:id="menuTop1" mnemonicParsing="false" text="File">
+          <Menu fx:id="menuTop1" mnemonicParsing="false" text="Map">
             <items>
               <MenuItem mnemonicParsing="false" text="Close" />
                   <SeparatorMenuItem mnemonicParsing="false" />
@@ -29,11 +30,16 @@
               <MenuItem mnemonicParsing="false" text="Delete" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Help">
+          <Menu mnemonicParsing="false" text="View">
             <items>
               <MenuItem mnemonicParsing="false" text="About" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeApplication" text="Close" />
+               </items>
+            </Menu>
         </menus>
       </MenuBar>
       <Separator fx:id="topSep" layoutY="27.0" prefHeight="0.0" prefWidth="941.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="27.0" />
@@ -43,8 +49,8 @@
 
                <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                <ToggleButton fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+               <ToggleButton fx:id="playButton" mnemonicParsing="false" onAction="#onPlayStart" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
-               <ToggleButton fx:id="button" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                 <Button fx:id="extraButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
            </children>
@@ -57,13 +63,22 @@
        <Spinner fx:id="delaySelect" editable="true" layoutX="51.0" layoutY="1.0" prefHeight="26.0" prefWidth="70.0" AnchorPane.leftAnchor="51.0" AnchorPane.topAnchor="0.0" />
       <Label fx:id="timeLabel" layoutX="15.0" layoutY="5.0" text="Time" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="5.0" />
       <Label fx:id="delayMSLabel" layoutX="128.0" layoutY="4.0" prefHeight="18.0" prefWidth="62.0" text="ms-delay" AnchorPane.leftAnchor="128.0" AnchorPane.topAnchor="4.0" />
-      <AnchorPane fx:id="addMenue" layoutX="373.0" layoutY="186.0" prefHeight="306.0" prefWidth="299.0" visible="false">
+      <AnchorPane fx:id="middlePane" layoutY="30.4" prefHeight="439.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
          <children>
-            <Button layoutX="227.0" layoutY="267.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="52.0" text="ADD" />
-            <Separator layoutY="260.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.bottomAnchor="43.199999999999974" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-            <Button layoutX="119.0" layoutY="271.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="TrafficLight" />
-            <Button layoutX="23.0" layoutY="271.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Vehicle" />
-         </children>
-      </AnchorPane>
+            <AnchorPane fx:id="dataPane" prefHeight="439.0" prefWidth="200.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                   <ListView fx:id="listData" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                   <Separator fx:id="dataSep" layoutX="183.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+            </AnchorPane>
+         </children></AnchorPane>
+       <AnchorPane fx:id="addMenue" layoutX="153.0" layoutY="177.0" prefHeight="306.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.60000000000002">
+           <children>
+               <Button layoutX="227.0" layoutY="267.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="52.0" text="ADD" />
+               <Separator layoutY="260.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.bottomAnchor="43.199999999999974" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <Button layoutX="119.0" layoutY="271.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="TrafficLight" />
+               <Button layoutX="23.0" layoutY="271.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Vehicle" />
+           </children>
+       </AnchorPane>
    </children>
 </AnchorPane>
