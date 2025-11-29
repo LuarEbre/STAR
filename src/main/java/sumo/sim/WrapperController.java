@@ -39,6 +39,9 @@ public class WrapperController {
             // Connection has been established
             System.out.println("Connected to Sumo.");
 
+            //add CSV file reader to add stats
+            CSV csv = new CSV("src/main/resources/Statistics/test.csv");
+
             // initialize list with all existing vehicles and traffic lights from .rou / .net xml files
             TrafficLights_List t1 = new TrafficLights_List(connection);
             Vehicle_List v1 = new Vehicle_List(connection);
@@ -65,9 +68,16 @@ public class WrapperController {
             }
             // print all traffic light data (later featuring phases of incoming edges)
             t1.printALL();
+
+            //adds new data of every vehicle to csv
+            csv.add_to_CsvFile(v1.getVehiclesData());
+            csv.add_to_CsvFile(t1.getTrafficLightsData());
+            csv.close();
+
         } catch (Exception e) {
             System.out.println("Connection failed: " + e.getMessage());
         } finally {
+
             // Close the simulation in any case
             connection.close();
         }
