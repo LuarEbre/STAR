@@ -1,98 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="546.0" prefWidth="883.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="frame" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
-      <SplitPane dividerPositions="0.2" layoutY="26.0" prefHeight="392.0" prefWidth="883.0" AnchorPane.bottomAnchor="128.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="26.0">
-        <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <ListView prefHeight="418.4" prefWidth="173.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-            </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <Canvas height="417.0" layoutY="0.8" width="702.0" AnchorPane.rightAnchor="0.0" />
-               </children>
-            </AnchorPane>
-        </items>
-      </SplitPane>
-      <Slider layoutX="168.8" layoutY="7.0" max="1000.0" prefHeight="14.0" prefWidth="242.0" value="100.0" AnchorPane.leftAnchor="169.0" AnchorPane.topAnchor="7.0" />
-      <Label layoutX="8.0" layoutY="7.0" prefHeight="16.0" prefWidth="34.0" text="Time: " AnchorPane.leftAnchor="6.999999999999979" AnchorPane.topAnchor="7.0" />
-      <Label layoutX="41.0" layoutY="6.0" prefHeight="18.0" prefWidth="76.0" text="00:00:00" AnchorPane.leftAnchor="41.0" AnchorPane.topAnchor="7.0" />
-      <Label layoutX="410.0" layoutY="6.0" prefHeight="18.0" prefWidth="61.0" text="100ms" AnchorPane.leftAnchor="410.0" AnchorPane.topAnchor="7.0" />
-      <HBox layoutY="430.0" prefHeight="117.0" prefWidth="883.0" spacing="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <children>
-            <Button mnemonicParsing="false" prefHeight="70.0" prefWidth="155.0" text="Select" />
-            <Button mnemonicParsing="false" prefHeight="70.0" prefWidth="155.0" text="Stop/Start" />
-            <Button mnemonicParsing="false" prefHeight="70.0" prefWidth="155.0" text="Edit" />
-            <Button mnemonicParsing="false" prefHeight="70.0" prefWidth="155.0" text="Add" />
-         </children>
-         <padding>
-            <Insets bottom="23.0" left="25.0" right="25.0" top="23.0" />
-         </padding>
-      </HBox>
-      <MenuBar layoutX="750.0" layoutY="1.0" prefHeight="26.0" prefWidth="207.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <MenuBar fx:id="menuTop" layoutX="675.0" layoutY="1.0" prefHeight="29.0" prefWidth="265.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
-          <Menu mnemonicParsing="false" text="Filters">
-               <items>
-                  <Menu mnemonicParsing="false" text="Color">
-                    <items>
-                        <CheckMenuItem mnemonicParsing="false" text="Green" />
-                        <CheckMenuItem mnemonicParsing="false" text="Blue" />
-                        <CheckMenuItem mnemonicParsing="false" text="Yellow" />
-                        <CheckMenuItem mnemonicParsing="false" text="Red" />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Speed">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Speed_val">
-                           <graphic>
-                              <Slider />
-                           </graphic>
-                        </MenuItem>
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Location">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                    </items>
-                  </Menu>
-               </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Map">
+          <Menu fx:id="menuTop1" mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Map 1" />
-                  <MenuItem mnemonicParsing="false" text="Map 2" />
+              <MenuItem mnemonicParsing="false" text="Close" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Reset">
+          <Menu mnemonicParsing="false" text="Edit">
             <items>
-              <MenuItem mnemonicParsing="false" text="Reset filters" />
-                  <MenuItem mnemonicParsing="false" text="Clear" />
+              <MenuItem mnemonicParsing="false" text="Delete" />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="View">
-               <items>
-                  <MenuItem mnemonicParsing="false" text="Reset filters" />
-                  <MenuItem mnemonicParsing="false" text="Clear" />
-               </items>
-            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
         </menus>
       </MenuBar>
+      <Separator fx:id="topSep" layoutY="27.0" prefHeight="0.0" prefWidth="941.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="27.0" />
+      <Separator fx:id="bottomSep" layoutX="6.0" layoutY="470.0" prefHeight="3.0" prefWidth="930.0" AnchorPane.bottomAnchor="124.8" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+       <HBox alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="663.0" spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="278.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+           <children>
+
+               <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+               <ToggleButton fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+               <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+               <ToggleButton fx:id="button" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+                <Button fx:id="extraButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+
+           </children>
+           <padding>
+               <Insets left="20.0" right="20.0" />
+           </padding>
+       </HBox>
+
+
+       <Spinner fx:id="delaySelect" editable="true" layoutX="51.0" layoutY="1.0" prefHeight="26.0" prefWidth="70.0" AnchorPane.leftAnchor="51.0" AnchorPane.topAnchor="0.0" />
+      <Label fx:id="timeLabel" layoutX="15.0" layoutY="5.0" text="Time" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="5.0" />
+      <Label fx:id="delayMSLabel" layoutX="128.0" layoutY="4.0" prefHeight="18.0" prefWidth="62.0" text="ms-delay" AnchorPane.leftAnchor="128.0" AnchorPane.topAnchor="4.0" />
+      <AnchorPane fx:id="addMenue" layoutX="373.0" layoutY="186.0" prefHeight="306.0" prefWidth="299.0" visible="false">
+         <children>
+            <Button layoutX="227.0" layoutY="267.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="52.0" text="ADD" />
+            <Separator layoutY="260.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.bottomAnchor="43.199999999999974" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <Button layoutX="119.0" layoutY="271.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="TrafficLight" />
+            <Button layoutX="23.0" layoutY="271.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="85.0" text="Vehicle" />
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

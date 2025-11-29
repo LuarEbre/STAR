@@ -1,0 +1,66 @@
+#frame {
+    -fx-background-color: #282828;
+}
+#menuTop {
+    -fx-background-color: #202020;
+}
+
+#menuTop1 {
+    -fx-text-fill: white;
+}
+
+#topSep .line {
+    -fx-background-color: #202020;
+    -fx-border-color: #202020;
+    -fx-border-width: 2;
+}
+
+#bottomSep .line {
+    -fx-background-color: #202020;
+    -fx-border-color: #202020;
+    -fx-border-width: 2;
+}
+
+/* style class for buttons*/
+.menu-btn {
+    -fx-background-color: #383838;
+    -fx-background-radius: 15;
+    -fx-alignment: center;
+}
+
+.menu-btn:hover {
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15;
+}
+
+.menu-btn:selected {
+    -fx-background-color: grey;
+    -fx-border-color: #720e9e;
+    -fx-border-width: 4;
+    -fx-background-radius: 15;
+    -fx-border-radius: 13;
+}
+
+.menu-btn:selected:hover { /* both selected and hovered */
+    -fx-background-color: grey;
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15;
+}
+
+#selectButton {
+    -fx-graphic: url("pointer.png");
+}
+
+#addMenue {
+    -fx-background-color: #383838;
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+}

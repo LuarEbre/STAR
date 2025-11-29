@@ -5,19 +5,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.util.Objects;
 
 //GUI application
 public class GuiApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        //FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/gui.fxml"));
-        Parent root = FXMLLoader.load(getClass().getResource("/Gui/gui.fxml")); // loading from fxml
-        Scene scene = new Scene(root);
-        stage.setTitle("SUMO");
-        //stage.setResizable(false);
-        stage.setFullScreen(true);
+        // link to gui.fxml (more than one possible)
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/gui.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        // link to css file
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
+
+        // stage (frame)
+        stage.setFullScreen(true); //needs escape button to close the appl.
+        stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
+        stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
         stage.show(); // display gui
     }
