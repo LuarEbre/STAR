@@ -41,6 +41,8 @@
 
 #middlePane {
     -fx-background-color: -fx-color-grey-middle;
+    -fx-border-color:-fx-color-grey-darkest;
+    -fx-border-width: 6;
 }
 
 #dataPane {
@@ -107,6 +109,20 @@
     -fx-border-radius: 15, 13;
     -fx-background-radius: 15;
 }
+
+/* Middle style */
+.zoomMenu {
+    -fx-fill: -fx-color-grey-light ;
+    -fx-stroke: #333333;
+    -fx-stroke-width: 0;
+    -fx-cursor: hand;
+}
+
+.zoomMenu:hover {
+    /* border = stroke, needs custom one */
+}
+
+
 
 /* Main Button menus*/
 #addMenu {

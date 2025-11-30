@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class GuiController {
@@ -16,14 +18,30 @@ public class GuiController {
     @FXML
     private ToggleButton playButton, selectButton, addButton;
     @FXML
-    private Label timeLabel;
-    @FXML
     private Spinner <Integer> delaySelect;
+    @FXML
+    private Circle circ1, circ2;
+    @FXML
+    private Rectangle rect1;
 
     public void closeAllMenus() {
         if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
+        openZoomMenu();
+        // still needs fix for small gap between buttons and menus at the top
+    }
+
+    public void closeZoomMenu() {
+        circ1.setVisible(false);
+        circ2.setVisible(false);
+        rect1.setVisible(false);
+    }
+
+    public void openZoomMenu() {
+        circ1.setVisible(true);
+        circ2.setVisible(true);
+        rect1.setVisible(true);
     }
 
     @FXML
@@ -74,28 +92,31 @@ public class GuiController {
     @FXML
     protected void onFiltersHover(MouseEvent event){
         closeAllMenus();
+        closeZoomMenu();
         filtersMenuSelect.setVisible(true);
     }
     @FXML
     protected void onFilterMenuExit(MouseEvent event) {
-        filtersMenuSelect.setVisible(false);
+        closeAllMenus();
     }
 
     @FXML
     protected void onMapsHover(MouseEvent event){
         // deactivate all menus
         closeAllMenus();
+        closeZoomMenu();
         // activate Map menu
         mapMenuSelect.setVisible(true);
     }
     @FXML
     protected void onMapsMenuExit(MouseEvent event) { // needs check if mouse exited on the left
-        mapMenuSelect.setVisible(false);
+        closeAllMenus();;
     }
 
     @FXML
     protected void onViewHover(MouseEvent event){
         closeAllMenus();
+        closeZoomMenu();
         viewMenuSelect.setVisible(true);
     }
 
@@ -108,6 +129,7 @@ public class GuiController {
     @FXML
     protected void onFileHover(MouseEvent event){
         closeAllMenus();
+        closeZoomMenu();
     }
 
     @FXML
