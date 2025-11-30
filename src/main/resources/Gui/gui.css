@@ -1,0 +1,216 @@
+
+/* Menus */
+#root {
+    -fx-background-color: #282828;
+}
+/* experimental : changes cursor style when hovering over buttons
+.button {
+    -fx-cursor: hand;
+}
+*/
+#menuTop {
+    -fx-background-color: #202020;
+}
+
+#menuTop1 {
+    -fx-text-fill: white;
+}
+
+#listData {
+    -fx-background-color: #282828
+}
+
+#middlePane {
+    -fx-background-color: #282828;
+}
+
+#dataPane {
+    -fx-background-color: #282828;
+}
+
+#dataSep .line {
+    -fx-background-color: #202020;
+    -fx-border-color: #202020;
+    -fx-border-width: 2;
+}
+
+#topSep .line {
+    -fx-background-color: #202020;
+    -fx-border-color: #202020;
+    -fx-border-width: 2;
+}
+
+#bottomSep .line {
+    -fx-background-color: #202020;
+    -fx-border-color: #202020;
+    -fx-border-width: 2;
+}
+
+/*Top Menu style */
+.topmenu-button {
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+    -fx-background-color: #202020;
+}
+
+.topmenu-button:hover {
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 1, 2;
+    -fx-border-insets: 1, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+    -fx-background-radius: 15;
+}
+
+.topMenuBackground {
+    -fx-background-color: #202020;
+}
+
+.topMenuLabel {
+    -fx-text-fill: #EE82EE;
+    -fx-font-family:"Arial Black";
+}
+
+.whiteLabel {
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+.viewLabel {
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+.viewLabel:selected {
+    -fx-text-fill: #EE82EE;
+    -fx-font-family:"Arial Black";
+}
+
+.mapSelect:hover {
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 3;
+    -fx-border-insets: 0, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+    -fx-background-radius: 15;
+}
+
+/* Main Button menus*/
+#addMenu { /* add button */
+    -fx-background-color: #383838;
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 30;
+    -fx-background-radius: 30;
+}
+
+/* style class for buttons*/
+.menu-btn {
+    -fx-background-color: #383838;
+    -fx-background-radius: 15;
+    -fx-alignment: center;
+}
+
+.menu-btn:hover {
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 3;
+    -fx-border-insets: 0, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+}
+
+.menu-btn:selected {
+    -fx-background-color: grey;
+    -fx-border-color: #720e9e;
+    -fx-border-width: 4;
+    -fx-background-radius: 15;
+    -fx-border-radius: 13;
+}
+
+.menu-btn:selected:hover { /* both selected and hovered */
+    -fx-background-color: grey;
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15;
+}
+
+/* Main Buttons */
+
+#selectButton {
+    -fx-background-image: url("/Gui/Icons/pointer3.png");
+    -fx-background-size: 50px 50px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#selectButton:hover {
+    -fx-background-image: url("/Gui/Icons/pointer2.png");
+    -fx-background-size: 48px 48px;
+}
+
+#selectButton:selected {
+    -fx-background-image: url("/Gui/Icons/pointer2.png");
+    -fx-background-size: 48px 48px;
+}
+
+#addButton {
+    -fx-background-image: url("/Gui/Icons/plus.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#addButton:hover{
+    -fx-background-image: url("/Gui/Icons/plus.png");
+    -fx-background-size: 62px 62px;
+}
+
+#playButton {
+    -fx-background-image: url("/Gui/Icons/play.png");
+    -fx-background-size: 48px 48px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#playButton:hover {
+    -fx-background-image: url("/Gui/Icons/play.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+#playButton:selected {
+    -fx-background-image: url("/Gui/Icons/pause.png");
+    -fx-background-size: 64px 64px;
+}
+
+#stressTestButton {
+    -fx-background-image: url("/Gui/Icons/stressTest.png");
+    -fx-background-size: 48px 48px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#stressTestButton:hover {
+    -fx-background-image: url("/Gui/Icons/carIcon.png");
+}
+
+#stressTestButton:selected {
+    -fx-background-image: url("/Gui/Icons/carIcon.png");
+}
+
+#stepButton {
+    -fx-background-image: url("/Gui/Icons/step.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#stepButton:hover {
+    -fx-background-image: url("/Gui/Icons/step_shoe.png");
+    -fx-background-size: 48px 48px;
+}
+

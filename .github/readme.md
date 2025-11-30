@@ -76,13 +76,13 @@ Metrics such as average speed, vehicle density, and travel times, are displayed 
     * Allows for zooming, panning, and camera rotation
   * Statistical output of selected elements (vehicle / traffic light)
   <p align="center">
-    <img src="dashboard.png" width="700" alt="Map Select GUI" />
+    <img src="dashboard.png" width="700" alt="Dashboard" />
   </p>
 - Traffic light manipulation
 - Filter vehicles by attributes (color, speed, route, etc.)
 - Live statistical analysis as well as output as .csv
   <p align="center">
-    <img src="analytics.png" width="700" alt="Map Select GUI" />
+    <img src="analytics.png" width="700" alt="Analytics" />
   </p>
 ## Prerequisites
 - JDK 17+
@@ -103,7 +103,14 @@ git clone https://github.com/LuarEbre/Real-Time-Traffic-Simulation-with-Java.git
 ##### 3. Windows Users only:
 - Allow elevator.exe to bypass Windows Defender (only if using IntelliJ)
 - Allow sumo to bypass the firewall (otherwise problems might occur when trying to run the server clientside)
-## Architecture
+## Architecture & Technology Stack
+<p align="center">
+    <img src="architecture.png" width="470" alt="Architecture Diagram" />
+</p>
+<p align="center">
+    <img src="technologystack.png" width="470" alt="Technology Stack" />
+</p>
+
 ## Team Members
 ### · [Kevin Kornmann](https://github.com/sklettnov)
 ### · [Leandro Liuzzo](https://github.com/lelezss)
