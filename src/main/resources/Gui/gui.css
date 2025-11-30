@@ -3,6 +3,11 @@
 #root {
     -fx-background-color: #282828;
 }
+/* experimental : changes cursor style when hovering over buttons
+.button {
+    -fx-cursor: hand;
+}
+*/
 #menuTop {
     -fx-background-color: #202020;
 }
@@ -50,20 +55,44 @@
 
 .topmenu-button:hover {
     -fx-border-color: #EE82EE, #720e9e;
-    -fx-border-width: 1, 1;
+    -fx-border-width: 1, 2;
     -fx-border-insets: 1, 2;
     -fx-border-style: solid, solid;
     -fx-border-radius: 15, 13;
     -fx-background-radius: 15;
 }
 
-#filtersMenuSelect {
+.topMenuBackground {
     -fx-background-color: #202020;
 }
 
-.filtersLabel {
+.topMenuLabel {
     -fx-text-fill: #EE82EE;
     -fx-font-family:"Arial Black";
+}
+
+.whiteLabel {
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+.viewLabel {
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+.viewLabel:selected {
+    -fx-text-fill: #EE82EE;
+    -fx-font-family:"Arial Black";
+}
+
+.mapSelect:hover {
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 3;
+    -fx-border-insets: 0, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+    -fx-background-radius: 15;
 }
 
 /* Main Button menus*/
@@ -109,6 +138,8 @@
     -fx-border-radius: 15;
 }
 
+/* Main Buttons */
+
 #selectButton {
     -fx-background-image: url("/Gui/Icons/pointer3.png");
     -fx-background-size: 50px 50px;
@@ -120,11 +151,11 @@
     -fx-background-image: url("/Gui/Icons/pointer2.png");
     -fx-background-size: 48px 48px;
 }
+
 #selectButton:selected {
     -fx-background-image: url("/Gui/Icons/pointer2.png");
     -fx-background-size: 48px 48px;
 }
-
 
 #addButton {
     -fx-background-image: url("/Gui/Icons/plus.png");
@@ -166,7 +197,20 @@
 #stressTestButton:hover {
     -fx-background-image: url("/Gui/Icons/carIcon.png");
 }
+
 #stressTestButton:selected {
     -fx-background-image: url("/Gui/Icons/carIcon.png");
+}
+
+#stepButton {
+    -fx-background-image: url("/Gui/Icons/step.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#stepButton:hover {
+    -fx-background-image: url("/Gui/Icons/step_shoe.png");
+    -fx-background-size: 48px 48px;
 }
 

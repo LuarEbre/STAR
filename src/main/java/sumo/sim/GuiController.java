@@ -12,7 +12,7 @@ import javafx.util.Duration;
 public class GuiController {
 
     @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect;
+    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect;
     @FXML
     private ToggleButton playButton, selectButton, addButton;
     @FXML
@@ -20,9 +20,14 @@ public class GuiController {
     @FXML
     private Spinner <Integer> delaySelect;
 
+    public void closeAllMenus() {
+        if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
+        if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
+        if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
+    }
+
     @FXML
     public void initialize() {
-        timeLabel.setText("00:00");
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 500, 50); //min,max, start
         delaySelect.setValueFactory(valueFactory);
@@ -68,6 +73,7 @@ public class GuiController {
 
     @FXML
     protected void onFiltersHover(MouseEvent event){
+        closeAllMenus();
         filtersMenuSelect.setVisible(true);
     }
     @FXML
@@ -77,21 +83,31 @@ public class GuiController {
 
     @FXML
     protected void onMapsHover(MouseEvent event){
-        filtersMenuSelect.setVisible(false);
+        // deactivate all menus
+        closeAllMenus();
+        // activate Map menu
+        mapMenuSelect.setVisible(true);
     }
     @FXML
-    protected void onMapsMenuExit(MouseEvent event) {
-
+    protected void onMapsMenuExit(MouseEvent event) { // needs check if mouse exited on the left
+        mapMenuSelect.setVisible(false);
     }
 
     @FXML
     protected void onViewHover(MouseEvent event){
-        filtersMenuSelect.setVisible(false);
+        closeAllMenus();
+        viewMenuSelect.setVisible(true);
     }
 
     @FXML
+    protected void onViewMenuExit(MouseEvent event){
+        closeAllMenus();
+    }
+
+
+    @FXML
     protected void onFileHover(MouseEvent event){
-        filtersMenuSelect.setVisible(false);
+        closeAllMenus();
     }
 
     @FXML
