@@ -1,7 +1,26 @@
-
 /* Menus */
 #root {
-    -fx-background-color: #282828;
+    /*
+    Grayscale Palette
+    */
+    -fx-color-grey-darkest: #141416;
+    -fx-color-grey-dark: #1A1A1D;
+    -fx-color-grey-middle: #2C2C30;
+    -fx-color-grey-light: #4F4E56;
+    -fx-color-grey-light-selected: #47464D;
+    -fx-color-grey-lightest: #86858E;
+    -fx-color-white: #F1F1F1;
+    /*
+    Accent Colors
+    */
+    -fx-color-red: #C14E4E;
+    -fx-color-orange: #E6992C;
+    -fx-color-magenta: #FF1CF0;
+    -fx-color-magenta-dark: #A230C8;
+    -fx-color-blue: #39BFF9;
+    -fx-color-green: #2CE658;
+
+    -fx-background-color: -fx-color-grey-dark;
 }
 /* experimental : changes cursor style when hovering over buttons
 .button {
@@ -9,85 +28,79 @@
 }
 */
 #menuTop {
-    -fx-background-color: #202020;
+    -fx-background-color: -fx-color-grey-dark;
 }
 
 #menuTop1 {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-color-grey-dark;
 }
 
 #listData {
-    -fx-background-color: #282828
+    -fx-background-color: -fx-color-grey-middle;
 }
 
 #middlePane {
-    -fx-background-color: #282828;
+    -fx-background-color: -fx-color-grey-middle;
 }
 
 #dataPane {
-    -fx-background-color: #282828;
+    -fx-background-color: -fx-color-grey-middle;
 }
 
 #dataSep .line {
-    -fx-background-color: #202020;
-    -fx-border-color: #202020;
-    -fx-border-width: 2;
+    -fx-border-color: -fx-color-grey-dark;
+    -fx-border-width: 3;
 }
 
 #topSep .line {
-    -fx-background-color: #202020;
-    -fx-border-color: #202020;
+    -fx-border-color: -fx-color-grey-darkest;
     -fx-border-width: 2;
 }
 
 #bottomSep .line {
-    -fx-background-color: #202020;
-    -fx-border-color: #202020;
+    -fx-border-color: -fx-color-grey-darkest;
     -fx-border-width: 2;
 }
 
 /*Top Menu style */
 .topmenu-button {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-color-white;
     -fx-font-family:"Arial Black";
-    -fx-background-color: #202020;
+    -fx-background-color: -fx-color-grey-darkest;
 }
 
 .topmenu-button:hover {
-    -fx-border-color: #EE82EE, #720e9e;
-    -fx-border-width: 1, 2;
-    -fx-border-insets: 1, 2;
-    -fx-border-style: solid, solid;
-    -fx-border-radius: 15, 13;
-    -fx-background-radius: 15;
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 15, 13;
 }
 
 .topMenuBackground {
-    -fx-background-color: #202020;
+    -fx-background-color: -fx-color-grey-dark;
 }
 
 .topMenuLabel {
-    -fx-text-fill: #EE82EE;
+    -fx-text-fill: -fx-color-magenta;
     -fx-font-family:"Arial Black";
 }
 
 .whiteLabel {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-color-white;
     -fx-font-family:"Arial Black";
 }
 
 .viewLabel {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-color-grey-lightest;
     -fx-font-family:"Arial Black";
 }
 
 .viewLabel:selected {
-    -fx-text-fill: #EE82EE;
+    -fx-text-fill: -fx-color-magenta;
     -fx-font-family:"Arial Black";
 }
 
 .mapSelect:hover {
-    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
     -fx-border-width: 3, 3;
     -fx-border-insets: 0, 2;
     -fx-border-style: solid, solid;
@@ -96,25 +109,26 @@
 }
 
 /* Main Button menus*/
-#addMenu { /* add button */
-    -fx-background-color: #383838;
-    -fx-border-color: #EE82EE, #720e9e;
+#addMenu {
+    /* add vehicle button */
+    -fx-background-color: -fx-color-grey-dark;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
     -fx-border-width: 3, 2;
     -fx-border-insets: 0, 3;
     -fx-border-style: solid, solid;
-    -fx-border-radius: 30;
-    -fx-background-radius: 30;
+    -fx-border-radius: 15,13;
+    -fx-background-radius: 15;
 }
 
 /* style class for buttons*/
 .menu-btn {
-    -fx-background-color: #383838;
+    -fx-background-color: -fx-color-grey-light;
     -fx-background-radius: 15;
     -fx-alignment: center;
 }
 
 .menu-btn:hover {
-    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
     -fx-border-width: 3, 3;
     -fx-border-insets: 0, 2;
     -fx-border-style: solid, solid;
@@ -122,20 +136,11 @@
 }
 
 .menu-btn:selected {
-    -fx-background-color: grey;
-    -fx-border-color: #720e9e;
+    -fx-background-color: -fx-color-grey-lightest;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
     -fx-border-width: 4;
     -fx-background-radius: 15;
     -fx-border-radius: 13;
-}
-
-.menu-btn:selected:hover { /* both selected and hovered */
-    -fx-background-color: grey;
-    -fx-border-color: #EE82EE, #720e9e;
-    -fx-border-width: 3, 2;
-    -fx-border-insets: 0, 3;
-    -fx-border-style: solid, solid;
-    -fx-border-radius: 15;
 }
 
 /* Main Buttons */
