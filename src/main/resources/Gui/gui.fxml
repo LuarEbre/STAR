@@ -13,20 +13,19 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#onMapsMenuExit" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
-      <Separator fx:id="topSep" layoutY="27.0" prefHeight="0.0" prefWidth="941.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="27.0" />
-      <Separator fx:id="bottomSep" layoutX="6.0" layoutY="470.0" prefHeight="3.0" prefWidth="930.0" AnchorPane.bottomAnchor="124.8" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-
        <HBox alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="663.0" spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="278.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
            <children>
 
                <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                <ToggleButton fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                <ToggleButton fx:id="playButton" mnemonicParsing="false" onAction="#onPlayStart" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
-               <ToggleButton fx:id="stepButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+               <Button fx:id="stepButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                 <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
            </children>
@@ -35,16 +34,16 @@
            </padding>
        </HBox>
 
-       <AnchorPane fx:id="middlePane" layoutY="30.4" onMouseEntered="#onMiddlePaneHover" prefHeight="439.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
-         <children>
-            <AnchorPane fx:id="dataPane" prefHeight="439.0" prefWidth="200.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+       <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseEntered="#onMiddlePaneHover" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
+           <children>
+            <AnchorPane fx:id="dataPane" prefHeight="439.0" prefWidth="200.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="-1.0">
                <children>
                    <ListView fx:id="listData" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                    <Separator fx:id="dataSep" layoutX="183.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" onMouseExited="#onFilterMenuExit" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" onMouseExited="#onFilterMenuExit" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <CheckBox layoutX="171.0" layoutY="32.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Color" />
                   <CheckBox layoutX="169.0" layoutY="88.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Speed" />
@@ -98,6 +97,11 @@
                   <Insets left="10.0" />
                </padding>
             </AnchorPane>
+
+             <Circle fx:id="circ1" fill="DODGERBLUE" layoutX="903.0" layoutY="178.0" radius="21.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" AnchorPane.rightAnchor="17.0" />
+            <Circle fx:id="circ2" fill="DODGERBLUE" layoutX="903.0" layoutY="262.0" radius="21.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" AnchorPane.rightAnchor="17.0" />
+             <Rectangle fx:id="rect1" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="82.0" layoutX="882.0" layoutY="178.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" width="42.0" AnchorPane.rightAnchor="17.0" />
+
          </children>
       </AnchorPane>
 
@@ -110,17 +114,17 @@
            </children>
        </AnchorPane>
 
-      <HBox fx:id="topMenuBox" layoutX="701.0" layoutY="-5.0" prefHeight="30.0" prefWidth="280.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox fx:id="topMenuBox" layoutX="701.0" layoutY="-5.0" prefHeight="27.0" prefWidth="280.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Pane fx:id="exitTopMenu" onMouseEntered="#closeAllMenus" prefHeight="30.0" prefWidth="14.0" />
-            <Button mnemonicParsing="false" onMouseEntered="#onMapsHover" prefWidth="70.0" styleClass="topmenu-button" text="Map" />
-            <Button mnemonicParsing="false" onMouseEntered="#onFiltersHover" prefWidth="70.0" styleClass="topmenu-button" text="Filters" />
-            <Button mnemonicParsing="false" onMouseEntered="#onViewHover" prefWidth="70.0" styleClass="topmenu-button" text="View" />
-            <Button mnemonicParsing="false" onAction="#closeApplication" onMouseEntered="#onFileHover" prefWidth="70.0" styleClass="topmenu-button" text="File" />
+            <Button mnemonicParsing="false" onMouseEntered="#onMapsHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
+            <Button mnemonicParsing="false" onMouseEntered="#onFiltersHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
+            <Button mnemonicParsing="false" onMouseEntered="#onViewHover" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
+            <Button mnemonicParsing="false" onAction="#closeApplication" onMouseEntered="#onFileHover" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
          </children>
       </HBox>
 
-      <HBox fx:id="topLeftMenu" layoutY="1.0" prefHeight="27.0" prefWidth="238.0" spacing="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1.0">
+      <HBox fx:id="topLeftMenu" layoutY="1.0" prefHeight="12.0" prefWidth="238.0" spacing="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1.0">
          <children>
             <Label fx:id="timeLabel" prefHeight="18.0" prefWidth="63.0" styleClass="whiteLabel" text="00:00:00">
                <HBox.margin>
@@ -128,7 +132,7 @@
                </HBox.margin>
             </Label>
       
-             <Spinner fx:id="delaySelect" prefHeight="26.0" prefWidth="70.0">
+             <Spinner fx:id="delaySelect" prefHeight="0.0" prefWidth="66.0">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
@@ -140,6 +144,5 @@
             </Label>
          </children>
       </HBox>
-
    </children>
 </AnchorPane>
