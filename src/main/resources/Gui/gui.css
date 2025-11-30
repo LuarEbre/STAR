@@ -1,3 +1,5 @@
+
+/* Menus */
 #root {
     -fx-background-color: #282828;
 }
@@ -24,7 +26,7 @@
 #dataSep .line {
     -fx-background-color: #202020;
     -fx-border-color: #202020;
-    -fx-border-width: 2
+    -fx-border-width: 2;
 }
 
 #topSep .line {
@@ -39,6 +41,42 @@
     -fx-border-width: 2;
 }
 
+/*Top Menu style */
+.topmenu-button {
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+    -fx-background-color: #202020;
+}
+
+.topmenu-button:hover {
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 1, 1;
+    -fx-border-insets: 1, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+    -fx-background-radius: 15;
+}
+
+#filtersMenuSelect {
+    -fx-background-color: #202020;
+}
+
+.filtersLabel {
+    -fx-text-fill: #EE82EE;
+    -fx-font-family:"Arial Black";
+}
+
+/* Main Button menus*/
+#addMenu { /* add button */
+    -fx-background-color: #383838;
+    -fx-border-color: #EE82EE, #720e9e;
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 30;
+    -fx-background-radius: 30;
+}
+
 /* style class for buttons*/
 .menu-btn {
     -fx-background-color: #383838;
@@ -48,10 +86,10 @@
 
 .menu-btn:hover {
     -fx-border-color: #EE82EE, #720e9e;
-    -fx-border-width: 3, 2;
-    -fx-border-insets: 0, 3;
+    -fx-border-width: 3, 3;
+    -fx-border-insets: 0, 2;
     -fx-border-style: solid, solid;
-    -fx-border-radius: 15;
+    -fx-border-radius: 15, 13;
 }
 
 .menu-btn:selected {
@@ -72,72 +110,63 @@
 }
 
 #selectButton {
-    -fx-background-image: url("pointer3.png");
+    -fx-background-image: url("/Gui/Icons/pointer3.png");
     -fx-background-size: 50px 50px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center
 }
 
 #selectButton:hover {
-    -fx-background-image: url("pointer2.png");
+    -fx-background-image: url("/Gui/Icons/pointer2.png");
     -fx-background-size: 48px 48px;
 }
 #selectButton:selected {
-    -fx-background-image: url("pointer2.png");
+    -fx-background-image: url("/Gui/Icons/pointer2.png");
     -fx-background-size: 48px 48px;
 }
 
 
 #addButton {
-    -fx-background-image: url("plus.png");
+    -fx-background-image: url("/Gui/Icons/plus.png");
     -fx-background-size: 56px 56px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #addButton:hover{
-    -fx-background-image: url("plus.png");
+    -fx-background-image: url("/Gui/Icons/plus.png");
     -fx-background-size: 62px 62px;
 }
 
 #playButton {
-    -fx-background-image: url("play.png");
+    -fx-background-image: url("/Gui/Icons/play.png");
     -fx-background-size: 48px 48px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center
 }
 
 #playButton:hover {
-    -fx-background-image: url("play.png");
+    -fx-background-image: url("/Gui/Icons/play.png");
     -fx-background-size: 56px 56px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center
 }
 #playButton:selected {
-    -fx-background-image: url("pause.png");
+    -fx-background-image: url("/Gui/Icons/pause.png");
     -fx-background-size: 64px 64px;
 }
 
 #stressTestButton {
-    -fx-background-image: url("stressTest.png");
+    -fx-background-image: url("/Gui/Icons/stressTest.png");
     -fx-background-size: 48px 48px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center
 }
 
 #stressTestButton:hover {
-    -fx-background-image: url("carIcon.png");
+    -fx-background-image: url("/Gui/Icons/carIcon.png");
 }
 #stressTestButton:selected {
-    -fx-background-image: url("carIcon.png");
+    -fx-background-image: url("/Gui/Icons/carIcon.png");
 }
 
-#addMenue { /* add button */
-    -fx-background-color: #383838;
-    -fx-border-color: #EE82EE, #720e9e;
-    -fx-border-width: 3, 2;
-    -fx-border-insets: 0, 3;
-    -fx-border-style: solid, solid;
-    -fx-border-radius: 30;
-    -fx-background-radius: 30;
-}

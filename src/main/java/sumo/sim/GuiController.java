@@ -4,25 +4,17 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
 public class GuiController {
+
     @FXML
-    private AnchorPane dataPane;
+    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect;
     @FXML
-    private AnchorPane root;
-    @FXML
-    private AnchorPane middlePane;
-    // attributes from FXML to communicate with objects
-    @FXML
-    private AnchorPane addMenue;
-    @FXML
-    private ToggleButton playButton;
-    @FXML
-    private ToggleButton selectButton;
-    @FXML
-    private ToggleButton addButton;
+    private ToggleButton playButton, selectButton, addButton;
     @FXML
     private Label timeLabel;
     @FXML
@@ -60,9 +52,9 @@ public class GuiController {
 
     @FXML
     protected void onAdd(){ // experimental animation
-        FadeTransition fade = new FadeTransition(Duration.millis(200), addMenue);
+        FadeTransition fade = new FadeTransition(Duration.millis(200), addMenu);
         if (addButton.isSelected()) { // toggled
-            addMenue.setVisible(true);
+            addMenu.setVisible(true);
             fade.setFromValue(0);
             fade.setToValue(1);
             fade.play();
@@ -70,12 +62,45 @@ public class GuiController {
             fade.setFromValue(1);
             fade.setToValue(0);
             fade.play();
-            addMenue.setVisible(false);
+            addMenu.setVisible(false);
         }
     }
 
     @FXML
-    protected void closeApplication() {
+    protected void onFiltersHover(MouseEvent event){
+        filtersMenuSelect.setVisible(true);
+    }
+    @FXML
+    protected void onFilterMenuExit(MouseEvent event) {
+        filtersMenuSelect.setVisible(false);
+    }
+
+    @FXML
+    protected void onMapsHover(MouseEvent event){
+        filtersMenuSelect.setVisible(false);
+    }
+    @FXML
+    protected void onMapsMenuExit(MouseEvent event) {
+
+    }
+
+    @FXML
+    protected void onViewHover(MouseEvent event){
+        filtersMenuSelect.setVisible(false);
+    }
+
+    @FXML
+    protected void onFileHover(MouseEvent event){
+        filtersMenuSelect.setVisible(false);
+    }
+
+    @FXML
+    protected void onMiddlePaneHover(){
+
+    }
+
+    @FXML
+    protected void closeApplication() { // later extra button in file
         Platform.exit();
     }
 
