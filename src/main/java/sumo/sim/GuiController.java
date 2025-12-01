@@ -3,7 +3,10 @@ package sumo.sim;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -23,6 +26,16 @@ public class GuiController {
     private Circle circ1, circ2;
     @FXML
     private Rectangle rect1;
+    @FXML
+    private Canvas map;
+    @FXML
+    private Label timeLabel;
+
+    private final WrapperController wrapperController;
+
+    public GuiController(WrapperController wrapperController) {
+        this.wrapperController = wrapperController;
+    }
 
     public void closeAllMenus() {
         if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
@@ -44,6 +57,11 @@ public class GuiController {
         rect1.setVisible(true);
     }
 
+    private void redraw(GraphicsContext gc, Image img) {
+        gc.clearRect(0, 0, map.getWidth(), map.getHeight());
+        gc.drawImage(img, 0, 0, map.getWidth(), map.getHeight());
+    }
+
     @FXML
     public void initialize() {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
@@ -52,6 +70,23 @@ public class GuiController {
 
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
+
+        GraphicsContext gc = map.getGraphicsContext2D();
+        Image img = new Image("/Gui/Render/mapEx.png");
+
+        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
+        map.heightProperty().bind(middlePane.heightProperty().multiply(0.98));
+
+        map.widthProperty().addListener((obs, oldV, newV) -> {
+            redraw(gc, img);
+        });
+        map.heightProperty().addListener((obs, oldV, newV) -> {
+            redraw(gc, img);
+        });
+
+        middlePane.sceneProperty().addListener((obs, oldV, newV) -> {
+            if (newV != null) redraw(gc, img);
+        });
 
     }
 
@@ -142,5 +177,17 @@ public class GuiController {
         Platform.exit();
     }
 
+
+    // Render
+
+    public void doSimStep() {
+        updateTime();
+        // rendering?
+        // connection time_step?
+    }
+
+    public void updateTime() {
+        timeLabel.setText(""+ wrapperController.getTime());
+    }
 }
 
