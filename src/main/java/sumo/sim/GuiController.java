@@ -31,9 +31,12 @@ public class GuiController {
     @FXML
     private Label timeLabel;
 
-    private final WrapperController wrapperController;
+    private WrapperController wrapperController;
 
-    public GuiController(WrapperController wrapperController) {
+    public GuiController() {
+    }
+
+    public void setConnectionToWrapperCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
     }
 
@@ -187,7 +190,7 @@ public class GuiController {
     }
 
     public void updateTime() {
-        timeLabel.setText(""+ wrapperController.getTime());
+       // timeLabel.setText(""+ wrapperController.getTime());
     }
 }
 
