@@ -18,7 +18,8 @@ public class WrapperController {
     private final SumoTraciConnection connection;
 
     WrapperController(SumoTraciConnection connection) {
-            guiController = new GuiController(this);
+            guiController = new GuiController();
+            guiController.setConnectionToWrapperCon(this); // isnt allowed in gui controller constructor -> so
             this.connection = connection;
     }
 
