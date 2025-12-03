@@ -5,8 +5,8 @@ import java.io.IOException;
 
 public class CSV {
 
-    private String File;
-    private FileWriter fw;
+    private final String File;
+    private final FileWriter fw;
 
     public CSV(String csv_file) throws IOException {
         this.File = csv_file;

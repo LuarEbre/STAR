@@ -26,7 +26,7 @@ public class XML {
     public static void insert_edge(String[] args) throws Exception {
 
         // Root holen (sollte <net> sein)
-        Element root = document.getRootElement();
+        Element root = document.getRootElement();Sonnenschein Verteilung
 
         // Neuen Edge erstellen
         Element edge = new Element("edge");
