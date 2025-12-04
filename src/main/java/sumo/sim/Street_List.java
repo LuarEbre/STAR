@@ -5,14 +5,14 @@ import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Street_List {
     // List of streets (like TL_List)
-    private final List<Street> streets = new LinkedList<>(); // List of TrafficLights
+    private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
-
     public Street_List(SumoTraciConnection con) {
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array

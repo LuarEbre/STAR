@@ -34,6 +34,7 @@ public class GuiController {
     private WrapperController wrapperController;
 
     public GuiController() {
+
     }
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
@@ -74,6 +75,7 @@ public class GuiController {
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
 
+        /*
         GraphicsContext gc = map.getGraphicsContext2D();
         Image img = new Image("/Gui/Render/mapEx.png");
 
@@ -90,7 +92,7 @@ public class GuiController {
         middlePane.sceneProperty().addListener((obs, oldV, newV) -> {
             if (newV != null) redraw(gc, img);
         });
-
+            */
     }
 
     @FXML
@@ -105,10 +107,15 @@ public class GuiController {
     @FXML
     protected void onSelect(){
         if (selectButton.isSelected()) { // toggled
-            System.out.println("Started");
+
         } else {
             System.out.println("Stopped");
         }
+    }
+
+    @FXML
+    protected void onStep() {
+        wrapperController.addVehicle();
     }
 
     @FXML
@@ -178,6 +185,7 @@ public class GuiController {
     @FXML
     protected void closeApplication() { // later extra button in file
         Platform.exit();
+        wrapperController.terminate();
     }
 
 
@@ -190,7 +198,14 @@ public class GuiController {
     }
 
     public void updateTime() {
-       // timeLabel.setText(""+ wrapperController.getTime());
+        // exception handling needed -> if getTime connection is closed
+        int time = (int) wrapperController.getTime();
+        StringBuilder b1 = new StringBuilder();
+        int hours = time / 3600; // every 3600 ms is one hour
+        int minutes = time % 3600 / 60; // minutes 0 to 3599 / 60
+        int seconds =  time % 60; // seconds 0 - 59
+        b1.append(String.format("%02d:%02d:%02d", hours, minutes, seconds));
+        timeLabel.setText(b1.toString());
     }
 }
 

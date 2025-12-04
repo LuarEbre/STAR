@@ -5,12 +5,14 @@ import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.ArrayList;
 
 public class Vehicle_List {
-    private final List<VehicleWrap> vehicles = new LinkedList<>(); // List of Vehicles
+    private final ArrayList<VehicleWrap> vehicles = new ArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con; // main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     // needs possible routes maybe? for car creation

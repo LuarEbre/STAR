@@ -1,6 +1,5 @@
 package sumo.sim;
 
-import de.tudresden.sumo.cmd.Edge;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 public class Street {
@@ -16,7 +15,7 @@ public class Street {
         this.id = id;
         this.con = con;
         try {
-            xml = new XML(SumoConnection.get_current_net_config());
+            xml = new XML(WrapperController.get_current_net());
             this.fromJunction = xml.get_from_junction(id);
             this.toJunction = xml.get_to_junction(id);
         } catch (Exception e) {
@@ -32,11 +31,9 @@ public class Street {
         return fromJunction;
     }
 
+    public Street getStreet() { return this; }
+
     public String getToJunction() {
         return toJunction;
     }
-
-
 }
-
-
