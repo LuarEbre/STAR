@@ -23,6 +23,7 @@ public class WrapperController {
     public static final String YELLOW = "\u001B[33m";
     private final SumoTraciConnection connection;
     private final GuiController guiController;
+    private Street_List sl;
     private TrafficLights_List tl;
     private Vehicle_List vl;
     private boolean terminated;
@@ -61,7 +62,8 @@ public class WrapperController {
         // Connection has been established
         System.out.println("Connected to Sumo.");
         vl = new Vehicle_List(connection);
-        tl = new TrafficLights_List(connection);
+        sl = new Street_List(this.connection);
+        tl = new TrafficLights_List(connection, sl);
         start();
     }
 
