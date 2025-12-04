@@ -12,6 +12,7 @@ public class Street_List {
     // List of streets (like TL_List)
     private final List<Street> streets = new LinkedList<>(); // List of TrafficLights
     private int count;
+
     public Street_List(SumoTraciConnection con) {
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array
@@ -32,5 +33,16 @@ public class Street_List {
             }
         }
         return null;
+    }
+
+    public List<Street> getStreets() {
+        return streets;
+    }
+
+    public void test_print() {
+        for (Street s : streets) {
+            System.out.println(s.getFromJunction());
+            System.out.println(s.getToJunction());
+        }
     }
 }
