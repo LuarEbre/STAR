@@ -66,4 +66,23 @@ public class TrafficLights_List {
         }
     }
 
+    public String getTrafficLightsData() {
+        StringBuilder sb = new StringBuilder();
+
+        for (TrafficLightWrap tl : trafficlights) {
+            Point2D.Double pos = tl.getPosition();
+
+            sb.append(tl.getId()).append(",");
+            sb.append(pos.x).append(",");
+            sb.append(pos.y).append(",");
+            sb.append(tl.getPhaseNumber()).append(",");
+
+            sb.append("\n");
+
+        }
+        return sb.toString();
+    }
+
+
+
 }

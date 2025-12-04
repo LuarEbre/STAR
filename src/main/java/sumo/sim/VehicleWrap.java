@@ -16,17 +16,24 @@ public class VehicleWrap {
     private boolean marked;
 
     private double speed;
-    private double maxspeed;
     private double accel;
     private double decel;
     private Point2D.Double position;
     private double angle;
     private int routeId; // which route is assigned
 
+    private int number_stops;
+    private double stop_time;
+    private double maxspeed;
+    private boolean active_last_frame;
+
     public VehicleWrap(String id , SumoTraciConnection con, String type) {
         this.id = id;
         this.con = con;
         this.type = type;
+
+        this.maxspeed = 0.0;
+        this.active_last_frame = false;
         updateVehicle();
     }
 
@@ -36,6 +43,22 @@ public class VehicleWrap {
             SumoPosition2D pos2D = (SumoPosition2D)con.do_job_get(Vehicle.getPosition(id)); // casted on SumoPosition2d
             this.position = new Point2D.Double(pos2D.x, pos2D.y); // SumoPosition values stored in Point2d object
             this.angle = (double)con.do_job_get(Vehicle.getAngle(id));
+
+            if(this.speed > 0){
+                this.maxspeed = speed;
+            }
+
+            if(this.speed == 0){
+                stop_time++;
+                if(active_last_frame == true){
+                    number_stops++;
+                }
+            }
+
+            if(this.speed > 0){
+                active_last_frame = true;
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -47,6 +70,9 @@ public class VehicleWrap {
     public String getID() {return id;}
     public String getType() {return type;}
     public boolean isMarked() {return marked;} // maybe return object? -> marked (by which filter) and which color
+    public int getNumber_stops() {return number_stops;}
+    public double getStop_time() {return stop_time;}
+    public double getMaxspeed() {return maxspeed;}
 
     public void setSpeed(double speed) {
         try {
