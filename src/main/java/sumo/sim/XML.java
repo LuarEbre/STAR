@@ -20,6 +20,7 @@ public class XML {
 
         saxBuilder = new SAXBuilder();
         document = saxBuilder.build(file);
+
     }
 
     /*
@@ -125,5 +126,30 @@ public class XML {
         return vehicles;
     }
 
+    public String get_from_junction(String id){
+        Element root = document.getRootElement();
+        List<Element> children = root.getChildren("edge");
+
+        for(Element i : children){
+            if(id.equals(i.getAttributeValue("id"))){
+                return i.getAttributeValue("from");
+            }
+        }
+        return null;
+    }
+
+    public String get_to_junction(String id){
+        Element root = document.getRootElement();
+        String to = null;
+
+        List<Element> children = root.getChildren("edge");
+
+        for(Element i : children){
+            if(id.equals(i.getAttributeValue("id"))){
+                return i.getAttributeValue("to");
+            }
+        }
+        return null;
+    }
 
 }
