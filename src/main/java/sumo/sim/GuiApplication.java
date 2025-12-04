@@ -27,13 +27,14 @@ public class GuiApplication extends Application {
         guiController = fxmlLoader.getController();
 
         // stage (frame)
-        stage.setFullScreen(true); //needs escape button to close the appl.
+       // stage.setFullScreen(true); //needs escape button to close the appl.
         stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
-        stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
+        //stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
         stage.show(); // display gui
 
         WrapperController wrapper = new WrapperController(guiController);
         guiController.setConnectionToWrapperCon(wrapper);
+
     }
 }
