@@ -34,6 +34,7 @@ public class GuiController {
     private WrapperController wrapperController;
 
     public GuiController() {
+
     }
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
@@ -74,6 +75,7 @@ public class GuiController {
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
 
+        /*
         GraphicsContext gc = map.getGraphicsContext2D();
         Image img = new Image("/Gui/Render/mapEx.png");
 
@@ -90,7 +92,7 @@ public class GuiController {
         middlePane.sceneProperty().addListener((obs, oldV, newV) -> {
             if (newV != null) redraw(gc, img);
         });
-
+            */
     }
 
     @FXML
@@ -178,6 +180,7 @@ public class GuiController {
     @FXML
     protected void closeApplication() { // later extra button in file
         Platform.exit();
+        wrapperController.terminate();
     }
 
 

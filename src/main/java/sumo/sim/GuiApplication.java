@@ -14,6 +14,8 @@ import java.util.Objects;
 
 //GUI application
 public class GuiApplication extends Application {
+    private static GuiController guiController; // static because you dont instance guiCon -> javafx instances the controller
+
     @Override
     public void start(Stage stage) throws IOException {
         // link to gui.fxml (more than one possible)
@@ -22,6 +24,7 @@ public class GuiApplication extends Application {
         // link to css file
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
         scene.setCursor(new ImageCursor(new Image("/Gui/Icons/cursor.png",  128, 128, true, true))); // changes cursor style
+        guiController = fxmlLoader.getController();
 
         // stage (frame)
         stage.setFullScreen(true); //needs escape button to close the appl.
@@ -29,5 +32,8 @@ public class GuiApplication extends Application {
         stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
         stage.show(); // display gui
+
+        WrapperController wrapper = new WrapperController(guiController);
+        guiController.setConnectionToWrapperCon(wrapper);
     }
 }
