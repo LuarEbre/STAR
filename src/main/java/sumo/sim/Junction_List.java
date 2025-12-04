@@ -6,10 +6,14 @@ import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.*;
 
 public class Junction_List {
-    private final Set<JunctionWrap> junctions = new HashSet<>();
+    //private final Set<JunctionWrap> junctions = new HashSet<>();
+    private final ArrayList<JunctionWrap> junctions = new ArrayList<>(); // List of TrafficLights
     private int count;
     private Map<String, Set<String>> adjacency = new HashMap<>();
     private Street_List streets;
@@ -57,7 +61,7 @@ public class Junction_List {
         }
     }
 
-    public Set<JunctionWrap> getJunctions() {
+    public ArrayList<JunctionWrap> getJunctions() {
         return junctions;
     }
 

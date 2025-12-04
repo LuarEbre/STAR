@@ -5,25 +5,27 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Trafficlight;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Locale;
 
 
 public class TrafficLights_List {
-    private final List<TrafficLightWrap> trafficlights = new LinkedList<>(); // List of TrafficLights
+    public final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
+    private final Street_List streetList;
     private int count;
 
-    public TrafficLights_List(SumoTraciConnection con) {
+    public TrafficLights_List(SumoTraciConnection con, Street_List s1) {
         this.con = con;
+        this.streetList = s1;
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Trafficlight.getIDList()); // returns string array
             for (String id : list) {
                 trafficlights.add(new TrafficLightWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
                 count++;
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -38,9 +40,7 @@ public class TrafficLights_List {
         return null; // if not existent
     }
 
-    public int getCount() {
-        return count;
-    }
+    public int getCount() { return count; }
 
     public void printIDs() {
         int counter = 0;
@@ -83,6 +83,23 @@ public class TrafficLights_List {
         return sb.toString();
     }
 
+    public void setAllControlledStreets() {
+        try {
+            for (TrafficLightWrap tl : trafficlights) {
+                SumoStringList string = (SumoStringList) con.do_job_get(Trafficlight.getControlledLanes(tl.getId()));
+                for (String s : string) {
+                    String[] parts = s.split("_");
+                    tl.setControlledStreets(streetList.getStreet(parts[0]));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-
+    public void printAllControlledStreets() {
+        for (TrafficLightWrap tl : trafficlights) {
+            tl.printControlledStreets();
+        }
+    }
 }

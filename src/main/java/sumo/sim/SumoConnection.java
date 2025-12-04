@@ -1,4 +1,4 @@
-package sumo.sim;
+/*package sumo.sim;
 
 import it.polito.appeal.traci.SumoTraciConnection;
 
@@ -6,9 +6,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 public class SumoConnection {
     private SumoTraciConnection connection;
     private WrapperController wrapperController;
-    private static String configFile;
-    private static String rou_configFile;
-    private static String net_configFile;
+    private static String net_config =  "src/main/ressources/Binaries/test.net.xml";
 
     public SumoConnection() {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -19,9 +17,7 @@ public class SumoConnection {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
-        rou_configFile = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
-        net_configFile = "src/main/resources/SumoConfig/Map_2/test.net.xml";
+        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
 
         // create new connection with the binary and map config file
@@ -37,18 +33,9 @@ public class SumoConnection {
             connection.addOption("start", "true");
             connection.addOption("quit-on-end", "true");
             connection.runServer(8813);
-            wrapperController = new WrapperController(connection);
-
+            //wrapperController = new WrapperController(connection);
             // Connection has been established
             System.out.println("Connected to Sumo.");
-
-            Street_List sl = new Street_List(connection);
-            Junction_List jl = new Junction_List(connection, sl);
-            jl.update_adjacency();
-
-            RouteWrap route1 = Util.generate_route("J1", "J7", jl);
-            route1.printRoute();
-
         } catch (Exception e) {
             System.out.println("Connection failed: " + e.getMessage());
         } finally {
@@ -57,15 +44,8 @@ public class SumoConnection {
         }
     }
 
-    public static String get_current_config(){
-        return configFile;
-    }
-
-    public static String get_current_rou_config(){
-        return rou_configFile;
-    }
-
     public static String get_current_net_config(){
-        return net_configFile;
+        return net_config;
     }
 }
+*/
