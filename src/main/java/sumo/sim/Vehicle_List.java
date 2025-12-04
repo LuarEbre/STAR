@@ -5,12 +5,14 @@ import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.ArrayList;
 
 public class Vehicle_List {
-    private final List<VehicleWrap> vehicles = new LinkedList<>(); // List of Vehicles
+    private final ArrayList<VehicleWrap> vehicles = new ArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con; // main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     // needs possible routes maybe? for car creation
@@ -97,6 +99,28 @@ public class Vehicle_List {
             }
         }
     }
+
+    public String getVehiclesData() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < this.count; i++) {
+            VehicleWrap currVehicle = this.getVehicle("v" + i);
+            Point2D.Double pos = currVehicle.getPosition();
+
+            sb.append(currVehicle.getID()).append(",");
+            //sb.append(currVehicle.getSpeed()).append(",");
+            sb.append(currVehicle.getType()).append(",");
+            sb.append(currVehicle.getNumber_stops()).append(",");
+            sb.append(currVehicle.getStop_time()).append(",");
+            sb.append(currVehicle.getMaxspeed()).append(",");
+            //sb.append(pos.x).append(",").append(pos.y).append(",");
+            //sb.append(currVehicle.getAngle()).append("\n");
+            sb.append("\n");
+
+        }
+        return sb.toString();
+    }
+
 
     public int getCount() {
         return count;

@@ -14,6 +14,8 @@ public class Street {
     }
 
     public String getId() {
-        return "";
+        return this.id;
     }
+
+    public Street getStreet() { return this; }
 }
