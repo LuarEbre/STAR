@@ -3,6 +3,13 @@ package sumo.sim;
 import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
+
+import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import java.awt.geom.Point2D;
 import java.util.Locale;
@@ -14,12 +21,74 @@ public class WrapperController {
     public static final String RESET = "\u001B[0m"; // white
     public static final String GREEN = "\u001B[32m";
     public static final String YELLOW = "\u001B[33m";
-    private final GuiController guiController;
     private final SumoTraciConnection connection;
+    private final GuiController guiController;
+    private Street_List sl;
+    private TrafficLights_List tl;
+    private Vehicle_List vl;
+    private boolean terminated;
+    private ScheduledExecutorService executor;
+    private int delay = 2000;
 
-    WrapperController(SumoTraciConnection connection) {
-            guiController = new GuiController(this);
-            this.connection = connection;
+    public WrapperController(GuiController guiController) {
+        // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
+        String sumoBinary = Util.getOSType().equals("Windows")
+                // using sumo-gui for visualisation now, will later be replaced by our own rendered map
+                ? "src/main/resources/Binaries/sumo.exe"
+                : "src/main/resources/Binaries/sumo-gui";
+
+        // config knows both .rou and .net XMLs
+        //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
+
+        // create new connection with the binary and map config file
+        this.connection = new SumoTraciConnection(sumoBinary, configFile);
+        this.guiController = guiController;
+        this.terminated = false;
+        connectionConfig();
+    }
+
+    public void connectionConfig() {
+        // add various connection options
+        //connection.addOption("delay", "50");
+        connection.addOption("start", "true");
+        connection.addOption("quit-on-end", "true");
+        try {
+            connection.runServer(8813);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // Connection has been established
+        System.out.println("Connected to Sumo.");
+        vl = new Vehicle_List(connection);
+        sl = new Street_List(this.connection);
+        tl = new TrafficLights_List(connection, sl);
+        start();
+    }
+
+    public void start() { // maybe with connection as argument? closing connection opened prior
+        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread
+        executor.scheduleAtFixedRate(() -> {
+            if (terminated) {
+                executor.shutdownNow();
+                return;
+            }
+            try {
+                double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
+                System.out.println(RED + "Time: " + timeSeconds + RESET);
+
+                vl.updateAllVehicles();
+                vl.printVehicles();
+
+                connection.do_timestep();
+                Platform.runLater(guiController::doSimStep);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }, 0, delay, TimeUnit.MILLISECONDS); // initialdelay, delay, unit
     }
 
     // methods controlling the simulation / also connected with the guiController
@@ -30,6 +99,26 @@ public class WrapperController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void addVehicle() { // int number, String type, Color color
+        // used by guiController
+        // executes addVehicle from WrapperVehicle
+        vl.addVehicle(1, "t_0"); // type t_0 (can be chosen)
+    }
+
+    public void changeDelay(int delay) {
+        this.delay = delay;
+        if (!executor.isShutdown() && executor!= null) {
+            executor.shutdown();
+            start();
+        }
+    }
+
+    public void terminate() {
+        terminated = true;
+        // needs exception handling , or some way to correctly terminate javafx thread
+        connection.close();
     }
 
 
