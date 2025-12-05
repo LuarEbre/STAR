@@ -32,7 +32,7 @@ public class WrapperController {
     private boolean paused;
     private double simTime;
 
-    public static String curr_net = "src/main/resources/Binaries/test.net.xml";
+    public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
