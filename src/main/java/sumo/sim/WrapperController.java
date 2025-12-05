@@ -28,7 +28,9 @@ public class WrapperController {
     private Vehicle_List vl;
     private boolean terminated;
     private ScheduledExecutorService executor;
-    private int delay = 2000;
+    private int delay = 50;
+    private boolean paused;
+    private double simTime;
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -46,6 +48,8 @@ public class WrapperController {
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
         this.terminated = false;
+        this.paused = true;
+        this.simTime = 0;
         connectionConfig();
     }
 
@@ -70,35 +74,32 @@ public class WrapperController {
     public void start() { // maybe with connection as argument? closing connection opened prior
         executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread
         executor.scheduleAtFixedRate(() -> {
-            if (terminated) {
-                executor.shutdownNow();
-                return;
+            if (!paused) {
+                if (terminated) {
+                    executor.shutdownNow();
+                    return;
+                }
+                try {
+                    double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
+                    System.out.println(RED + "Time: " + timeSeconds + RESET);
+
+                    vl.updateAllVehicles();
+                    vl.printVehicles();
+
+                    doStepUpdate();
+                    Platform.runLater(guiController::doSimStep);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            try {
-                double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
-                System.out.println(RED + "Time: " + timeSeconds + RESET);
-
-                vl.updateAllVehicles();
-                vl.printVehicles();
-
-                connection.do_timestep();
-                Platform.runLater(guiController::doSimStep);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }, 0, delay, TimeUnit.MILLISECONDS); // initialdelay, delay, unit
+            }, 0, delay, TimeUnit.MILLISECONDS); // initialdelay, delay, unit
     }
 
     // methods controlling the simulation / also connected with the guiController
 
     public double getTime() {
-        try {
-            return (double) connection.do_job_get(Simulation.getTime());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return simTime;
     }
 
     public void addVehicle() { // int number, String type, Color color
@@ -115,7 +116,40 @@ public class WrapperController {
         }
     }
 
+    public void startSim() {
+        paused = false;
+    }
+
+    public void stopSim() {
+        paused = true;
+    }
+
+    public void doStepUpdate() {
+        // updating gui and simulation
+        try {
+            connection.do_timestep();
+            simTime = (double) connection.do_job_get(Simulation.getTime());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void doSingleStep()  {
+        if (paused) {
+            try {
+                System.out.println("step");
+                connection.do_timestep(); // only useful if paused
+                simTime = (double) connection.do_job_get(Simulation.getTime());
+                Platform.runLater(guiController::doSimStep);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public void terminate() {
+        paused = false; // else executor would not terminate
         terminated = true;
         // needs exception handling , or some way to correctly terminate javafx thread
         connection.close();

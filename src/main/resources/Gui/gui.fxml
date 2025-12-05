@@ -9,6 +9,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -20,14 +21,26 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#onMapsMenuExit" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#closeAllMenus" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
+
+       <!-- Main Buttons -->
        <HBox alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="663.0" spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="278.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
            <children>
 
                <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
-               <ToggleButton fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
-               <ToggleButton fx:id="playButton" mnemonicParsing="false" onAction="#onPlayStart" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+               <ToggleButton fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></ToggleButton>
+               <ToggleButton fx:id="playButton" mnemonicParsing="false" onAction="#onPlayStart" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn">
+               <graphic>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Slider fx:id="playSlider" visible="false" />
+                     </children>
+                  </VBox>
+               </graphic></ToggleButton>
                <Button fx:id="stepButton" mnemonicParsing="false" onAction="#onStep" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                 <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
@@ -37,6 +50,7 @@
            </padding>
        </HBox>
 
+       <!-- Middle pane -->
        <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseEntered="#onMiddlePaneHover" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
            <children>
                <Canvas fx:id="map" height="447.0" layoutX="200.0" width="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
@@ -48,7 +62,8 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" onMouseExited="#onFilterMenuExit" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <!-- Menus from Top right buttons -->
+            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" onMouseExited="#closeAllMenus" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <CheckBox layoutX="171.0" layoutY="32.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Color" />
                   <CheckBox layoutX="169.0" layoutY="88.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Speed" />
@@ -63,7 +78,7 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" onMouseExited="#onMapsMenuExit" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" onMouseExited="#closeAllMenus" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
                   <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
@@ -72,7 +87,7 @@
                      <font>
                         <Font size="9.0" />
                      </font></Label>
-                  <Label layoutX="28.0" layoutY="254.0" styleClass="topMenuLabel" text="Copyright 2026 KK, LL, RE, SR. ALL RIGHTS RESERVED" textFill="VIOLET">
+                  <Label layoutX="28.0" layoutY="254.0" styleClass="topMenuLabel" text="Copyright 2026 NB, KK, LL, RE, SR. ALL RIGHTS RESERVED" textFill="VIOLET">
                      <font>
                         <Font size="8.0" />
                      </font></Label>
@@ -84,7 +99,7 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" onMouseExited="#onViewMenuExit" prefHeight="139.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" onMouseExited="#closeAllMenus" prefHeight="139.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <VBox prefHeight="200.0" prefWidth="146.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -107,9 +122,29 @@
             <Circle fx:id="circ2" fill="DODGERBLUE" layoutX="903.0" layoutY="262.0" radius="21.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" AnchorPane.rightAnchor="17.0" />
              <Rectangle fx:id="rect1" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="82.0" layoutX="882.0" layoutY="178.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" width="42.0" AnchorPane.rightAnchor="17.0" />
 
+               <VBox fx:id="fileMenuSelect" onMouseExited="#closeAllMenus" prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Button fx:id="fileButtonClose" mnemonicParsing="false" onAction="#closeApplication" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Close">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="fileButtonReset" layoutX="15.0" layoutY="20.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Reset" />
+                  <Button fx:id="fileButtonSettings" layoutX="15.0" layoutY="52.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Settings" />
+                  <Button fx:id="fileButtonReturn" layoutX="15.0" layoutY="83.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Return" />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="15.0" right="15.0" top="10.0" />
+               </padding>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </VBox>
+       <!-- Menu button top right close -->  <!-- -->
+
          </children>
       </AnchorPane>
-
+       <!-- Main Buttons menu -->
              <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="306.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.60000000000002">
            <children>
                <Button layoutX="180.0" layoutY="267.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="99.0" text="Add" />
@@ -127,16 +162,18 @@
            </children>
        </AnchorPane>
 
+       <!-- Buttons top right menu -->
       <HBox fx:id="topMenuBox" layoutX="701.0" layoutY="-5.0" prefHeight="27.0" prefWidth="280.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Pane fx:id="exitTopMenu" onMouseEntered="#closeAllMenus" prefHeight="30.0" prefWidth="14.0" />
             <Button mnemonicParsing="false" onMouseEntered="#onMapsHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
             <Button mnemonicParsing="false" onMouseEntered="#onFiltersHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
             <Button mnemonicParsing="false" onMouseEntered="#onViewHover" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
-            <Button mnemonicParsing="false" onAction="#closeApplication" onMouseEntered="#onFileHover" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
+            <Button mnemonicParsing="false" onMouseEntered="#onFileHover" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
          </children>
       </HBox>
 
+       <!-- Left menu time etc. -->
       <HBox fx:id="topLeftMenu" layoutY="1.0" prefHeight="12.0" prefWidth="238.0" spacing="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1.0">
          <children>
             <Label fx:id="timeLabel" prefHeight="18.0" prefWidth="63.0" styleClass="whiteLabel" text="00:00:00">

@@ -50,7 +50,7 @@
 }
 
 #dataSep .line {
-    -fx-border-color: -fx-color-grey-dark;
+    -fx-border-color: -fx-color-grey-darkest;
     -fx-border-width: 3;
 }
 
@@ -122,6 +122,20 @@
     /* border = stroke, needs custom one */
 }
 
+.fileMenu {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-font-family:"Arial Black";
+}
+
+.fileMenu:hover {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 15, 13;
+    -fx-text-fill: -fx-color-magenta;
+}
+
 
 
 /* Main Button menus*/
@@ -157,6 +171,10 @@
     -fx-border-width: 4;
     -fx-background-radius: 15;
     -fx-border-radius: 13;
+}
+
+.menu-btn:disabled {
+    -fx-background-color: -fx-color-grey-middle;
 }
 
 /* Main Buttons */
@@ -233,6 +251,11 @@
 #stepButton:hover {
     -fx-background-image: url("/Gui/Icons/step_shoe.png");
     -fx-background-size: 48px 48px;
+}
+
+#stepButton:pressed {
+    -fx-background-image: url("/Gui/Icons/step_shoe.png");
+    -fx-background-size: 56px 56px;
 }
 
 

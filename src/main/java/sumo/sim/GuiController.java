@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -19,7 +20,11 @@ public class GuiController {
     @FXML
     private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton;
+    private VBox fileMenuSelect;
+    @FXML
+    private ToggleButton playButton, selectButton, addButton, stressTestButton;
+    @FXML
+    private Button stepButton;
     @FXML
     private Spinner <Integer> delaySelect;
     @FXML
@@ -30,6 +35,8 @@ public class GuiController {
     private Canvas map;
     @FXML
     private Label timeLabel;
+    @FXML
+    private Slider playSlider;
 
     private WrapperController wrapperController;
 
@@ -45,6 +52,7 @@ public class GuiController {
         if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
+        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);
         openZoomMenu();
         // still needs fix for small gap between buttons and menus at the top
     }
@@ -97,10 +105,15 @@ public class GuiController {
 
     @FXML
     protected void onPlayStart() {
+        disableAllButtons();
+        playButton.setDisable(false);
         if (playButton.isSelected()) { // toggled
-            System.out.println("Started");
+            wrapperController.startSim();
+            //playSlider.setVisible(true);
         } else {
-            System.out.println("Stopped");
+            wrapperController.stopSim();
+            //playSlider.setVisible(false);
+            enableAllButtons();
         }
     }
 
@@ -115,7 +128,7 @@ public class GuiController {
 
     @FXML
     protected void onStep() {
-        wrapperController.addVehicle();
+        wrapperController.doSingleStep();
     }
 
     @FXML
@@ -131,6 +144,7 @@ public class GuiController {
             fade.setToValue(0);
             fade.play();
             addMenu.setVisible(false);
+            enableAllButtons();
         }
     }
 
@@ -139,10 +153,6 @@ public class GuiController {
         closeAllMenus();
         closeZoomMenu();
         filtersMenuSelect.setVisible(true);
-    }
-    @FXML
-    protected void onFilterMenuExit(MouseEvent event) {
-        closeAllMenus();
     }
 
     @FXML
@@ -153,10 +163,6 @@ public class GuiController {
         // activate Map menu
         mapMenuSelect.setVisible(true);
     }
-    @FXML
-    protected void onMapsMenuExit(MouseEvent event) { // needs check if mouse exited on the left
-        closeAllMenus();;
-    }
 
     @FXML
     protected void onViewHover(MouseEvent event){
@@ -166,15 +172,10 @@ public class GuiController {
     }
 
     @FXML
-    protected void onViewMenuExit(MouseEvent event){
-        closeAllMenus();
-    }
-
-
-    @FXML
     protected void onFileHover(MouseEvent event){
         closeAllMenus();
         closeZoomMenu();
+        fileMenuSelect.setVisible(true);
     }
 
     @FXML
@@ -188,8 +189,23 @@ public class GuiController {
         wrapperController.terminate();
     }
 
+    // functionality
 
-    // Render
+    public void disableAllButtons(){
+        selectButton.setDisable(true);
+        playButton.setDisable(true);
+        addButton.setDisable(true);
+        stressTestButton.setDisable(true);
+        stepButton.setDisable(true);
+    }
+
+    public void enableAllButtons(){
+        selectButton.setDisable(false);
+        playButton.setDisable(false);
+        addButton.setDisable(false);
+        stressTestButton.setDisable(false);
+        stepButton.setDisable(false);
+    }
 
     public void doSimStep() {
         updateTime();
