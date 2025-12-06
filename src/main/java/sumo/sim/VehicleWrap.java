@@ -23,6 +23,7 @@ public class VehicleWrap {
     private int routeId; // which route is assigned
 
     private int number_stops;
+    private int timeActive; // time driving before despawning -> 300 seconds active and 34 seconds standing
     private double stop_time;
     private double maxspeed;
     private boolean active_last_frame;
@@ -50,7 +51,7 @@ public class VehicleWrap {
 
             if(this.speed == 0){
                 stop_time++;
-                if(active_last_frame == true){
+                if(active_last_frame){
                     number_stops++;
                 }
             }
@@ -72,7 +73,7 @@ public class VehicleWrap {
     public boolean isMarked() {return marked;} // maybe return object? -> marked (by which filter) and which color
     public int getNumber_stops() {return number_stops;}
     public double getStop_time() {return stop_time;}
-    public double getMaxspeed() {return maxspeed;}
+    public double getMaxSpeed() {return maxspeed;}
 
     public void setSpeed(double speed) {
         try {
