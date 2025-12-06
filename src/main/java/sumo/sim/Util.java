@@ -19,7 +19,7 @@ public class Util {
 
     public static RouteWrap generate_route(String start, String end, Junction_List jl) {
 
-        // --- Initialisieren ---
+        // --- Initialize ---
         for (JunctionWrap jw : jl.getJunctions()) {
             jw.setDistance(Double.MAX_VALUE);
             jw.setPredecessor(null);
@@ -29,7 +29,7 @@ public class Util {
         JunctionWrap endNode = jl.getJunction(end);
 
         if (startNode == null || endNode == null) {
-            System.err.println("Start oder End Junction existiert nicht!");
+            System.err.println("Start or End Junction does not exist!");
             return new RouteWrap(Collections.emptyList());
         }
 

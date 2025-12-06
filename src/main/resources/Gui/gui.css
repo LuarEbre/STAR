@@ -150,6 +150,10 @@
     -fx-background-radius: 15;
 }
 
+.addMenu-labels {
+    -fx-text-fill: -fx-color-magenta;
+}
+
 /* style class for buttons*/
 .menu-btn {
     -fx-background-color: -fx-color-grey-light;
@@ -259,4 +263,22 @@
 }
 
 
+#listData .list-cell {
+    -fx-padding: 3 3 3 3;
+    -fx-background-color: -fx-color-grey-middle;
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+#listData .list-cell:odd {
+    -fx-background-color: -fx-color-grey-light;
+}
+
+#listData .list-cell:selected {
+    -fx-background-color: -fx-color-magenta;
+}
+
+#listData .scroll-bar {
+    -fx-background-color: -fx-color-grey-darkest;
+}
 

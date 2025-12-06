@@ -112,7 +112,7 @@ public class Vehicle_List {
             sb.append(currVehicle.getType()).append(",");
             sb.append(currVehicle.getNumber_stops()).append(",");
             sb.append(currVehicle.getStop_time()).append(",");
-            sb.append(currVehicle.getMaxspeed()).append(",");
+            sb.append(currVehicle.getMaxSpeed()).append(",");
             //sb.append(pos.x).append(",").append(pos.y).append(",");
             //sb.append(currVehicle.getAngle()).append("\n");
             sb.append("\n");
