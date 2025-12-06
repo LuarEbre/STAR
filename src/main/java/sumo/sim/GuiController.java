@@ -24,7 +24,7 @@ public class GuiController {
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton;
     @FXML
-    private Button stepButton;
+    private Button stepButton, addVehicleButton;
     @FXML
     private Spinner <Integer> delaySelect;
     @FXML
@@ -37,6 +37,8 @@ public class GuiController {
     private Label timeLabel;
     @FXML
     private Slider playSlider;
+    @FXML
+    private ListView<String> listData; // list displaying data as a string
 
     private WrapperController wrapperController;
 
@@ -69,11 +71,6 @@ public class GuiController {
         rect1.setVisible(true);
     }
 
-    private void redraw(GraphicsContext gc, Image img) {
-        gc.clearRect(0, 0, map.getWidth(), map.getHeight());
-        gc.drawImage(img, 0, 0, map.getWidth(), map.getHeight());
-    }
-
     @FXML
     public void initialize() {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
@@ -82,25 +79,7 @@ public class GuiController {
 
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
-
-        /*
-        GraphicsContext gc = map.getGraphicsContext2D();
-        Image img = new Image("/Gui/Render/mapEx.png");
-
-        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
-        map.heightProperty().bind(middlePane.heightProperty().multiply(0.98));
-
-        map.widthProperty().addListener((obs, oldV, newV) -> {
-            redraw(gc, img);
-        });
-        map.heightProperty().addListener((obs, oldV, newV) -> {
-            redraw(gc, img);
-        });
-
-        middlePane.sceneProperty().addListener((obs, oldV, newV) -> {
-            if (newV != null) redraw(gc, img);
-        });
-            */
+        updateDataList();
     }
 
     @FXML
@@ -214,7 +193,6 @@ public class GuiController {
     }
 
     public void updateTime() {
-        // exception handling needed -> if getTime connection is closed
         int time = (int) wrapperController.getTime();
         StringBuilder b1 = new StringBuilder();
         int hours = time / 3600; // every 3600 ms is one hour
@@ -223,5 +201,26 @@ public class GuiController {
         b1.append(String.format("%02d:%02d:%02d", hours, minutes, seconds));
         timeLabel.setText(b1.toString());
     }
+
+    public void updateDataList() {
+        // list of data should be returned from vehicle/tl lists -> entry for every object, maybe list in listdata.getItems().addAll
+        listData.getItems().clear();
+
+        for (int i=0; i<4 ;i++) {
+            listData.getItems().add("---- Vehicle #X ----");
+            listData.getItems().addAll("Vehicle ID: ", "Type: ", "Route ID", "Color: ", "Speed: ", "Position: ",
+                    "Angle: ", "Accel: ", "Decel: ", "Stop Time: ", ""
+            ); // change = set/add(index, String) ; append = set(index, old + " + new text");
+            // needs formula to calculate index for appending?
+        }
+    }
+
+    @FXML
+    protected void addVehicle(){
+        // parameters from addMenu components
+        // static test
+        wrapperController.addVehicle();
+    }
+
 }
 
