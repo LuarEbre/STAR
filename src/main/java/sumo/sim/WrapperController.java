@@ -19,8 +19,6 @@ public class WrapperController {
     // Colors for printing , to be removed later
     public static final String RED = "\u001B[31m";
     public static final String RESET = "\u001B[0m"; // white
-    public static final String GREEN = "\u001B[32m";
-    public static final String YELLOW = "\u001B[33m";
     private final SumoTraciConnection connection;
     private final GuiController guiController;
     private Street_List sl;
@@ -87,6 +85,7 @@ public class WrapperController {
 
                     vl.updateAllVehicles();
                     vl.printVehicles();
+                    System.out.println("Delay:" + delay);
 
                     doStepUpdate();
                     Platform.runLater(guiController::doSimStep);
@@ -99,10 +98,6 @@ public class WrapperController {
     }
 
     // methods controlling the simulation / also connected with the guiController
-
-    public double getTime() {
-        return simTime;
-    }
 
     public void addVehicle() { // int number, String type, Color color
         // used by guiController
@@ -157,9 +152,19 @@ public class WrapperController {
         connection.close();
     }
 
+    // getter
+
     public static String get_current_net(){
         return curr_net;
     }
 
+    public double getTime() {
+        return simTime;
+    }
 
+    public int getDelay() {
+        return delay;
+    }
+
+    //setter
 }

@@ -75,6 +75,7 @@
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 15, 13;
+    -fx-text-fill: -fx-color-magenta;
 }
 
 .topMenuBackground {
@@ -108,6 +109,48 @@
     -fx-border-style: solid, solid;
     -fx-border-radius: 15, 13;
     -fx-background-radius: 15;
+}
+
+/* Top left delay menu -> Spinner consist of multiple components */
+
+#delaySelect {
+    -fx-background-color: -fx-color-grey-darkest;
+}
+
+#delaySelect .text-field {
+    -fx-background-color: -fx-color-grey-darkest;
+    -fx-border-color: -fx-color-grey-light;
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+#delaySelect .text-field:hover {
+    -fx-border-color: -fx-color-grey-light;
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+}
+
+
+#delaySelect .increment-arrow-button {
+    -fx-background-color: -fx-color-grey-darkest;
+    -fx-border-color: -fx-color-grey-light;
+}
+
+#delaySelect .increment-arrow-button:hover {
+    -fx-border-color: -fx-color-grey-light;
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+}
+
+#delaySelect .decrement-arrow-button {
+    -fx-background-color: -fx-color-grey-darkest;
+    -fx-border-color: -fx-color-grey-light;
+}
+
+#delaySelect .decrement-arrow-button:hover {
+    -fx-border-color: -fx-color-grey-light;
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
 }
 
 /* Middle style */
