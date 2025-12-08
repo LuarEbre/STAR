@@ -11,9 +11,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+
+import java.text.SimpleDateFormat;
 
 public class GuiController {
 
@@ -41,6 +44,7 @@ public class GuiController {
     private ListView<String> listData; // list displaying data as a string
     private final int defaultDelay;
     private final int maxDelay;
+    private GraphicsContext gc;
 
     private WrapperController wrapperController;
 
@@ -51,6 +55,9 @@ public class GuiController {
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
+        SimulationRenderer sr = new SimulationRenderer(map,gc);
+        sr.initRender(wrapperController.get_junction());
+
     }
 
     public void closeAllMenus() {
@@ -95,6 +102,11 @@ public class GuiController {
                 validateInput(delayTextField);
             }
         });
+
+        gc = map.getGraphicsContext2D();
+        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
+        map.heightProperty().bind(middlePane.heightProperty());
+
     }
 
     @FXML
@@ -114,7 +126,6 @@ public class GuiController {
     @FXML
     protected void onSelect(){
         if (selectButton.isSelected()) { // toggled
-
         } else {
             System.out.println("Stopped");
         }
@@ -122,7 +133,7 @@ public class GuiController {
 
     @FXML
     protected void onStep() {
-        wrapperController.doSingleStep();
+        wrapperController.doStepUpdate();
     }
 
     @FXML

@@ -1,7 +1,5 @@
 package sumo.sim;
 
-import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Lane;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 public class Street {
@@ -9,11 +7,10 @@ public class Street {
     private final SumoTraciConnection con;
     private final String id;
     // List of <Lane> objects
-    private String fromJunction;
-    private String toJunction;
+    private String fromJunction; //start
+    private String toJunction; //end
+    // get startPoint to get EndPoint : draw(startPoint, endPoint)
     XML xml = null;
-    double density;
-    double noise;
 
     public Street(String id, SumoTraciConnection con) {
         this.id = id;
@@ -22,7 +19,6 @@ public class Street {
             xml = new XML(WrapperController.get_current_net());
             this.fromJunction = xml.get_from_junction(id);
             this.toJunction = xml.get_to_junction(id);
-            update_street();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -36,39 +32,9 @@ public class Street {
         return fromJunction;
     }
 
-    public Street getStreet() {
-        return this;
-    }
+    public Street getStreet() { return this; }
 
     public String getToJunction() {
         return toJunction;
-    }
-
-    public void calc_density(SumoTraciConnection con) {
-        try {
-            double num = (double) con.do_job_get(Edge.getLastStepVehicleNumber(this.id));
-            double length = (double) con.do_job_get(Lane.getLength(this.id+ "_0"));
-            this.density = num/ length / 1000;
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public double getDensity() {
-        return density;
-    }
-
-    public void setDensity(double density) {
-        this.density = density;
-    }
-
-    public void update_street(){
-        try {
-            calc_density(con);
-            this.noise = (double) con.do_job_get(Edge.getNoiseEmission(id));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

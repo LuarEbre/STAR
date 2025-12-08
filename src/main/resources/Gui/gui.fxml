@@ -145,39 +145,64 @@
          </children>
       </AnchorPane>
        <!-- Main Buttons menu -->
-             <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="306.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.60000000000002">
+             <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
-               <Button fx:id="addVehicleButton" onAction="#addVehicle" layoutX="180.0" layoutY="267.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="99.0" text="Add" />
+               <Button fx:id="addVehicleButton" layoutX="181.0" layoutY="339.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="27.0" prefWidth="93.0" text="Add" />
                <Separator layoutY="260.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.bottomAnchor="43.199999999999974" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-            <ChoiceBox layoutX="111.0" layoutY="110.0" prefHeight="26.0" prefWidth="170.0" />
-            <ColorPicker layoutX="111.0" layoutY="64.0" prefHeight="26.0" prefWidth="170.0" />
-            <HBox layoutX="108.8" prefHeight="26.0" prefWidth="170.0" AnchorPane.leftAnchor="109.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+            <ChoiceBox layoutX="14.0" layoutY="291.0" prefHeight="26.0" prefWidth="79.0" />
+            <Separator layoutY="268.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <Label fx:id="preSetLabel" layoutX="24.0" layoutY="272.0" prefHeight="18.0" prefWidth="136.0" styleClass="addMenu-labels" text="Pre - Sets" />
+            <HBox layoutY="51.0" prefHeight="180.0" prefWidth="299.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <children>
-                  <Button fx:id="amountMinus" mnemonicParsing="false" prefHeight="26.0" prefWidth="36.0" text="-" />
-                  <TextField fx:id="amountField" prefHeight="26.0" prefWidth="105.0" />
-                  <Button fx:id="amountPlus" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="36.0" text="+" />
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="28.0">
+                     <children>
+                        <Label fx:id="amountLabel" styleClass="addMenu-labels" text="Amount">
+                           <font>
+                              <Font name="Arial Black" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="colorLabel" styleClass="addMenu-labels" text="Color">
+                           <font>
+                              <Font name="Arial Black" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="typeLabel" styleClass="addMenu-labels" text="Type">
+                           <font>
+                              <Font name="Arial Black" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="routeLabel" styleClass="addMenu-labels" text="Route">
+                           <font>
+                              <Font name="Arial Black" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="15.0" top="5.0" />
+                     </padding>
+                  </VBox>
+                  <VBox prefHeight="180.0" prefWidth="184.0" spacing="20.0">
+                     <children>
+                        <HBox prefHeight="26.0" prefWidth="170.0">
+                           <children>
+                              <Button fx:id="amountMinus" mnemonicParsing="false" prefHeight="26.0" prefWidth="36.0" text="-" />
+                              <TextField fx:id="amountField" prefHeight="26.0" prefWidth="122.0" />
+                              <Button fx:id="amountPlus" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="36.0" text="+" />
+                           </children>
+                        </HBox>
+                        <ColorPicker prefHeight="26.0" prefWidth="184.0" />
+                        <ChoiceBox prefHeight="26.0" prefWidth="188.0" />
+                        <ChoiceBox prefHeight="26.0" prefWidth="188.0" />
+                     </children>
+                  </VBox>
                </children>
             </HBox>
-            <Label fx:id="amountLabel" layoutX="39.0" layoutY="25.0" styleClass="addMenu-labels" text="Amount">
+            <Label layoutX="94.0" layoutY="7.0" prefHeight="34.0" prefWidth="110.0" styleClass="addMenu-labels" text="Vehicles">
                <font>
-                  <Font name="Arial Black" size="12.0" />
-               </font></Label>
-            <Label fx:id="colorLabel" layoutX="39.0" layoutY="68.0" styleClass="addMenu-labels" text="Color">
-               <font>
-                  <Font name="Arial Black" size="12.0" />
-               </font></Label>
-            <Label fx:id="typeLabel" layoutX="39.0" layoutY="114.0" styleClass="addMenu-labels" text="Type">
-               <font>
-                  <Font name="Arial Black" size="12.0" />
-               </font></Label>
-            <ChoiceBox layoutX="111.0" layoutY="153.0" prefHeight="26.0" prefWidth="170.0" />
-            <Label fx:id="routeLabel" layoutX="39.0" layoutY="157.0" styleClass="addMenu-labels" text="Route">
-               <font>
-                  <Font name="Arial Black" size="12.0" />
-               </font></Label>
-            <ChoiceBox layoutX="14.0" layoutY="218.0" prefHeight="26.0" prefWidth="79.0" />
-            <Separator layoutY="190.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-            <Label fx:id="preSetLabel" layoutX="21.0" layoutY="199.0" prefHeight="18.0" prefWidth="136.0" styleClass="addMenu-labels" text="Pre - Sets" />
+                  <Font size="23.0" />
+               </font>
+            </Label>
+            <Button fx:id="addVehicleButton1" layoutX="149.0" layoutY="290.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="27.0" prefWidth="110.0" text="Generate Route" />
            </children>
        </AnchorPane>
 
