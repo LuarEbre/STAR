@@ -12,7 +12,7 @@ import java.util.Locale;
 
 
 public class TrafficLights_List {
-    public final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
+    private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final Street_List streetList;
     private int count;
