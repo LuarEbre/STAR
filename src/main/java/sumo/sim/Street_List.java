@@ -60,4 +60,10 @@ public class Street_List {
         }
         return densest;
     }
+
+    public void updateStreets(){
+        for (Street s : streets) {
+            s.update_street();
+        }
+    }
 }

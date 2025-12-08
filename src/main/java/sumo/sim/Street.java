@@ -13,6 +13,7 @@ public class Street {
     private String toJunction;
     XML xml = null;
     double density;
+    double noise;
 
     public Street(String id, SumoTraciConnection con) {
         this.id = id;
@@ -21,7 +22,7 @@ public class Street {
             xml = new XML(WrapperController.get_current_net());
             this.fromJunction = xml.get_from_junction(id);
             this.toJunction = xml.get_to_junction(id);
-            calc_density(con);
+            update_street();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -62,4 +63,12 @@ public class Street {
         this.density = density;
     }
 
+    public void update_street(){
+        try {
+            calc_density(con);
+            this.noise = (double) con.do_job_get(Edge.getNoiseEmission(id));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
