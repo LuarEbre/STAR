@@ -15,7 +15,7 @@ public class SimulationRenderer {
     public SimulationRenderer(Canvas canvas, GraphicsContext gc) {
         this.map = canvas;
         this.gc = gc;
-        this.zoom = 4;
+        this.zoom = 0.5;
     }
 
     public void initRender(Junction_List jl, Street_List sl){
@@ -27,9 +27,10 @@ public class SimulationRenderer {
 
     public void renderJunctions(Junction_List jl, Street_List sl){
 
-        double offsetX = abs(jl.getMinPosX())+300; // min position like -230 -> +230 so that it start at 0,0
-        double offsetY = abs(jl.getMinPosY())+200; // +300 and +200 just for testing -> displaying in the middle
-        gc.setFill(Color.DARKGRAY);
+        double offsetX = abs(jl.getMinPosX()); // min position like -230 -> +230 so that it start at 0,0
+        double offsetY = abs(jl.getMinPosY()+700); // +300 and +200 just for testing -> displaying in the middle
+        //gc.setFill(Color.DARKGRAY);
+        gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1.0);
         for (Street s : sl.getStreets()) { // streets
@@ -38,7 +39,12 @@ public class SimulationRenderer {
                 double[] rawX = l.getShapeX();
                 double[] rawY = l.getShapeY();
 
-                int pointCount = rawX.length;
+                // needs checking -> error preventing
+                if (rawX == null || rawY == null || rawX.length == 0) continue;
+                // continue -> if true -> skip everything and move to the next object of the loop
+                // if arrays are null or empty skip
+
+                int pointCount = rawX.length; // how many objects are inside the array
                 double[] screenX = new double[pointCount];
                 double[] screenY = new double[pointCount];
 
@@ -50,7 +56,7 @@ public class SimulationRenderer {
 
                 if (pointCount >= 2) {
                     // if there are at least 2 values in pointCount -> it's a line e.g. : [54.7, 38.75]
-                    gc.setLineWidth(12); // should be adjustable
+                    gc.setLineWidth(5); // should be adjustable
                     gc.strokePolyline(screenX, screenY, pointCount);
                 }
             }
@@ -60,6 +66,8 @@ public class SimulationRenderer {
             gc.setLineWidth(1);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
+
+            if (rawX == null || rawY == null || rawX.length == 0) continue;
 
             int pointCount = rawX.length; // how many entries in array [54.7, 38.75] <- 2
             double[] screenX = new double[pointCount];

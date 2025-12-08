@@ -34,7 +34,6 @@ public class Street {
             for (int i = 0; i < laneCount; i++) {
                 String currentLaneID = id + "_" + i; // street id_lane
                 lanes.add(new LaneWrap(currentLaneID, con, id));
-                System.out.println("Lane hinzugefügt: " + currentLaneID + " zu Edge: " + id);
             }
 
         } catch (Exception e) {
