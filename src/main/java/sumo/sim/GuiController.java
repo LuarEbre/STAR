@@ -104,6 +104,8 @@ public class GuiController {
         });
 
         gc = map.getGraphicsContext2D();
+        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
+        map.heightProperty().bind(middlePane.heightProperty());
 
     }
 
@@ -131,7 +133,7 @@ public class GuiController {
 
     @FXML
     protected void onStep() {
-        wrapperController.doSingleStep();
+        wrapperController.doStepUpdate();
     }
 
     @FXML
