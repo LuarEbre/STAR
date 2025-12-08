@@ -63,7 +63,7 @@ public class Street_List {
 
     public void updateStreets(){
         for (Street s : streets) {
-            s.update_street();
+            s.updateStreet();
         }
     }
 }
