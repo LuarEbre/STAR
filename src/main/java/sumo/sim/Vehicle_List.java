@@ -6,10 +6,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
-import java.util.ArrayList;
 
 public class Vehicle_List {
     private final ArrayList<VehicleWrap> vehicles = new ArrayList<>(); // List of Vehicles
@@ -73,7 +70,7 @@ public class Vehicle_List {
     public void updateAllVehicles() {
         for (int i = 0; i < this.count; i++) {
             if (this.exists("v"+i)) { // if still exists
-                getVehicle("v"+i).updateVehicle();
+                this.vehicles.get(i).updateVehicle();
             }
         }
     }
@@ -89,12 +86,18 @@ public class Vehicle_List {
                         // forces US locale, making double values be separated via period, rather than comma
                         Locale.US,
                         // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
-                        "            %s: speed = %05.2f, position = (%06.2f | %06.2f), angle = %06.2f%n",
+                        "            %s: speed = %f, position = (%06.2f | %06.2f), angle = %06.2f, avgSpeed = %f, accel = %f%n               waited %.0fs, active for %ds, stopped %d times, alive for %ds%n",
                         currVehicle.getID(),
                         currVehicle.getSpeed(),
                         pos.x,
                         pos.y,
-                        currVehicle.getAngle()
+                        currVehicle.getAngle(),
+                        currVehicle.getAvgSpeed(),
+                        currVehicle.getAccel(),
+                        currVehicle.getWaitingTime(),
+                        currVehicle.getActiveTime(),
+                        currVehicle.getnStops(),
+                        currVehicle.getTotalLifetime()
                 );
             }
         }
@@ -110,8 +113,8 @@ public class Vehicle_List {
             sb.append(currVehicle.getID()).append(",");
             //sb.append(currVehicle.getSpeed()).append(",");
             sb.append(currVehicle.getType()).append(",");
-            sb.append(currVehicle.getNumber_stops()).append(",");
-            sb.append(currVehicle.getStop_time()).append(",");
+            sb.append(currVehicle.getnStops()).append(",");
+            sb.append(currVehicle.getWaitingTime()).append(",");
             sb.append(currVehicle.getMaxSpeed()).append(",");
             //sb.append(pos.x).append(",").append(pos.y).append(",");
             //sb.append(currVehicle.getAngle()).append("\n");
