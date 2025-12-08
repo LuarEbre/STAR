@@ -54,4 +54,8 @@ public class JunctionWrap {
         return distance;
     }
 
+    public Point2D.Double getPosition() {
+        return position;
+    }
+
 }
