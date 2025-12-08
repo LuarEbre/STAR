@@ -1,6 +1,6 @@
 <configuration>
     <input>
-        <net-file value="frankfurt.net.xml"/>
+        <net-file value="frankfurt_kfz.net.xml"/>
         
         <route-files value="frankfurt.rou.xml"/>
     </input>
