@@ -19,13 +19,12 @@ public class WrapperController {
     // Colors for printing , to be removed later
     public static final String RED = "\u001B[31m";
     public static final String RESET = "\u001B[0m"; // white
-    public static final String GREEN = "\u001B[32m";
-    public static final String YELLOW = "\u001B[33m";
     private final SumoTraciConnection connection;
     private final GuiController guiController;
     private Street_List sl;
     private TrafficLights_List tl;
     private Vehicle_List vl;
+    private Junction_List jl;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
@@ -70,6 +69,8 @@ public class WrapperController {
         vl = new Vehicle_List(connection);
         sl = new Street_List(this.connection);
         tl = new TrafficLights_List(connection, sl);
+        jl = new Junction_List(connection, sl);
+        Type_List types = new Type_List(connection);
         start();
     }
 
@@ -87,6 +88,7 @@ public class WrapperController {
 
                     vl.updateAllVehicles();
                     vl.printVehicles();
+                    System.out.println("Delay:" + delay);
 
                     doStepUpdate();
                     Platform.runLater(guiController::doSimStep);
@@ -100,11 +102,7 @@ public class WrapperController {
 
     // methods controlling the simulation / also connected with the guiController
 
-    public double getTime() {
-        return simTime;
-    }
-
-    public void addVehicle() { // int number, String type, Color color
+    public void addVehicle() { // int number, String type, Color color ,,int amount, String type, String route
         // used by guiController
         // executes addVehicle from WrapperVehicle
         vl.addVehicle(1, "t_0"); // type t_0 (can be chosen)
@@ -157,9 +155,23 @@ public class WrapperController {
         connection.close();
     }
 
+    // getter
+
     public static String get_current_net(){
         return curr_net;
     }
 
+    public double getTime() {
+        return simTime;
+    }
 
+    public int getDelay() {
+        return delay;
+    }
+
+    public Junction_List get_junction() {
+        return jl;
+    }
+
+    //setter
 }
