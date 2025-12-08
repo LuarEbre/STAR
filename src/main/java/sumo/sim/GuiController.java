@@ -55,8 +55,9 @@ public class GuiController {
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
+        gc = map.getGraphicsContext2D();
         SimulationRenderer sr = new SimulationRenderer(map,gc);
-        sr.initRender(wrapperController.get_junction());
+        sr.initRender(wrapperController.get_junction(),wrapperController.get_sl());
 
     }
 
@@ -103,7 +104,6 @@ public class GuiController {
             }
         });
 
-        gc = map.getGraphicsContext2D();
         map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
         map.heightProperty().bind(middlePane.heightProperty());
 
