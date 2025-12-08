@@ -4,7 +4,8 @@ import java.util.List;
 
 public class RouteWrap {
     // has route id and all edges(street) object in that route ;
-    public List<String> id;
+    private List<String> id;
+
     // list of Street associated with that route;
 
     public RouteWrap(List <String> id) {
@@ -21,3 +22,4 @@ public class RouteWrap {
         }
     }
 }
+

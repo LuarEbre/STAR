@@ -64,7 +64,7 @@ public class Util {
             }
         }
 
-        // --- Pfad zurückverfolgen ---
+        // RECONSTRUCT NODE PATH (Junctions)
         List<String> junction_Path = new LinkedList<>();
         JunctionWrap step = endNode;
 
@@ -73,8 +73,25 @@ public class Util {
             step = jl.getJunction(step.getPredecessor());
         }
 
-        // --- HERE: return junctions, not edges ---
-        return new RouteWrap(junction_Path);
+        // RECONSTRUCT EDGE LIST
+        List<String> edge_List = new ArrayList<>();
+
+        for (int i = 0; i < junction_Path.size() - 1; i++) {
+            String from = junction_Path.get(i);
+            String to = junction_Path.get(i + 1);
+
+            String edgeID = jl.findEdgeID(from, to);
+
+            if (edgeID == null) {
+                System.err.println("⚠️ Edge not found between " + from + " → " + to);
+                continue;
+            }
+
+            edge_List.add(edgeID);
+
+        }
+
+        return new RouteWrap(edge_List);
     }
 
 
