@@ -160,5 +160,9 @@ public class WrapperController {
         return jl;
     }
 
+    public Street_List get_sl() {
+        return sl;
+    }
+
     //setter
 }

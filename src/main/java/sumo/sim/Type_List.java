@@ -25,7 +25,7 @@ public class Type_List {
                 //several type attributes should be added here
                 String color = connection.do_job_get(Vehicletype.getColor(id)).toString();
                 double speed = (double) connection.do_job_get(Vehicletype.getMaxSpeed(id));
-                System.out.println("id: " + id);
+                //System.out.println("id: " + id);
 
                 Type type = new Type(id, color, speed);
                 types.put(id, type); // type and hashmap same ID
