@@ -38,9 +38,7 @@ public class SimulationRenderer {
             Point2D.Double p = jw.getPosition();
             gc.setFill(Color.RED);
             gc.fillOval(p.getX()+x_offset, p.getY()+y_offset, 15, 15);
-            jl.print_adjacency();
             for (String s : jl.getAdjacentVertexes(jw.getID())){
-                System.out.println("herawdawkjf"  + s);
                 //gc.strokePolyline();//p.X, p.Y s.getPosition.x, s.getPosition.y -> s id of edges connected to jw
                 gc.setLineWidth(2);
                 gc.strokeLine(p.x+x_offset+7, p.y+y_offset+7, jl.getJunction(s).getPosition().x+x_offset+7, jl.getJunction(s).getPosition().y+y_offset+7);
