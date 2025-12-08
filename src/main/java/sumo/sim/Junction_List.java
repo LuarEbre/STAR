@@ -27,6 +27,7 @@ public class Junction_List {
                 junctions.add(new JunctionWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
                 count++;
             }
+            update_adjacency();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
