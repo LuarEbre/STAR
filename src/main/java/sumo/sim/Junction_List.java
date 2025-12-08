@@ -16,7 +16,7 @@ public class Junction_List {
     private final ArrayList<JunctionWrap> junctions = new ArrayList<>(); // List of TrafficLights
     private int count;
     private Map<String, Set<String>> adjacency = new HashMap<>();
-    private Street_List streets;
+    private final Street_List streets;
 
 
     public Junction_List(SumoTraciConnection con, Street_List streets) {
@@ -27,6 +27,7 @@ public class Junction_List {
                 junctions.add(new JunctionWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
                 count++;
             }
+            update_adjacency();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -61,9 +62,6 @@ public class Junction_List {
         }
     }
 
-    public ArrayList<JunctionWrap> getJunctions() {
-        return junctions;
-    }
 
     public JunctionWrap getJunction(String id) {
         for (JunctionWrap jw : junctions) {
@@ -95,6 +93,26 @@ public class Junction_List {
 
         }
         return null;
+    }
+
+    public double getMinPosX(){
+        double minX = 0.0;
+        for (JunctionWrap jw : junctions) {
+            if (jw.getPosition().x < minX) minX = jw.getPosition().x;
+        }
+        return minX;
+    }
+
+    public double getMinPosY(){
+        double minY = 0.0;
+        for (JunctionWrap jw : junctions) {
+            if (jw.getPosition().y < minY) minY = jw.getPosition().y;
+        }
+        return minY;
+    }
+
+    public ArrayList<JunctionWrap> getJunctions() {
+        return junctions;
     }
 
 
