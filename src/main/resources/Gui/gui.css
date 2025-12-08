@@ -40,7 +40,7 @@
 }
 
 #middlePane {
-    -fx-background-color: -fx-color-grey-middle;
+    -fx-background-color: -fx-color-grey-light;
     -fx-border-color:-fx-color-grey-darkest;
     -fx-border-width: 6;
 }
