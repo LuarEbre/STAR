@@ -20,6 +20,8 @@ public class GuiApplication extends Application {
     public void start(Stage stage) throws IOException {
         // link to gui.fxml (more than one possible)
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/gui.fxml"));
+        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/Title/title.fxml")); // experimental
+
         Scene scene = new Scene(fxmlLoader.load());
         // link to css file
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
@@ -27,12 +29,13 @@ public class GuiApplication extends Application {
         guiController = fxmlLoader.getController();
 
         // stage (frame)
-       // stage.setFullScreen(true); //needs escape button to close the appl.
+        stage.setFullScreen(true); //needs escape button to close the appl.
         stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
-        //stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
+        stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
         stage.show(); // display gui
 
+        // Establishing connection between WrappCon and GuiCon
         WrapperController wrapper = new WrapperController(guiController);
         guiController.setConnectionToWrapperCon(wrapper);
 
