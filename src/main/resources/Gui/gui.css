@@ -50,7 +50,7 @@
 }
 
 #dataSep .line {
-    -fx-border-color: -fx-color-grey-dark;
+    -fx-border-color: -fx-color-grey-darkest;
     -fx-border-width: 3;
 }
 
@@ -75,6 +75,7 @@
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 15, 13;
+    -fx-text-fill: -fx-color-magenta;
 }
 
 .topMenuBackground {
@@ -110,6 +111,48 @@
     -fx-background-radius: 15;
 }
 
+/* Top left delay menu -> Spinner consist of multiple components */
+
+#delaySelect {
+    -fx-background-color: -fx-color-grey-darkest;
+}
+
+#delaySelect .text-field {
+    -fx-background-color: -fx-color-grey-darkest;
+    -fx-border-color: -fx-color-grey-light;
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+#delaySelect .text-field:hover {
+    -fx-border-color: -fx-color-grey-light;
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+}
+
+
+#delaySelect .increment-arrow-button {
+    -fx-background-color: -fx-color-grey-darkest;
+    -fx-border-color: -fx-color-grey-light;
+}
+
+#delaySelect .increment-arrow-button:hover {
+    -fx-border-color: -fx-color-grey-light;
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+}
+
+#delaySelect .decrement-arrow-button {
+    -fx-background-color: -fx-color-grey-darkest;
+    -fx-border-color: -fx-color-grey-light;
+}
+
+#delaySelect .decrement-arrow-button:hover {
+    -fx-border-color: -fx-color-grey-light;
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+}
+
 /* Middle style */
 .zoomMenu {
     -fx-fill: -fx-color-grey-light ;
@@ -120,6 +163,20 @@
 
 .zoomMenu:hover {
     /* border = stroke, needs custom one */
+}
+
+.fileMenu {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-font-family:"Arial Black";
+}
+
+.fileMenu:hover {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 15, 13;
+    -fx-text-fill: -fx-color-magenta;
 }
 
 
@@ -134,6 +191,10 @@
     -fx-border-style: solid, solid;
     -fx-border-radius: 15,13;
     -fx-background-radius: 15;
+}
+
+.addMenu-labels {
+    -fx-text-fill: -fx-color-magenta;
 }
 
 /* style class for buttons*/
@@ -157,6 +218,10 @@
     -fx-border-width: 4;
     -fx-background-radius: 15;
     -fx-border-radius: 13;
+}
+
+.menu-btn:disabled {
+    -fx-background-color: -fx-color-grey-middle;
 }
 
 /* Main Buttons */
@@ -235,5 +300,28 @@
     -fx-background-size: 48px 48px;
 }
 
+#stepButton:pressed {
+    -fx-background-image: url("/Gui/Icons/step_shoe.png");
+    -fx-background-size: 56px 56px;
+}
 
+
+#listData .list-cell {
+    -fx-padding: 3 3 3 3;
+    -fx-background-color: -fx-color-grey-middle;
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+#listData .list-cell:odd {
+    -fx-background-color: -fx-color-grey-light;
+}
+
+#listData .list-cell:selected {
+    -fx-background-color: -fx-color-magenta;
+}
+
+#listData .scroll-bar {
+    -fx-background-color: -fx-color-grey-darkest;
+}
 

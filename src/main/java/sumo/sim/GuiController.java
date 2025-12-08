@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -19,7 +20,11 @@ public class GuiController {
     @FXML
     private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton;
+    private VBox fileMenuSelect;
+    @FXML
+    private ToggleButton playButton, selectButton, addButton, stressTestButton;
+    @FXML
+    private Button stepButton, addVehicleButton;
     @FXML
     private Spinner <Integer> delaySelect;
     @FXML
@@ -30,11 +35,18 @@ public class GuiController {
     private Canvas map;
     @FXML
     private Label timeLabel;
+    @FXML
+    private Slider playSlider;
+    @FXML
+    private ListView<String> listData; // list displaying data as a string
+    private final int defaultDelay;
+    private final int maxDelay;
 
     private WrapperController wrapperController;
 
     public GuiController() {
-
+        defaultDelay = 50;
+        maxDelay = 999;
     }
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
@@ -45,6 +57,7 @@ public class GuiController {
         if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
+        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);
         openZoomMenu();
         // still needs fix for small gap between buttons and menus at the top
     }
@@ -61,46 +74,40 @@ public class GuiController {
         rect1.setVisible(true);
     }
 
-    private void redraw(GraphicsContext gc, Image img) {
-        gc.clearRect(0, 0, map.getWidth(), map.getHeight());
-        gc.drawImage(img, 0, 0, map.getWidth(), map.getHeight());
-    }
-
     @FXML
     public void initialize() {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 500, 50); //min,max, start
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min,max, start
         delaySelect.setValueFactory(valueFactory);
+        delaySelect.setEditable(true); // no longer read only
 
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
+        updateDataList();
 
-        /*
-        GraphicsContext gc = map.getGraphicsContext2D();
-        Image img = new Image("/Gui/Render/mapEx.png");
+        TextField delayTextField = delaySelect.getEditor(); // split spinner into its components -> text field
+        delayTextField.setOnAction(e -> validateInput(delayTextField)); // action = enter, check input after "enter"
 
-        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
-        map.heightProperty().bind(middlePane.heightProperty().multiply(0.98));
-
-        map.widthProperty().addListener((obs, oldV, newV) -> {
-            redraw(gc, img);
+        // listener gets called whenever text inside delayTextField ist touched -> focused
+        // listener arguments: obs -> property , old / Value of text field, focused -> user inside textfield
+        delayTextField.focusedProperty().addListener((obs, old, focused) -> {
+            if (!focused) { // if user exits text field re-evaluate input
+                validateInput(delayTextField);
+            }
         });
-        map.heightProperty().addListener((obs, oldV, newV) -> {
-            redraw(gc, img);
-        });
-
-        middlePane.sceneProperty().addListener((obs, oldV, newV) -> {
-            if (newV != null) redraw(gc, img);
-        });
-            */
     }
 
     @FXML
     protected void onPlayStart() {
+        stepButton.setDisable(true);
+        playButton.setDisable(false);
         if (playButton.isSelected()) { // toggled
-            System.out.println("Started");
+            wrapperController.startSim();
+            //playSlider.setVisible(true);
         } else {
-            System.out.println("Stopped");
+            wrapperController.stopSim();
+            //playSlider.setVisible(false);
+            stepButton.setDisable(false);
         }
     }
 
@@ -115,7 +122,7 @@ public class GuiController {
 
     @FXML
     protected void onStep() {
-        wrapperController.addVehicle();
+        wrapperController.doSingleStep();
     }
 
     @FXML
@@ -131,6 +138,7 @@ public class GuiController {
             fade.setToValue(0);
             fade.play();
             addMenu.setVisible(false);
+            //enableAllButtons();
         }
     }
 
@@ -139,10 +147,6 @@ public class GuiController {
         closeAllMenus();
         closeZoomMenu();
         filtersMenuSelect.setVisible(true);
-    }
-    @FXML
-    protected void onFilterMenuExit(MouseEvent event) {
-        closeAllMenus();
     }
 
     @FXML
@@ -153,10 +157,6 @@ public class GuiController {
         // activate Map menu
         mapMenuSelect.setVisible(true);
     }
-    @FXML
-    protected void onMapsMenuExit(MouseEvent event) { // needs check if mouse exited on the left
-        closeAllMenus();;
-    }
 
     @FXML
     protected void onViewHover(MouseEvent event){
@@ -166,15 +166,10 @@ public class GuiController {
     }
 
     @FXML
-    protected void onViewMenuExit(MouseEvent event){
-        closeAllMenus();
-    }
-
-
-    @FXML
     protected void onFileHover(MouseEvent event){
         closeAllMenus();
         closeZoomMenu();
+        fileMenuSelect.setVisible(true);
     }
 
     @FXML
@@ -188,17 +183,38 @@ public class GuiController {
         wrapperController.terminate();
     }
 
+    // functionality
 
-    // Render
+    public void disableAllButtons(){
+        selectButton.setDisable(true);
+        playButton.setDisable(true);
+        addButton.setDisable(true);
+        stressTestButton.setDisable(true);
+        stepButton.setDisable(true);
+    }
+
+    public void enableAllButtons(){
+        selectButton.setDisable(false);
+        playButton.setDisable(false);
+        addButton.setDisable(false);
+        stressTestButton.setDisable(false);
+        stepButton.setDisable(false);
+    }
 
     public void doSimStep() {
         updateTime();
+        updateDelay();
         // rendering?
         // connection time_step?
     }
 
+    public void updateDelay() {
+        if (delaySelect.getValue() != wrapperController.getDelay()) {
+            wrapperController.changeDelay(delaySelect.getValue());
+        }
+    }
+
     public void updateTime() {
-        // exception handling needed -> if getTime connection is closed
         int time = (int) wrapperController.getTime();
         StringBuilder b1 = new StringBuilder();
         int hours = time / 3600; // every 3600 ms is one hour
@@ -207,5 +223,44 @@ public class GuiController {
         b1.append(String.format("%02d:%02d:%02d", hours, minutes, seconds));
         timeLabel.setText(b1.toString());
     }
+
+    public void updateDataList() {
+        // list of data should be returned from vehicle/tl lists -> entry for every object, maybe list in listdata.getItems().addAll
+        listData.getItems().clear();
+
+        for (int i=0; i<4 ;i++) {
+            listData.getItems().add("---- Vehicle #X ----");
+            listData.getItems().addAll("Vehicle ID: ", "Type: ", "Route ID", "Color: ", "Speed: ", "Position: ",
+                    "Angle: ", "Accel: ", "Decel: ", "Stop Time: ", ""
+            ); // change = set/add(index, String) ; append = set(index, old + " + new text");
+            // needs formula to calculate index for appending?
+        }
+    }
+
+    public void validateInput(TextField editor) {
+        try {
+            int val = Integer.parseInt(editor.getText()); // if it is not an Integer -> exception
+            if (val > maxDelay) {
+                val = maxDelay;
+            }
+            if (val <= 0) {
+                val = 1;
+            }
+            delaySelect.getValueFactory().setValue(val); // setting value
+            editor.setText(String.valueOf(val));
+
+        } catch (NumberFormatException e) { // catches exception
+            delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
+            editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
+        }
+    }
+
+    @FXML
+    public void addVehicle(){
+        // parameters from addMenu components
+        // static test
+        wrapperController.addVehicle();
+    }
+
 }
 
