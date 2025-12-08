@@ -24,6 +24,7 @@ public class WrapperController {
     private Street_List sl;
     private TrafficLights_List tl;
     private Vehicle_List vl;
+    private Junction_List jl;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
@@ -68,6 +69,7 @@ public class WrapperController {
         vl = new Vehicle_List(connection);
         sl = new Street_List(this.connection);
         tl = new TrafficLights_List(connection, sl);
+        jl = new Junction_List(connection, sl);
         Type_List types = new Type_List(connection);
         start();
     }
@@ -165,6 +167,10 @@ public class WrapperController {
 
     public int getDelay() {
         return delay;
+    }
+
+    public Junction_List get_junction() {
+        return jl;
     }
 
     //setter

@@ -7,8 +7,9 @@ public class Street {
     private final SumoTraciConnection con;
     private final String id;
     // List of <Lane> objects
-    private String fromJunction;
-    private String toJunction;
+    private String fromJunction; //start
+    private String toJunction; //end
+    // get startPoint to get EndPoint : draw(startPoint, endPoint)
     XML xml = null;
 
     public Street(String id, SumoTraciConnection con) {
