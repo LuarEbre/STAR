@@ -195,6 +195,7 @@
 
 .addMenu-labels {
     -fx-text-fill: -fx-color-magenta;
+    -fx-font-family:"Arial Black";
 }
 
 /* style class for buttons*/
