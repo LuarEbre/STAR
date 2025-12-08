@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 
 public class VehicleWrap {
     private final String id;
+    private String name; // name = id; -> but can be customized for searching
     private final String type;
     private final SumoTraciConnection con;
     //private final SumoColor color;

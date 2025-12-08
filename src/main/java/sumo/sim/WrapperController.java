@@ -24,6 +24,7 @@ public class WrapperController {
     private Street_List sl;
     private TrafficLights_List tl;
     private Vehicle_List vl;
+    private Junction_List jl;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
@@ -37,13 +38,13 @@ public class WrapperController {
         String sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
                 ? "src/main/resources/Binaries/sumo.exe"
-                : "src/main/resources/Binaries/sumo";
+                : "/usr/local/bin/sumo";
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
         String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-
+        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -68,6 +69,8 @@ public class WrapperController {
         vl = new Vehicle_List(connection);
         sl = new Street_List(this.connection);
         tl = new TrafficLights_List(connection, sl);
+        jl = new Junction_List(connection, sl);
+        Type_List types = new Type_List(connection);
         start();
     }
 
@@ -88,7 +91,6 @@ public class WrapperController {
                     System.out.println("Delay:" + delay);
 
                     doStepUpdate();
-                    Platform.runLater(guiController::doSimStep);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -99,7 +101,7 @@ public class WrapperController {
 
     // methods controlling the simulation / also connected with the guiController
 
-    public void addVehicle() { // int number, String type, Color color
+    public void addVehicle() { // int number, String type, Color color ,,int amount, String type, String route
         // used by guiController
         // executes addVehicle from WrapperVehicle
         vl.addVehicle(1, "t_0"); // type t_0 (can be chosen)
@@ -126,23 +128,11 @@ public class WrapperController {
         try {
             connection.do_timestep();
             simTime = (double) connection.do_job_get(Simulation.getTime());
+            Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-    }
-
-    public void doSingleStep()  {
-        if (paused) {
-            try {
-                System.out.println("step");
-                connection.do_timestep(); // only useful if paused
-                simTime = (double) connection.do_job_get(Simulation.getTime());
-                Platform.runLater(guiController::doSimStep);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     public void terminate() {
@@ -164,6 +154,10 @@ public class WrapperController {
 
     public int getDelay() {
         return delay;
+    }
+
+    public Junction_List get_junction() {
+        return jl;
     }
 
     //setter
