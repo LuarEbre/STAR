@@ -18,6 +18,7 @@ public class VehicleWrap {
 
     // final values, set once and never updated after
     private final String id;
+    private String name; // name = id; -> but can be customized for searching
     private final String type;
     private final SumoTraciConnection con;
     private SumoColor color;

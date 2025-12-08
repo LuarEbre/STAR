@@ -11,9 +11,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+
+import java.text.SimpleDateFormat;
 
 public class GuiController {
 
@@ -39,15 +42,23 @@ public class GuiController {
     private Slider playSlider;
     @FXML
     private ListView<String> listData; // list displaying data as a string
+    private final int defaultDelay;
+    private final int maxDelay;
+    private GraphicsContext gc;
 
     private WrapperController wrapperController;
 
     public GuiController() {
-
+        defaultDelay = 50;
+        maxDelay = 999;
     }
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
+        gc = map.getGraphicsContext2D();
+        SimulationRenderer sr = new SimulationRenderer(map,gc);
+        sr.initRender(wrapperController.get_junction(),wrapperController.get_sl());
+
     }
 
     public void closeAllMenus() {
@@ -74,17 +85,33 @@ public class GuiController {
     @FXML
     public void initialize() {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 500, 50); //min,max, start
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min,max, start
         delaySelect.setValueFactory(valueFactory);
+        delaySelect.setEditable(true); // no longer read only
 
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
         updateDataList();
+
+        TextField delayTextField = delaySelect.getEditor(); // split spinner into its components -> text field
+        delayTextField.setOnAction(e -> validateInput(delayTextField)); // action = enter, check input after "enter"
+
+        // listener gets called whenever text inside delayTextField ist touched -> focused
+        // listener arguments: obs -> property , old / Value of text field, focused -> user inside textfield
+        delayTextField.focusedProperty().addListener((obs, old, focused) -> {
+            if (!focused) { // if user exits text field re-evaluate input
+                validateInput(delayTextField);
+            }
+        });
+
+        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
+        map.heightProperty().bind(middlePane.heightProperty());
+
     }
 
     @FXML
     protected void onPlayStart() {
-        disableAllButtons();
+        stepButton.setDisable(true);
         playButton.setDisable(false);
         if (playButton.isSelected()) { // toggled
             wrapperController.startSim();
@@ -92,14 +119,13 @@ public class GuiController {
         } else {
             wrapperController.stopSim();
             //playSlider.setVisible(false);
-            enableAllButtons();
+            stepButton.setDisable(false);
         }
     }
 
     @FXML
     protected void onSelect(){
         if (selectButton.isSelected()) { // toggled
-
         } else {
             System.out.println("Stopped");
         }
@@ -107,7 +133,7 @@ public class GuiController {
 
     @FXML
     protected void onStep() {
-        wrapperController.doSingleStep();
+        wrapperController.doStepUpdate();
     }
 
     @FXML
@@ -123,7 +149,7 @@ public class GuiController {
             fade.setToValue(0);
             fade.play();
             addMenu.setVisible(false);
-            enableAllButtons();
+            //enableAllButtons();
         }
     }
 
@@ -188,8 +214,15 @@ public class GuiController {
 
     public void doSimStep() {
         updateTime();
+        updateDelay();
         // rendering?
         // connection time_step?
+    }
+
+    public void updateDelay() {
+        if (delaySelect.getValue() != wrapperController.getDelay()) {
+            wrapperController.changeDelay(delaySelect.getValue());
+        }
     }
 
     public void updateTime() {
@@ -215,8 +248,26 @@ public class GuiController {
         }
     }
 
+    public void validateInput(TextField editor) {
+        try {
+            int val = Integer.parseInt(editor.getText()); // if it is not an Integer -> exception
+            if (val > maxDelay) {
+                val = maxDelay;
+            }
+            if (val <= 0) {
+                val = 1;
+            }
+            delaySelect.getValueFactory().setValue(val); // setting value
+            editor.setText(String.valueOf(val));
+
+        } catch (NumberFormatException e) { // catches exception
+            delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
+            editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
+        }
+    }
+
     @FXML
-    protected void addVehicle(){
+    public void addVehicle(){
         // parameters from addMenu components
         // static test
         wrapperController.addVehicle();
