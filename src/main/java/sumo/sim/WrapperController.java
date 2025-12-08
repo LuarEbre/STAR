@@ -42,9 +42,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -91,7 +91,6 @@ public class WrapperController {
                     System.out.println("Delay:" + delay);
 
                     doStepUpdate();
-                    Platform.runLater(guiController::doSimStep);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -129,23 +128,11 @@ public class WrapperController {
         try {
             connection.do_timestep();
             simTime = (double) connection.do_job_get(Simulation.getTime());
+            Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-    }
-
-    public void doSingleStep()  {
-        if (paused) {
-            try {
-                System.out.println("step");
-                connection.do_timestep(); // only useful if paused
-                simTime = (double) connection.do_job_get(Simulation.getTime());
-                Platform.runLater(guiController::doSimStep);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     public void terminate() {
