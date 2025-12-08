@@ -4,15 +4,21 @@ import de.tudresden.sumo.cmd.Edge;
 import de.tudresden.sumo.cmd.Lane;
 import it.polito.appeal.traci.SumoTraciConnection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Street {
     private double maxSpeed; // same attributes as in .net
     private final SumoTraciConnection con;
     private final String id;
     // List of <Lane> objects
+    private final ArrayList<LaneWrap> lanes = new ArrayList<>();
     private String fromJunction;
     private String toJunction;
-    XML xml = null;
     private double density;
+    private double noise;
+
+    private XML xml;
 
     public Street(String id, SumoTraciConnection con) {
         this.id = id;
@@ -67,6 +73,7 @@ public class Street {
     public void updateStreet(){
         try {
             calcDensity();
+            this.noise = (double)con.do_job_get(Edge.getNoiseEmission(id));
 
         }catch (Exception e){
             throw new RuntimeException(e);
