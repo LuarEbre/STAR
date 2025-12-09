@@ -5,6 +5,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
+import java.awt.geom.Point2D;
+
 public class SimulationRenderer {
     private final GraphicsContext gc;
     private final Canvas map;
@@ -13,13 +15,15 @@ public class SimulationRenderer {
     private double camY;
     private final Junction_List jl;
     private final Street_List sl;
+    private final Vehicle_List vl;
 
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
         this.zoom = 1;
         this.sl = sl;
         this.jl = jl;
+        this.vl = vl;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
         this.camY = jl.getCenterPosY() ;
     }
@@ -57,6 +61,7 @@ public class SimulationRenderer {
         gc.setTransform(transform); // applies new matrix to gc matrix
 
     }
+
 
     public void renderMap(Junction_List jl, Street_List sl){
 
@@ -104,23 +109,35 @@ public class SimulationRenderer {
             }
 
         }
+        renderVehicle();
     }
 
     public void renderVehicle(){
+        double angle = 0;
+        double posX;
+        double posY;
+        gc.setStroke(Color.RED);
 
+        for (VehicleWrap v : vl.getVehicles()) {
+           angle = v.getAngle();
+           posX = v.getPosition().getX();
+           posY = v.getPosition().getY();
+           //gc.translate(posX, posY);
+           //gc.scale(zoom, zoom);
+           //gc.rotate(angle);
+           gc.strokeOval(posX, posY, 4, 4);
+        }
     }
 
-    public void moveX(double pad) {
-        camX += pad;
-    }
-
-    public void moveY(double pad) {
-        camY += pad;
+    public void padMad(double x, double y) {
+        camX += x/(zoom/2); // zoom / 2 -> if zoomed out -> x gets bigger
+        camY += y/(zoom/2);
     }
 
     public void zoomMap(double z) {
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
+
 
 
 }
