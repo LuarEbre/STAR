@@ -284,6 +284,16 @@
     -fx-font-family:"Arial Black";
 }
 
+#stressTestMenu {
+    -fx-background-color: -fx-color-grey-dark;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15,13;
+    -fx-background-radius: 15;
+}
+
 /* style class for buttons*/
 .menu-btn {
     -fx-background-color: -fx-color-grey-light;

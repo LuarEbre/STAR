@@ -3,7 +3,7 @@ package sumo.sim;
 import java.util.*;
 
 public class RouteList {
-    // stores all routes: key = route ID(e.g. "r_0.0", value = RouteWhrap-object
+    // stores all routes: key = route ID(e.g. "r_0.0", value = RouteWrap-object
     private final Map<String, RouteWrap> routes = new HashMap<>();
 
     // stores the edge IDs which ar defined as starting points (set for fast checking)

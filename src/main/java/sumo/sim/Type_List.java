@@ -24,6 +24,11 @@ public class Type_List {
             SumoStringList list = (SumoStringList) connection.do_job_get(Vehicletype.getIDList());
             for (String id : list) {
                 //several type attributes should be added here
+
+                // filtering Default_types
+                if (id.equals("DEFAULT_RAILTYPE") || id.equals("DEFAULT_BIKETYPE") ||
+                        id.equals("DEFAULT_CONTAINERTYPE") || id.equals("DEFAULT_PEDTYPE")) continue;
+
                 String color = connection.do_job_get(Vehicletype.getColor(id)).toString();
                 double speed = (double) connection.do_job_get(Vehicletype.getMaxSpeed(id));
                 //System.out.println("id: " + id);
@@ -44,5 +49,9 @@ public class Type_List {
             i++;
         }
         return ret;
+    }
+
+    public Type getSpecificType(String id) {
+        return types.get(id);
     }
 }
