@@ -42,8 +42,8 @@ public class RouteList {
             }
         }
 
-        System.out.println("RouteList geladen: " + routes.size() + " Routen, "
-                + validStartEdgeIDs.size() + " valide Startkanten gefunden.");
+        System.out.println("RouteList loaded: " + routes.size() + " routes, "
+                + validStartEdgeIDs.size() + " valid starting points found.");
     }
 
     // public methods for gui implementation
