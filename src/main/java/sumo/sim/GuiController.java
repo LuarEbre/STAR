@@ -2,12 +2,15 @@ package sumo.sim;
 
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -42,9 +45,12 @@ public class GuiController {
     private Slider playSlider;
     @FXML
     private ListView<String> listData; // list displaying data as a string
+    @FXML
+    private ChoiceBox<String> typeSelector;
     private final int defaultDelay;
     private final int maxDelay;
     private GraphicsContext gc;
+    private SimulationRenderer sr;
 
     private WrapperController wrapperController;
 
@@ -55,10 +61,10 @@ public class GuiController {
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
-        gc = map.getGraphicsContext2D();
-        SimulationRenderer sr = new SimulationRenderer(map,gc);
-        sr.initRender(wrapperController.get_junction(),wrapperController.get_sl());
+        initializeRender();
 
+        String[] arr = wrapperController.setTypeList();
+        typeSelector.setItems(FXCollections.observableArrayList(arr));
     }
 
     public void closeAllMenus() {
@@ -106,6 +112,7 @@ public class GuiController {
 
         map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
         map.heightProperty().bind(middlePane.heightProperty());
+
 
     }
 
@@ -215,6 +222,7 @@ public class GuiController {
     public void doSimStep() {
         updateTime();
         updateDelay();
+        //renderUpdate();
         // rendering?
         // connection time_step?
     }
@@ -266,12 +274,41 @@ public class GuiController {
         }
     }
 
+    public void initializeRender(){
+        gc = map.getGraphicsContext2D();
+        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl());
+        renderUpdate();
+    }
+
+    public void renderUpdate(){
+        sr.initRender();
+    }
+
     @FXML
     public void addVehicle(){
         // parameters from addMenu components
         // static test
         wrapperController.addVehicle();
     }
+
+    @FXML
+    protected void mapClick(){
+        sr.moveX(100);
+    }
+
+    @FXML
+    protected void zoomMap(ScrollEvent event){
+
+        if (event.getDeltaY() > 0) { // delta y vertical
+            sr.zoomMap(1.2);
+            System.out.println("zoom");
+        } else  {
+            System.out.println("zoomout");
+            sr.zoomMap(0.8);
+        }
+    }
+
+
 
 }
 

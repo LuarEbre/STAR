@@ -12,8 +12,8 @@ public class LaneWrap {
     private final String laneID;
     private final SumoTraciConnection connection;
     private final String edgeID;
-    private double[] shapeX;
-    private double[] shapeY;
+    private final double[] shapeX;
+    private final double[] shapeY;
 
     public LaneWrap(String laneID,SumoTraciConnection connection, String edgeID) {
         this.laneID = laneID;
