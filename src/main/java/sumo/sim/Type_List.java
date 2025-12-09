@@ -12,8 +12,9 @@ import java.util.Map;
 public class Type_List {
     // has a list of all current (and newly created) Vehicle types
 
-    private final Map<String,Type> types = new HashMap<>(); // string key unique: type id
+    private final Map<String, Type> types = new HashMap<>(); // string key unique: type id
     private final SumoTraciConnection connection;
+
     /*
     type_id -> list(color,max speed)
      */
@@ -25,7 +26,7 @@ public class Type_List {
                 //several type attributes should be added here
                 String color = connection.do_job_get(Vehicletype.getColor(id)).toString();
                 double speed = (double) connection.do_job_get(Vehicletype.getMaxSpeed(id));
-                System.out.println("id: " + id);
+                //System.out.println("id: " + id);
 
                 Type type = new Type(id, color, speed);
                 types.put(id, type); // type and hashmap same ID
@@ -35,7 +36,13 @@ public class Type_List {
         }
     }
 
-    public Map<String,Type> getAllTypes() {
-        return types;
+    public String[] getAllTypes() {
+        String[] ret = new String[types.size()];
+        int i = 0;
+        for (String id : types.keySet()) {
+            ret[i] = id;
+            i++;
+        }
+        return ret;
     }
 }

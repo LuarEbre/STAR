@@ -1,0 +1,284 @@
+/* Menus */
+#root {
+    /*
+    Grayscale Palette
+    */
+    -fx-color-grey-darkest: #F5F5F5;
+    -fx-color-grey-dark: #FAFAFA;
+    -fx-color-grey-middle: #E6E6E8;
+    -fx-color-grey-light: #CFCFD4;
+    -fx-color-grey-light-selected: #BFBFD4;
+    -fx-color-grey-lightest: #8D8D95;
+    -fx-color-white: #16161A;
+    /*
+    Accent Colors
+    */
+    -fx-color-red: #C14E4E;
+    -fx-color-orange: #E6992C;
+    -fx-color-magenta: #FF1CF0;
+    -fx-color-magenta-dark: #A230C8;
+    -fx-color-blue: #39BFF9;
+    -fx-color-green: #2CE658;
+
+    -fx-background-color: -fx-color-grey-dark;
+}
+/* experimental : changes cursor style when hovering over buttons
+.button {
+    -fx-cursor: hand;
+}
+*/
+#menuTop {
+    -fx-background-color: -fx-color-grey-dark;
+}
+
+#menuTop1 {
+    -fx-text-fill: -fx-color-grey-dark;
+}
+
+#listData {
+    -fx-background-color: -fx-color-grey-middle;
+}
+
+#middlePane {
+    -fx-background-color: -fx-color-grey-middle;
+    -fx-border-color:-fx-color-grey-darkest;
+    -fx-border-width: 6;
+}
+
+#dataPane {
+    -fx-background-color: -fx-color-grey-middle;
+}
+
+#dataSep .line {
+    -fx-border-color: -fx-color-grey-darkest;
+    -fx-border-width: 3;
+}
+
+#topSep .line {
+    -fx-border-color: -fx-color-grey-darkest;
+    -fx-border-width: 2;
+}
+
+#bottomSep .line {
+    -fx-border-color: -fx-color-grey-darkest;
+    -fx-border-width: 2;
+}
+
+/*Top Menu style */
+.topmenu-button {
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family:"Arial Black";
+    -fx-background-color: -fx-color-grey-darkest;
+}
+
+.topmenu-button:hover {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 15, 13;
+}
+
+.topMenuBackground {
+    -fx-background-color: -fx-color-grey-dark;
+}
+
+.topMenuLabel {
+    -fx-text-fill: -fx-color-magenta;
+    -fx-font-family:"Arial Black";
+}
+
+.whiteLabel {
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family:"Arial Black";
+}
+
+.viewLabel {
+    -fx-text-fill: -fx-color-grey-lightest;
+    -fx-font-family:"Arial Black";
+}
+
+.viewLabel:selected {
+    -fx-text-fill: -fx-color-magenta;
+    -fx-font-family:"Arial Black";
+}
+
+.mapSelect:hover {
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 3, 3;
+    -fx-border-insets: 0, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+    -fx-background-radius: 15;
+}
+
+/* Middle style */
+.zoomMenu {
+    -fx-fill: -fx-color-grey-light ;
+    -fx-stroke: #333333;
+    -fx-stroke-width: 0;
+    -fx-cursor: hand;
+}
+
+.zoomMenu:hover {
+    /* border = stroke, needs custom one */
+}
+
+.fileMenu {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-font-family:"Arial Black";
+}
+
+.fileMenu:hover {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 15, 13;
+    -fx-text-fill: -fx-color-magenta;
+}
+
+
+
+/* Main Button menus*/
+#addMenu {
+    /* add vehicle button */
+    -fx-background-color: -fx-color-grey-dark;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15,13;
+    -fx-background-radius: 15;
+}
+
+.addMenu-labels {
+    -fx-text-fill: -fx-color-magenta;
+}
+
+/* style class for buttons*/
+.menu-btn {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-background-radius: 15;
+    -fx-alignment: center;
+}
+
+.menu-btn:hover {
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 3, 3;
+    -fx-border-insets: 0, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+}
+
+.menu-btn:selected {
+    -fx-background-color: -fx-color-grey-lightest;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 4;
+    -fx-background-radius: 15;
+    -fx-border-radius: 13;
+}
+
+.menu-btn:disabled {
+    -fx-background-color: -fx-color-grey-middle;
+}
+
+/* Main Buttons */
+
+#selectButton {
+    -fx-background-image: url("/Gui/Icons/pointer3.png");
+    -fx-background-size: 50px 50px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#selectButton:hover {
+    -fx-background-image: url("/Gui/Icons/pointer2.png");
+    -fx-background-size: 48px 48px;
+}
+
+#selectButton:selected {
+    -fx-background-image: url("/Gui/Icons/pointer2.png");
+    -fx-background-size: 48px 48px;
+}
+
+#addButton {
+    -fx-background-image: url("/Gui/Icons/plus.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#addButton:hover{
+    -fx-background-image: url("/Gui/Icons/plus.png");
+    -fx-background-size: 62px 62px;
+}
+
+#playButton {
+    -fx-background-image: url("/Gui/Icons/play.png");
+    -fx-background-size: 48px 48px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#playButton:hover {
+    -fx-background-image: url("/Gui/Icons/play.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+#playButton:selected {
+    -fx-background-image: url("/Gui/Icons/pause.png");
+    -fx-background-size: 64px 64px;
+}
+
+#stressTestButton {
+    -fx-background-image: url("/Gui/Icons/stressTest.png");
+    -fx-background-size: 48px 48px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#stressTestButton:hover {
+    -fx-background-image: url("/Gui/Icons/carIcon.png");
+}
+
+#stressTestButton:selected {
+    -fx-background-image: url("/Gui/Icons/carIcon.png");
+}
+
+#stepButton {
+    -fx-background-image: url("/Gui/Icons/step.png");
+    -fx-background-size: 56px 56px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#stepButton:hover {
+    -fx-background-image: url("/Gui/Icons/step_shoe.png");
+    -fx-background-size: 48px 48px;
+}
+
+#stepButton:pressed {
+    -fx-background-image: url("/Gui/Icons/step_shoe.png");
+    -fx-background-size: 56px 56px;
+}
+
+
+#listData .list-cell {
+    -fx-padding: 3 3 3 3;
+    -fx-background-color: -fx-color-grey-middle;
+    -fx-text-fill: white;
+    -fx-font-family:"Arial Black";
+}
+
+#listData .list-cell:odd {
+    -fx-background-color: -fx-color-grey-light;
+}
+
+#listData .list-cell:selected {
+    -fx-background-color: -fx-color-magenta;
+}
+
+#listData .scroll-bar {
+    -fx-background-color: -fx-color-grey-darkest;
+}
+
