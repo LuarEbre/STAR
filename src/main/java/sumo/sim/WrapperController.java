@@ -30,6 +30,7 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private XML netXml;
 
     public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
 
@@ -42,9 +43,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -158,6 +159,10 @@ public class WrapperController {
 
     public Junction_List get_junction() {
         return jl;
+    }
+
+    public Street_List get_sl() {
+        return sl;
     }
 
     //setter
