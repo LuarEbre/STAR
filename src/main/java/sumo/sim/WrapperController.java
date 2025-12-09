@@ -2,17 +2,15 @@ package sumo.sim;
 
 import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
-import javafx.application.Application;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.scene.paint.Color;
+import javafx.collections.ObservableList;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import java.awt.geom.Point2D;
-import java.util.Locale;
 
 // Main Controller class connecting everything and running the sim.
 public class WrapperController {
@@ -25,11 +23,13 @@ public class WrapperController {
     private TrafficLights_List tl;
     private Vehicle_List vl;
     private Junction_List jl;
+    private Type_List typel;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private XML netXml;
 
     public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
 
@@ -42,9 +42,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -70,8 +70,10 @@ public class WrapperController {
         sl = new Street_List(this.connection);
         tl = new TrafficLights_List(connection, sl);
         jl = new Junction_List(connection, sl);
+        typel = new Type_List(connection);
         Type_List types = new Type_List(connection);
         start();
+        startRenderer();
     }
 
     public void start() { // maybe with connection as argument? closing connection opened prior
@@ -97,6 +99,16 @@ public class WrapperController {
                 }
             }
             }, 0, delay, TimeUnit.MILLISECONDS); // initialdelay, delay, unit
+    }
+
+    public void startRenderer() { // maybe with connection as argument? closing connection opened prior
+        AnimationTimer renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
+            @Override
+            public void handle(long timestamp) {
+                guiController.renderUpdate();
+            }
+        };
+        renderLoop.start(); // runs 60 frames per second
     }
 
     // methods controlling the simulation / also connected with the guiController
@@ -160,5 +172,13 @@ public class WrapperController {
         return jl;
     }
 
+    public Street_List get_sl() {
+        return sl;
+    }
+
     //setter
+
+    public String[] setTypeList() {
+        return typel.getAllTypes();
+    }
 }

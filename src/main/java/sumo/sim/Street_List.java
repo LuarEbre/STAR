@@ -20,8 +20,10 @@ public class Street_List {
             SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array
             this.connection = con;
             for (String id : list) {
-                streets.add(new Street(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
-                count++;
+                if(!id.startsWith(":")) {
+                    streets.add(new Street(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
+                    count++;
+                }
             }
 
         } catch (Exception e) {
