@@ -2,12 +2,15 @@ package sumo.sim;
 
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -42,6 +45,8 @@ public class GuiController {
     private Slider playSlider;
     @FXML
     private ListView<String> listData; // list displaying data as a string
+    @FXML
+    private ChoiceBox<String> typeSelector;
     private final int defaultDelay;
     private final int maxDelay;
     private GraphicsContext gc;
@@ -57,6 +62,9 @@ public class GuiController {
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
         initializeRender();
+
+        String[] arr = wrapperController.setTypeList();
+        typeSelector.setItems(FXCollections.observableArrayList(arr));
     }
 
     public void closeAllMenus() {
@@ -104,6 +112,7 @@ public class GuiController {
 
         map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
         map.heightProperty().bind(middlePane.heightProperty());
+
 
     }
 
@@ -213,7 +222,7 @@ public class GuiController {
     public void doSimStep() {
         updateTime();
         updateDelay();
-        renderUpdate();
+        //renderUpdate();
         // rendering?
         // connection time_step?
     }
@@ -284,13 +293,22 @@ public class GuiController {
 
     @FXML
     protected void mapClick(){
-        System.out.println("mapClick");
         sr.moveX(100);
     }
 
-    protected void zoomMap(){
-        sr.zoomMap(1);
+    @FXML
+    protected void zoomMap(ScrollEvent event){
+
+        if (event.getDeltaY() > 0) { // delta y vertical
+            sr.zoomMap(1.2);
+            System.out.println("zoom");
+        } else  {
+            System.out.println("zoomout");
+            sr.zoomMap(0.8);
+        }
     }
+
+
 
 }
 

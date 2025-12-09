@@ -1,13 +1,9 @@
 package sumo.sim;
 
-import de.tudresden.sumo.cmd.Junction;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
-
-
-import static java.lang.Math.abs;
 
 public class SimulationRenderer {
     private final GraphicsContext gc;
@@ -20,8 +16,8 @@ public class SimulationRenderer {
 
     public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl) {
         this.map = canvas;
-        this.gc = gc;
-        this.zoom = 0.4;
+        this.gc = gc; // for drawing on canvas
+        this.zoom = 1;
         this.sl = sl;
         this.jl = jl;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
@@ -33,7 +29,7 @@ public class SimulationRenderer {
         // -> network: only do the following rendering with objects inside this restricting area;
         gc.setTransform(new Affine()); // transformation matrix
 
-        gc.setFill(Color.LIGHTGREEN);
+        gc.setFill(Color.GREEN);
         gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
         transform();
         renderMap(jl,sl);
@@ -119,8 +115,9 @@ public class SimulationRenderer {
     }
 
     public void zoomMap(double z) {
-        zoom += z;
+        zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
+
 
 }
 

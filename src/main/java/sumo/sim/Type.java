@@ -11,4 +11,8 @@ public class Type {
         this.color = color;
         this.speed = speed;
     }
+
+    public String getId() {
+        return id;
+    }
 }
