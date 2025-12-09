@@ -53,7 +53,7 @@
        <!-- Middle pane -->
        <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseEntered="#onMiddlePaneHover" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
            <children>
-               <Canvas fx:id="map" height="447.0" layoutX="200.0" onMouseClicked="#mapClick" onScroll="#zoomMap" width="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               <Canvas fx:id="map" height="447.0" layoutX="200.0" onScroll="#zoomMap" width="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 
                <AnchorPane fx:id="dataPane" prefHeight="439.0" prefWidth="200.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="-1.0">
                <children>

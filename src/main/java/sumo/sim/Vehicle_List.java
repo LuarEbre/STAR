@@ -26,7 +26,7 @@ public class Vehicle_List {
     public void addVehicle(int n, String type) { // more arguments later? maybe overloaded methods with different args.
         try {
             for (int i=0; i<n; i++) {
-                con.do_job_set(Vehicle.addFull("v" + count, "r1", type, // ids -> latest car id
+                con.do_job_set(Vehicle.addFull("v" + count, "r0", type, // ids -> latest car id
                         "now", "0", "0", "0",
                         "current", "max", "current", "",
                         "", "", 0, 0)
@@ -77,6 +77,14 @@ public class Vehicle_List {
                 this.vehicles.get(i).updateVehicle();
             }
         }
+    }
+
+    public ArrayList<Point2D.Double> getAllPositions() {
+        ArrayList<Point2D.Double> positions = new ArrayList<>();
+        for (VehicleWrap v : vehicles) {
+            positions.add(v.getPosition());
+        }
+        return positions;
     }
 
     public void printVehicles() {
@@ -132,5 +140,9 @@ public class Vehicle_List {
 
     public int getCount() {
         return count;
+    }
+
+    public ArrayList<VehicleWrap> getVehicles() {
+        return vehicles;
     }
 }
