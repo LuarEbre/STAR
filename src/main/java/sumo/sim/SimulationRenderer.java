@@ -106,6 +106,10 @@ public class SimulationRenderer {
         }
     }
 
+    public void renderVehicle(){
+
+    }
+
     public void moveX(double pad) {
         camX += pad;
     }

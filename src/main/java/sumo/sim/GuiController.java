@@ -3,23 +3,19 @@ package sumo.sim;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.text.SimpleDateFormat;
 
 public class GuiController {
 
@@ -46,7 +42,7 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector;
+    private ChoiceBox<String> typeSelector, routeSelector;
     private final int defaultDelay;
     private final int maxDelay;
     private GraphicsContext gc;
@@ -59,12 +55,24 @@ public class GuiController {
         maxDelay = 999;
     }
 
-    public void setConnectionToWrapperCon(WrapperController wrapperController) {
+    public void initializeCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
         initializeRender();
 
+        // displays all available types found in xml
         String[] arr = wrapperController.setTypeList();
         typeSelector.setItems(FXCollections.observableArrayList(arr));
+        int i = 0;
+        boolean found = false;
+        while (i< arr.length && !found ) {
+            if (arr[i].equals("DEFAULT_VEHTYPE")) {
+                found = true;
+                typeSelector.setValue(arr[i]); // default vehtype standard
+            }
+            i++;
+        }
+
+        //routeSelector.setItems("Custom");
     }
 
     public void closeAllMenus() {
@@ -110,8 +118,9 @@ public class GuiController {
             }
         });
 
-        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
-        map.heightProperty().bind(middlePane.heightProperty());
+        // scales map based on pane width and height
+        map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
+        map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
 
 
     }
@@ -288,7 +297,9 @@ public class GuiController {
     public void addVehicle(){
         // parameters from addMenu components
         // static test
-        wrapperController.addVehicle();
+        int amount = 1;
+        String type = typeSelector.getValue();
+        wrapperController.addVehicle(amount, type);
     }
 
     @FXML

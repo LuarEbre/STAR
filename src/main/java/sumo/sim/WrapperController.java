@@ -42,9 +42,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -113,10 +113,10 @@ public class WrapperController {
 
     // methods controlling the simulation / also connected with the guiController
 
-    public void addVehicle() { // int number, String type, Color color ,,int amount, String type, String route
+    public void addVehicle(int amount, String type) { // int number, String type, Color color ,,int amount, String type, String route
         // used by guiController
         // executes addVehicle from WrapperVehicle
-        vl.addVehicle(1, "t_0"); // type t_0 (can be chosen)
+        vl.addVehicle(amount, type);
     }
 
     public void changeDelay(int delay) {

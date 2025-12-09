@@ -90,8 +90,9 @@ public class Vehicle_List {
                         // forces US locale, making double values be separated via period, rather than comma
                         Locale.US,
                         // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
-                        "            %s: speed = %f, position = (%06.2f | %06.2f), angle = %06.2f, avgSpeed = %f, accel = %f%n               waited %.0fs, active for %ds, stopped %d times, alive for %ds%n",
+                        "             %s: type =  %s, speed = %f, position = (%06.2f | %06.2f), angle = %06.2f, avgSpeed = %f, accel = %f%n               waited %.0fs, active for %ds, stopped %d times, alive for %ds%n",
                         currVehicle.getID(),
+                        currVehicle.getType(),
                         currVehicle.getSpeed(),
                         pos.x,
                         pos.y,

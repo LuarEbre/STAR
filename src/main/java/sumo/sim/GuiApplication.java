@@ -37,7 +37,7 @@ public class GuiApplication extends Application {
 
         // Establishing connection between WrappCon and GuiCon
         WrapperController wrapper = new WrapperController(guiController);
-        guiController.setConnectionToWrapperCon(wrapper);
+        guiController.initializeCon(wrapper);
 
     }
 }
