@@ -13,9 +13,12 @@ public class Street_List {
     // List of streets (like TL_List)
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
+    private SumoTraciConnection connection;
+
     public Street_List(SumoTraciConnection con) {
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array
+            this.connection = con;
             for (String id : list) {
                 if(!id.startsWith(":")) {
                     streets.add(new Street(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
@@ -48,5 +51,21 @@ public class Street_List {
         }
     }
 
+    public Street getDensest(){
+        Street densest = new Street("", connection);
+        densest.setDensity(0);
 
+        for (Street s : streets) {
+            if(s.getDensity()>densest.getDensity()){
+                densest = s;
+            }
+        }
+        return densest;
+    }
+
+    public void updateStreets(){
+        for (Street s : streets) {
+            s.updateStreet();
+        }
+    }
 }

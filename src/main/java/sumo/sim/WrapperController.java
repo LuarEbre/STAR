@@ -38,7 +38,7 @@ public class WrapperController {
         String sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
                 ? "src/main/resources/Binaries/sumo.exe"
-                : "/usr/local/bin/sumo";
+                : "src/main/resources/Binaries/sumo";
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";

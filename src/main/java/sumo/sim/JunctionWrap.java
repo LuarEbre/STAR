@@ -65,8 +65,7 @@ public class JunctionWrap {
     }
 
     public double distance_to(JunctionWrap u) {
-        double distance = abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
-        return distance;
+        return abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
     }
 
     public Point2D.Double getPosition() {
