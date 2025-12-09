@@ -3,21 +3,28 @@ package sumo.sim;
 import java.util.List;
 
 public class RouteWrap {
-    // has route id and all edges(street) object in that route ;
-    public List<String> id;
-    // list of Street associated with that route;
 
-    public RouteWrap(List <String> id) {
-        this.id = id;
+    //stores the edge IDs which define the route
+    private final List<String> edges;
+
+    public RouteWrap(List<String> edges) {
+        this.edges = edges; // stores the edge IDs
     }
 
-    public List<String> getId() {
-        return id;
+    // returns list of edge IDs which belong to the route
+    public List<String> getEdges() {
+        return edges;
+    }
+
+    // returns edge ID which is the start of the route
+    public String getStartEdgeID() {
+        return edges.isEmpty() ? null : edges.get(0);
     }
 
     public void printRoute() {
-        for (int i = 0; i < id.size(); i++) {
-            System.out.println(id.get(i));
+        //uses list of edges
+        for (String edgeId : edges) {
+            System.out.println(edgeId);
         }
     }
 }

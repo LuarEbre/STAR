@@ -34,7 +34,7 @@ public class JunctionWrap {
             this.shapeX = new double[numPoints];
             this.shapeY = new double[numPoints];
 
-            for (int i = 0; i < numPoints; i++) { // every point allocated to shapeX and Y
+            for (int i = 0; i < numPoints; i++) { // every point allocated to shape X and Y
                 SumoPosition2D point = coords.get(i);
                 this.shapeX[i] = point.x;
                 this.shapeY[i] = point.y;
@@ -65,8 +65,7 @@ public class JunctionWrap {
     }
 
     public double distance_to(JunctionWrap u) {
-        double distance = abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
-        return distance;
+        return abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
     }
 
     public Point2D.Double getPosition() {

@@ -6,8 +6,14 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import java.awt.geom.Point2D;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.*;
+import java.io.File;
+import java.io.IOException;
 
 public class XML {
 // XML file read/write class
@@ -22,6 +28,7 @@ public class XML {
         document = saxBuilder.build(file);
 
     }
+
 
     /*
     public static void insert_edge(String[] args) throws Exception {
@@ -150,6 +157,54 @@ public class XML {
             }
         }
         return null;
+    }
+    // new method to call net-offset from <location>-section
+    public double[] getNetOffsets() {
+        Element root = document.getRootElement();
+        Element location = root.getChild("location");
+
+        if (location != null) {
+            String netOffsetValue = location.getAttributeValue("netOffset");
+            if (netOffsetValue != null) {
+                String[] parts = netOffsetValue.split(",");
+                if (parts.length == 2) {
+                    try {
+                        // convetion to double
+                        double xOffset = Double.parseDouble(parts[0].trim());
+                        double yOffset = Double.parseDouble(parts[1].trim());
+                        return new double[]{xOffset, yOffset};
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error parsing the netoffset data: " + e.getMessage());
+                    }
+                }
+            }
+        }
+        // if no offset found = (0,0)
+        return new double[]{0.0, 0.0};
+    }
+    /**
+     * Parst alle <route>-Elemente aus der Routen-XML-Datei und gibt sie zurück.
+     * @return Eine Map, wobei der Schlüssel die Route-ID ist und der Wert
+     * eine Liste der Kanten-IDs ist.
+     */
+    public Map<String, List<String>> getRoutes() {
+        Element root = document.getRootElement();
+
+        List<Element> routeElements = root.getChildren("route");
+
+        Map<String, List<String>> allRoutes = new HashMap<>();
+
+        for (Element route : routeElements) {
+            String routeId = route.getAttributeValue("id");
+            String edgesString = route.getAttributeValue("edges");
+
+            if (routeId != null && edgesString != null) {
+                // splits string of edges into list of edge IDs
+                List<String> edges = Arrays.asList(edgesString.split("\\s+"));
+                allRoutes.put(routeId, edges);
+            }
+        }
+        return allRoutes;
     }
 
 }
