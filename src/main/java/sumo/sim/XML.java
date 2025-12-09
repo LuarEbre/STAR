@@ -6,8 +6,11 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import javax.xml.stream.*;
+
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,16 +20,86 @@ import java.io.IOException;
 
 public class XML {
 // XML file read/write class
-    private static File file;
-    private static SAXBuilder saxBuilder;
-    private static Document document;
+    private static FileInputStream file;
+    //private static SAXBuilder saxBuilder;
+    //private static Document document;
+    private static XMLInputFactory factory = null;
+    private static XMLStreamReader reader = null;
 
     public XML(String path) throws Exception{
-        file = new File(path);
+        file = new FileInputStream(path);
+        factory = XMLInputFactory.newInstance();
+        reader = factory.createXMLStreamReader(file);
 
-        saxBuilder = new SAXBuilder();
-        document = saxBuilder.build(file);
+        //saxBuilder = new SAXBuilder();
+        //document = saxBuilder.build(file);
 
+    }
+
+    public String get_from_junction(String id){
+        try{
+            while(reader.hasNext()){
+                int event =  reader.next();
+
+                if(event == XMLStreamConstants.START_ELEMENT && reader.getLocalName().equals("edge")){
+
+                    String edgeID = reader.getAttributeValue(null, "id");
+                    if(id.equals(edgeID)){
+                        return reader.getAttributeValue(null, "from");
+                    }
+                }
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public String get_to_junction(String id) {
+        try {
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT &&
+                        reader.getLocalName().equals("edge")) {
+
+                    String edgeId = reader.getAttributeValue(null, "id");
+                    if (id.equals(edgeId)) {
+                        return reader.getAttributeValue(null, "to");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public Map<String, String[]> readAllEdges() {
+        Map<String, String[]> map = new HashMap<>();
+
+        try {
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT &&
+                        reader.getLocalName().equals("edge")) {
+
+                    String id = reader.getAttributeValue(null, "id");
+                    String from = reader.getAttributeValue(null, "from");
+                    String to = reader.getAttributeValue(null, "to");
+
+                    if (id != null && from != null && to != null) {
+                        map.put(id, new String[]{from, to});
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return map;
     }
 
 
@@ -82,7 +155,7 @@ public class XML {
         xmlOutputter.output(document, new java.io.FileWriter(file));
     }
     */
-
+    /*
     public static void new_route(String id, String[] edges ) throws Exception{
 
         Element root = document.getRootElement();
@@ -187,6 +260,8 @@ public class XML {
      * @return Eine Map, wobei der Schlüssel die Route-ID ist und der Wert
      * eine Liste der Kanten-IDs ist.
      */
+
+    /*
     public Map<String, List<String>> getRoutes() {
         Element root = document.getRootElement();
 
@@ -206,5 +281,7 @@ public class XML {
         }
         return allRoutes;
     }
+    */
+
 
 }
