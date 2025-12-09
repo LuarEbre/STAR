@@ -45,6 +45,7 @@ public class GuiController {
     private final int defaultDelay;
     private final int maxDelay;
     private GraphicsContext gc;
+    private SimulationRenderer sr;
 
     private WrapperController wrapperController;
 
@@ -55,10 +56,7 @@ public class GuiController {
 
     public void setConnectionToWrapperCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
-        gc = map.getGraphicsContext2D();
-        SimulationRenderer sr = new SimulationRenderer(map,gc);
-        sr.initRender(wrapperController.get_junction(),wrapperController.get_sl());
-
+        initializeRender();
     }
 
     public void closeAllMenus() {
@@ -215,6 +213,7 @@ public class GuiController {
     public void doSimStep() {
         updateTime();
         updateDelay();
+        renderUpdate();
         // rendering?
         // connection time_step?
     }
@@ -266,11 +265,31 @@ public class GuiController {
         }
     }
 
+    public void initializeRender(){
+        gc = map.getGraphicsContext2D();
+        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl());
+        renderUpdate();
+    }
+
+    public void renderUpdate(){
+        sr.initRender();
+    }
+
     @FXML
     public void addVehicle(){
         // parameters from addMenu components
         // static test
         wrapperController.addVehicle();
+    }
+
+    @FXML
+    protected void mapClick(){
+        System.out.println("mapClick");
+        sr.moveX(100);
+    }
+
+    protected void zoomMap(){
+        sr.zoomMap(1);
     }
 
 }

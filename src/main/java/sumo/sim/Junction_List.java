@@ -96,7 +96,7 @@ public class Junction_List {
     }
 
     public double getMinPosX(){
-        double minX = 0.0;
+        double minX = Double.MAX_VALUE; // max value so the first element is always the smallest, still needs check if list is empty
         for (JunctionWrap jw : junctions) {
             if (jw.getPosition().x < minX) minX = jw.getPosition().x;
         }
@@ -104,11 +104,42 @@ public class Junction_List {
     }
 
     public double getMinPosY(){
-        double minY = 0.0;
+        double minY = Double.MAX_VALUE;
         for (JunctionWrap jw : junctions) {
             if (jw.getPosition().y < minY) minY = jw.getPosition().y;
         }
         return minY;
+    }
+
+
+    public double getCenterPosX() {
+        if (junctions.isEmpty()) return 0;
+
+        double minX = Double.MAX_VALUE; // max possible so always next element min
+        double maxX = -Double.MAX_VALUE;
+
+        for (JunctionWrap jw : junctions) {
+            double x = jw.getPosition().getX();
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+        }
+
+        return (minX + maxX) / 2;
+    }
+
+    public double getCenterPosY() {
+        if (junctions.isEmpty()) return 0;
+
+        double minY = Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+
+        for (JunctionWrap jw : junctions) {
+            double y = jw.getPosition().getY();
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+        }
+
+        return (minY + maxY) / 2;
     }
 
     public ArrayList<JunctionWrap> getJunctions() {
