@@ -180,6 +180,92 @@
 }
 
 
+#amountMinus {
+    -fx-background-radius: 6 0 0 6;
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family:"Arial Black";
+    -fx-font-weight: bold;
+}
+
+#amountPlus {
+    -fx-background-radius: 0 6 6 0;
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family:"Arial Black";
+    -fx-font-weight: bold;
+}
+
+#amountField {
+    -fx-background-radius: 0 0 0 0;
+    -fx-background-color: -fx-color-grey-lightest;
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family:"Arial Black";
+    -fx-alignment: center;
+}
+
+#colorSelector {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-font-family:"Arial Black";
+}
+
+#colorSelector > .label {
+    -fx-text-fill: -fx-color-white;
+}
+
+/* universal settings for all choiceboxes */
+.choice-box {
+    -fx-background-color: -fx-color-grey-light;
+}
+
+.choice-box > .label {
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family: "Arial Black";
+    -fx-allignment: center;
+}
+
+.choice-box .open-button .arrow {
+    -fx-background-color: -fx-color-white;
+}
+
+/* dropdown menu */
+.choice-box .context-menu {
+    -fx-background-color: -fx-color-grey-middle;
+}
+
+.choice-box .menu-item {
+    -fx-padding: 10px;
+}
+
+.choice-box .menu-item .label {
+    -fx-text-fill: -fx-color-white;
+}
+
+.choice-box .menu-item:focused .label {
+    -fx-text-fill: -fx-color-white;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 2, 0.0, 0, 1);
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+}
+
+#addVehicleButton {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: -fx-color-white;
+}
+
+#generateRoute {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: -fx-color-white;
+}
+
+#addMenu .separator .line {
+    -fx-border-color: -fx-color-grey-darkest;
+    -fx-border-width: 1.5px;
+    -fx-background-color: null;
+}
 
 /* Main Button menus*/
 #addMenu {
