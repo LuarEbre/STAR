@@ -2,6 +2,8 @@ package sumo.sim;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CSV {
 
@@ -15,12 +17,15 @@ public class CSV {
     }
 
 
-    public void add_to_CsvFile(String new_data) {
+    public void add_to_CsvFile(String[] new_data) {
         try {
-            fw.append(new_data + "\n");
+            for(int i = 0; i < new_data.length; i++){
+                fw.write(new_data[i]);
+                fw.write("\n");
+            }
 
         } catch (IOException i) {
-            i.printStackTrace();
+            System.out.println("Could not write Data to CSV File" + i);
         }
     }
 
