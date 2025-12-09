@@ -30,6 +30,7 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private XML netXml;
 
     public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
 

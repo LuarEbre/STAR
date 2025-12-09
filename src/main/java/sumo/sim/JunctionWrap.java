@@ -34,7 +34,7 @@ public class JunctionWrap {
             this.shapeX = new double[numPoints];
             this.shapeY = new double[numPoints];
 
-            for (int i = 0; i < numPoints; i++) { // every point allocated to shapeX and Y
+            for (int i = 0; i < numPoints; i++) { // every point allocated to shape X and Y
                 SumoPosition2D point = coords.get(i);
                 this.shapeX[i] = point.x;
                 this.shapeY[i] = point.y;
