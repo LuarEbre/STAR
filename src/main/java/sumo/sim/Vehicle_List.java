@@ -56,26 +56,22 @@ public class Vehicle_List {
         }
     }
 
-    public boolean exists(String ID){
-        try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList()); // all current cars
-            for (String id : list) {
-               if  (id.equals(ID)) { // if car with certain id is still on the road
-                   return true;
-               }
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return false; // if despawned , delete from list?
+    public boolean exists(String ID) {
+        return this.getVehicle(ID).exists();
     }
 
     public void updateAllVehicles() {
-        for (int i = 0; i < this.count; i++) {
-            if (this.exists("v"+i)) { // if still exists
-                this.vehicles.get(i).updateVehicle();
+        try {
+            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList()); // all current cars
+            for (VehicleWrap v : vehicles) {
+                if(list.contains(v.getID())) {
+                    v.setExists(true);
+                    v.updateVehicle();
+                }
+                else v.setExists(false);
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -88,29 +84,27 @@ public class Vehicle_List {
     }
 
     public void printVehicles() {
-        for (int i = 0; i < this.count; i++) { // for all vehicles in the list, later via gui without this loop
-            if (this.exists("v"+i)) {
-
-                VehicleWrap currVehicle = this.getVehicle("v"+i);
-                Point2D.Double pos = currVehicle.getPosition();
+        for (VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                Point2D.Double pos = v.getPosition();
 
                 System.out.printf(
                         // forces US locale, making double values be separated via period, rather than comma
                         Locale.US,
                         // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
                         "             %s: type =  %s, speed = %f, position = (%06.2f | %06.2f), angle = %06.2f, avgSpeed = %f, accel = %f%n               waited %.0fs, active for %ds, stopped %d times, alive for %ds%n",
-                        currVehicle.getID(),
-                        currVehicle.getType(),
-                        currVehicle.getSpeed(),
+                        v.getID(),
+                        v.getType(),
+                        v.getSpeed(),
                         pos.x,
                         pos.y,
-                        currVehicle.getAngle(),
-                        currVehicle.getAvgSpeed(),
-                        currVehicle.getAccel(),
-                        currVehicle.getWaitingTime(),
-                        currVehicle.getActiveTime(),
-                        currVehicle.getnStops(),
-                        currVehicle.getTotalLifetime()
+                        v.getAngle(),
+                        v.getAvgSpeed(),
+                        v.getAccel(),
+                        v.getWaitingTime(),
+                        v.getActiveTime(),
+                        v.getnStops(),
+                        v.getTotalLifetime()
                 );
             }
         }
