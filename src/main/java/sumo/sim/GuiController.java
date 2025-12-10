@@ -4,6 +4,9 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -11,6 +14,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -19,7 +23,10 @@ import javafx.util.Duration;
 public class GuiController {
 
     @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect;
+    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu;
+
+    // performance update -> addMenu and StressTestMenu in separate fxml files
+
     @FXML
     private VBox fileMenuSelect;
     @FXML
@@ -44,6 +51,8 @@ public class GuiController {
     private ChoiceBox<String> typeSelector, routeSelector;
     @FXML
     private TextField amountField;
+    @FXML
+    private HBox mainButtonBox;
 
     private final int defaultDelay;
     private final int maxDelay;
@@ -114,8 +123,6 @@ public class GuiController {
         delaySelect.setValueFactory(valueFactory);
         delaySelect.setEditable(true); // no longer read only
 
-        // scales data field
-        dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
         updateDataList();
 
         TextField delayTextField = delaySelect.getEditor(); // split spinner into its components -> text field
@@ -129,10 +136,38 @@ public class GuiController {
             }
         });
 
+        rescale();
+    }
+
+    private void rescale(){
+        // scales data field
+        dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
         // scales map based on pane width and height
         map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
         map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+        mainButtonBox.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.7));
 
+       // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
+    }
+
+    private void toggleMenuAtButton(Pane menu, Node button) {
+        if (menu.isVisible()) {
+            menu.setVisible(false);
+            return;
+        }
+        menu.setVisible(true);
+        //menu.applyCss();
+        //menu.layout();
+
+        Bounds buttonBounds = button.localToScene(button.getBoundsInLocal()); // position of buttons bound to screen
+        double buttonCenterX = buttonBounds.getMinX() + (buttonBounds.getWidth() / 2); // middle position of button
+        double menuX = buttonCenterX - (menu.getWidth() / 2);
+        double menuY = buttonBounds.getMinY() - menu.getHeight() - 10;
+        Point2D localPos = root.sceneToLocal(menuX, menuY);
+
+        menu.setLayoutX(localPos.getX());
+        menu.setLayoutY(localPos.getY());
+        //menu.toFront();
     }
 
     @FXML
@@ -163,20 +198,8 @@ public class GuiController {
     }
 
     @FXML
-    protected void onAdd(){ // experimental animation
-        FadeTransition fade = new FadeTransition(Duration.millis(200), addMenu);
-        if (addButton.isSelected()) { // toggled
-            addMenu.setVisible(true);
-            fade.setFromValue(0);
-            fade.setToValue(1);
-            fade.play();
-        } else {
-            fade.setFromValue(1);
-            fade.setToValue(0);
-            fade.play();
-            addMenu.setVisible(false);
-            //enableAllButtons();
-        }
+    protected void onAdd(){
+        toggleMenuAtButton(addMenu, addButton);
     }
 
     @FXML
@@ -207,6 +230,11 @@ public class GuiController {
         closeAllMenus();
         closeZoomMenu();
         fileMenuSelect.setVisible(true);
+    }
+
+    @FXML
+    protected void onStressTest(){
+        toggleMenuAtButton(stressTestMenu, stressTestButton);
     }
 
     @FXML

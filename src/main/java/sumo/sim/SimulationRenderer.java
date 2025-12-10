@@ -7,12 +7,15 @@ import javafx.scene.transform.Affine;
 
 import java.awt.geom.Point2D;
 
+import static java.lang.Math.abs;
+
 public class SimulationRenderer {
     private final GraphicsContext gc;
     private final Canvas map;
     private double zoom;
     private double camX;
     private double camY;
+    private double scale; // should depend on how big the map is -> difference between max and min?
     private final Junction_List jl;
     private final Street_List sl;
     private final Vehicle_List vl;
@@ -26,6 +29,11 @@ public class SimulationRenderer {
         this.vl = vl;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
         this.camY = jl.getCenterPosY() ;
+        double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
+        double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
+        scale = 1+(scaleX / scaleY);
+        System.out.println("scale: " + scale);
+        //scale = 1;
     }
 
     public void initRender(){
@@ -67,7 +75,7 @@ public class SimulationRenderer {
 
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1.0);
+        gc.setLineWidth(scale);
         for (Street s : sl.getStreets()) { // streets
             for (LaneWrap l : s.getLanes()) { // lanes of streets
 
@@ -88,7 +96,9 @@ public class SimulationRenderer {
         }
 
         for(JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
-            gc.setLineWidth(1);
+            gc.setFill(Color.RED);
+            gc.setStroke(Color.RED);
+            gc.setLineWidth(scale);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
 
@@ -99,13 +109,12 @@ public class SimulationRenderer {
             // [54.7, 38.75] 2 -> line
             // > 3 elements in array : polygon
             if (rawX.length >= 3) {
-                gc.fillPolygon(rawX, rawY, rawX.length); // fills polygon
-                gc.strokePolygon(rawX, rawY, rawX.length); // border
+                gc.fillPolygon(rawX, rawY, rawX.length ); // fills polygon
+                //gc.strokePolygon(rawX, rawY, rawX.length); // border
             } else if (rawX.length == 2) {
-                /*
-                gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]); */
+                //gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]);
             } else {
-                gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
+               gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
             }
 
         }

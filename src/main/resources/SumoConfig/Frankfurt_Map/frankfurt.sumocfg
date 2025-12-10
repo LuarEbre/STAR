@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+
+<!-- generated on 2025-12-10 12:30:56 by Eclipse SUMO sumo Version 1.24.0
+-->
+
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
     <input>
         <net-file value="frankfurt_kfz.net.xml"/>
         <route-files value="frankfurt_routes_only.xml"/>
@@ -7,5 +12,6 @@
 
     <time>
         <begin value="0"/>
-        </time>
-</configuration>
+    </time>
+
+</sumoConfiguration>
