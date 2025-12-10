@@ -31,14 +31,14 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
-    public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
+    public static String curr_net = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
         String sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
                 ? "src/main/resources/Binaries/sumo.exe"
-                : "src/main/resources/Binaries/sumo";
+                : "/usr/local/bin/sumo";
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
