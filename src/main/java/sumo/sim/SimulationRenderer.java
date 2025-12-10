@@ -128,13 +128,12 @@ public class SimulationRenderer {
         gc.setStroke(Color.RED);
 
         for (VehicleWrap v : vl.getVehicles()) {
-           angle = v.getAngle();
-           posX = v.getPosition().getX();
-           posY = v.getPosition().getY();
-           //gc.translate(posX, posY);
-           //gc.scale(zoom, zoom);
-           //gc.rotate(angle);
-           gc.strokeOval(posX, posY, 4, 4);
+            if(!v.exists()) continue;
+            angle = v.getAngle();
+            posX = v.getPosition().getX();
+            posY = v.getPosition().getY();
+            // no need to translate coordinates since translation is already applied to graphics context
+            gc.strokeOval(posX, posY, 4, 4); // for now drawing an oval, could be either a svg or other polygon in the future
         }
     }
 

@@ -139,6 +139,8 @@ public class VehicleWrap {
     public double getMaxSpeed() {return maxSpeed;}
     public int getActiveTime() {return activeTime;}
     public int getTotalLifetime() {return totalLifetime;}
+    public boolean exists() {return exists;}
+    public void setExists(boolean exists) {this.exists = exists;}
 
     public void setSpeed(double speed) {
         try {
