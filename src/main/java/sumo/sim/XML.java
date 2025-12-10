@@ -89,4 +89,31 @@ public class XML {
         return map;
     }
 
+    public Map<String, List<String>> getRoutes(){
+        Map<String, List<String>> map = new HashMap<>();
+        try{
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT && reader.getLocalName().equals("route")) {
+                    String id = reader.getAttributeValue(null, "id");
+                    String edges = reader.getAttributeValue(null, "edges");
+
+                    List<String> edgesList = new ArrayList<>();
+
+                    for(String edge : edges.split(" ")){
+                        edgesList.add(edge);
+                    }
+
+                    map.put(id, edgesList);
+                }
+                return map;
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+
+        return map;
+    }
+
 }

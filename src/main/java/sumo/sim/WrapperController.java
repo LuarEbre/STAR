@@ -31,14 +31,14 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
-    public static String curr_net = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
+    public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
         String sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
                 ? "src/main/resources/Binaries/sumo.exe"
-                : "/usr/local/bin/sumo";
+                : "src/main/resources/Binaries/sumo";
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
@@ -88,6 +88,8 @@ public class WrapperController {
                     double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
                     System.out.println(RED + "Time: " + timeSeconds + RESET);
 
+                    vl.updateAllVehicles();
+                    vl.printVehicles();
                     System.out.println("Delay:" + delay);
 
                     doStepUpdate();
@@ -111,10 +113,10 @@ public class WrapperController {
 
     // methods controlling the simulation / also connected with the guiController
 
-    public void addVehicle(int amount, String type) { // int number, String type, Color color ,,int amount, String type, String route
+    public void addVehicle() { // int number, String type, Color color ,,int amount, String type, String route
         // used by guiController
         // executes addVehicle from WrapperVehicle
-        vl.addVehicle(amount, type);
+        vl.addVehicle(1, "t_0"); // type t_0 (can be chosen)
     }
 
     public void changeDelay(int delay) {
@@ -137,8 +139,6 @@ public class WrapperController {
         // updating gui and simulation
         try {
             connection.do_timestep();
-            vl.updateAllVehicles();
-            vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
@@ -174,10 +174,6 @@ public class WrapperController {
 
     public Street_List get_sl() {
         return sl;
-    }
-
-    public Vehicle_List get_vl() {
-        return vl;
     }
 
     //setter

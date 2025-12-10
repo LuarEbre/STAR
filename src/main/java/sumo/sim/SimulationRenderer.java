@@ -5,35 +5,23 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
-import java.awt.geom.Point2D;
-
-import static java.lang.Math.abs;
-
 public class SimulationRenderer {
     private final GraphicsContext gc;
     private final Canvas map;
     private double zoom;
     private double camX;
     private double camY;
-    private double scale; // should depend on how big the map is -> difference between max and min?
     private final Junction_List jl;
     private final Street_List sl;
-    private final Vehicle_List vl;
 
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
         this.zoom = 1;
         this.sl = sl;
         this.jl = jl;
-        this.vl = vl;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
         this.camY = jl.getCenterPosY() ;
-        double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
-        double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
-        scale = 1+(scaleX / scaleY);
-        System.out.println("scale: " + scale);
-        //scale = 1;
     }
 
     public void initRender(){
@@ -70,12 +58,11 @@ public class SimulationRenderer {
 
     }
 
-
     public void renderMap(Junction_List jl, Street_List sl){
 
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(scale);
+        gc.setLineWidth(1.0);
         for (Street s : sl.getStreets()) { // streets
             for (LaneWrap l : s.getLanes()) { // lanes of streets
 
@@ -96,9 +83,7 @@ public class SimulationRenderer {
         }
 
         for(JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
-            gc.setFill(Color.RED);
-            gc.setStroke(Color.RED);
-            gc.setLineWidth(scale);
+            gc.setLineWidth(1);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
 
@@ -109,44 +94,29 @@ public class SimulationRenderer {
             // [54.7, 38.75] 2 -> line
             // > 3 elements in array : polygon
             if (rawX.length >= 3) {
-                gc.fillPolygon(rawX, rawY, rawX.length ); // fills polygon
-                //gc.strokePolygon(rawX, rawY, rawX.length); // border
+                gc.fillPolygon(rawX, rawY, rawX.length); // fills polygon
+                gc.strokePolygon(rawX, rawY, rawX.length); // border
             } else if (rawX.length == 2) {
-                //gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]);
+                /*
+                gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]); */
             } else {
-               gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
+                gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
             }
 
         }
-        renderVehicle();
     }
 
-    public void renderVehicle(){
-        double angle = 0;
-        double posX;
-        double posY;
-        gc.setStroke(Color.RED);
-
-        for (VehicleWrap v : vl.getVehicles()) {
-           angle = v.getAngle();
-           posX = v.getPosition().getX();
-           posY = v.getPosition().getY();
-           //gc.translate(posX, posY);
-           //gc.scale(zoom, zoom);
-           //gc.rotate(angle);
-           gc.strokeOval(posX, posY, 4, 4);
-        }
+    public void moveX(double pad) {
+        camX += pad;
     }
 
-    public void padMad(double x, double y) {
-        camX += x/(zoom/2); // zoom / 2 -> if zoomed out -> x gets bigger
-        camY += y/(zoom/2);
+    public void moveY(double pad) {
+        camY += pad;
     }
 
     public void zoomMap(double z) {
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
-
 
 
 }
