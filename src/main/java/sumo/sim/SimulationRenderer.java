@@ -19,13 +19,15 @@ public class SimulationRenderer {
     private final Junction_List jl;
     private final Street_List sl;
     private final Vehicle_List vl;
+    private final TrafficLights_List tls;
 
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl, TrafficLights_List tls) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
         this.sl = sl;
         this.jl = jl;
         this.vl = vl;
+        this.tls = tls;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
         this.camY = jl.getCenterPosY() ;
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
@@ -135,6 +137,10 @@ public class SimulationRenderer {
             // no need to translate coordinates since translation is already applied to graphics context
             gc.strokeOval(posX, posY, 4, 4); // for now drawing an oval, could be either a svg or other polygon in the future
         }
+    }
+
+    public void renderTL(){
+
     }
 
     public void padMad(double x, double y) {
