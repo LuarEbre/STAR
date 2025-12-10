@@ -36,4 +36,8 @@ public class RouteList {
         }
         return null;
     }
+    //getter for routecount(use in logic to check if any route is availabl)
+    public int getRouteCount() {
+        return this.allRoutes.size();
+    }
 }
