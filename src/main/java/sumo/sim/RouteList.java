@@ -36,7 +36,7 @@ public class RouteList {
                 RouteWrap routeWrap = new RouteWrap(edges);
                 routes.put(id, routeWrap);
 
-                // 2. Store the first edge of the route as valid starting poibt
+                // 2. Store the first edge of the route as valid starting point
                 String startEdgeId = edges.get(0);
                 validStartEdgeIDs.add(startEdgeId);
             }
