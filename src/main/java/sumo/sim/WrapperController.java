@@ -1,6 +1,7 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Simulation;
+import de.tudresden.sumo.cmd.Vehicle;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -42,9 +43,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -91,6 +92,10 @@ public class WrapperController {
                     vl.updateAllVehicles();
                     vl.printVehicles();
                     System.out.println("Delay:" + delay);
+
+                    // Debug: Checking if onfig works properly
+
+                    System.out.println(tl.getTrafficLightsData());
 
                     doStepUpdate();
 
