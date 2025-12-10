@@ -116,7 +116,8 @@ public class Vehicle_List {
         }
     }
 
-    public String getVehiclesData() {
+    public String[] getVehiclesData() {
+        String[] vehiclesData = new String[this.count];
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < this.count; i++) {
@@ -133,8 +134,10 @@ public class Vehicle_List {
             //sb.append(currVehicle.getAngle()).append("\n");
             sb.append("\n");
 
+            vehiclesData[i] = sb.toString();
+
         }
-        return sb.toString();
+        return vehiclesData;
     }
 
 
