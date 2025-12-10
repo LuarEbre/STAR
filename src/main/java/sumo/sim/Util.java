@@ -30,7 +30,8 @@ public class Util {
 
         if (startNode == null || endNode == null) {
             System.err.println("Start or End Junction does not exist!");
-            return new RouteWrap(Collections.emptyList());
+            String failId = "FAILED_" + (start != null ? start : "NULL_START") + "_TO_" + (end != null ? end : "NULL_END");
+            return new RouteWrap(failId, Collections.emptyList());
         }
 
         startNode.setDistance(0);
@@ -83,15 +84,15 @@ public class Util {
             String edgeID = jl.findEdgeID(from, to);
 
             if (edgeID == null) {
-                System.err.println("⚠️ Edge not found between " + from + " → " + to);
+                System.err.println("Edge not found between " + from + " → " + to);
                 continue;
             }
 
             edge_List.add(edgeID);
 
         }
-
-        return new RouteWrap(edge_List);
+        String generatedId = "GEN_" + start.toUpperCase() + "_TO_" + end.toUpperCase();
+        return new RouteWrap(generatedId, edge_List);
     }
 
 
