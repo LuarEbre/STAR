@@ -196,6 +196,15 @@
     -fx-font-weight: bold;
 }
 
+#amountPlus:pressed {
+    -fx-background-color: -fx-color-grey-light-selected;
+}
+
+#amountMinus:pressed {
+    -fx-background-color: -fx-color-grey-light-selected;
+}
+
+
 #amountField {
     -fx-background-radius: 0 0 0 0;
     -fx-background-color: -fx-color-grey-lightest;
