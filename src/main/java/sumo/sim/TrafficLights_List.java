@@ -40,6 +40,10 @@ public class TrafficLights_List {
         return null; // if not existent
     }
 
+    public List<TrafficLightWrap> getTrafficlights() {
+        return trafficlights;
+    }
+
     public int getCount() { return count; }
 
     public void printIDs() {
@@ -101,5 +105,13 @@ public class TrafficLights_List {
         for (TrafficLightWrap tl : trafficlights) {
             tl.printControlledStreets();
         }
+    }
+
+    public void updateTLs(){
+        for(TrafficLightWrap tl : trafficlights ){
+
+
+        }
+
     }
 }
