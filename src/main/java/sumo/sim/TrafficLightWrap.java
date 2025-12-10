@@ -43,6 +43,49 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
+    public void setPhaseNumber(int index) {
+        //TODO: check if index exists in TL
+        try {
+            con.do_job_set(Trafficlight.setPhase(id,index));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setPhaseName(String tlPhaseName) {
+        try {
+            con.do_job_set(Trafficlight.setPhaseName(id, tlPhaseName));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setPhaseDuration(double phaseDuration) {
+        try {
+            con.do_job_set(Trafficlight.setPhaseDuration(id, phaseDuration));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setProgram(String programID) {
+        //TODO: check for programID
+        try {
+            con.do_job_set(Trafficlight.setProgram(id, programID));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setRedYellowGreenState(String state) {
+        //TODO: string check
+        try {
+            con.do_job_set(Trafficlight.setRedYellowGreenState(id, state));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public String getPhaseName() {
         try {
             return (String) con.do_job_get(Trafficlight.getPhaseName(id));
