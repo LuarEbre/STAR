@@ -20,12 +20,12 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
-
+<?import javafx.scene.layout.StackPane?>
 <AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#closeAllMenus" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
-       <HBox alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="663.0" spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="278.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+       <HBox fx:id="mainButtonBox" AnchorPane.bottomAnchor="5.0" alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="663.0" spacing="40.0"  xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
            <children>
 
                <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
@@ -42,7 +42,7 @@
                   </VBox>
                </graphic></ToggleButton>
                <Button fx:id="stepButton" mnemonicParsing="false" onAction="#onStep" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
-                <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+                <ToggleButton fx:id="stressTestButton" onAction="#onStressTest" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
            </children>
            <padding>
@@ -140,11 +140,38 @@
                   <Insets />
                </opaqueInsets>
             </VBox>
+
        <!-- Menu button top right close -->  <!-- -->
 
          </children>
       </AnchorPane>
        <!-- Main Buttons menu -->
+       <AnchorPane fx:id="stressTestMenu" visible="false" layoutX="364.0" layoutY="164.0" prefHeight="275.0" prefWidth="386.0" AnchorPane.bottomAnchor="114.0" >
+           <children>
+               <HBox layoutX="69.0" layoutY="169.0" prefHeight="91.0" prefWidth="386.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <Separator layoutY="182.0" prefHeight="3.0" prefWidth="386.0" />
+               <Label layoutX="118.0" layoutY="22.0" prefHeight="18.0" prefWidth="94.0" styleClass="addMenu-labels" text="Mode" />
+               <Button layoutX="252.0" layoutY="144.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="110.0" text="Start Test" />
+               <ChoiceBox layoutX="221.0" layoutY="18.0" prefWidth="150.0" />
+               <ChoiceBox layoutX="221.0" layoutY="61.0" prefWidth="150.0" />
+               <Label layoutX="118.0" layoutY="65.0" styleClass="addMenu-labels" text="Extras" />
+               <ChoiceBox layoutX="221.0" layoutY="102.0" prefWidth="150.0" />
+               <Label layoutX="118.0" layoutY="106.0" styleClass="addMenu-labels" text="Vehicle Types" />
+               <Separator layoutX="103.0" orientation="VERTICAL" prefHeight="180.0" prefWidth="6.0" />
+               <VBox layoutX="-4.0" layoutY="-1.0" prefHeight="180.0" prefWidth="110.0" spacing="15.0">
+                   <children>
+                       <CheckBox mnemonicParsing="false" text="feature1" />
+                       <CheckBox layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="feature2" />
+                       <CheckBox layoutX="10.0" layoutY="28.0" mnemonicParsing="false" text="CheckBox" />
+                       <CheckBox layoutX="10.0" layoutY="45.0" mnemonicParsing="false" text="CheckBox" />
+                       <CheckBox layoutX="10.0" layoutY="63.0" mnemonicParsing="false" text="CheckBox" />
+                   </children>
+                   <padding>
+                       <Insets left="15.0" top="15.0" />
+                   </padding>
+               </VBox>
+           </children>
+       </AnchorPane>
              <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
                <Button fx:id="addVehicleButton" layoutX="181.0" layoutY="339.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="27.0" prefWidth="93.0" text="Add" />
@@ -225,7 +252,7 @@
                   <Insets bottom="5.0" left="10.0" top="5.0" />
                </HBox.margin>
             </Label>
-      
+
              <Spinner fx:id="delaySelect" prefHeight="0.0" prefWidth="66.0">
                <HBox.margin>
                   <Insets />
