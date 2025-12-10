@@ -2,6 +2,8 @@ package sumo.sim;
 
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
@@ -16,9 +18,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+
+import java.util.function.UnaryOperator;
 
 public class GuiController {
 
@@ -28,11 +33,13 @@ public class GuiController {
     // performance update -> addMenu and StressTestMenu in separate fxml files
 
     @FXML
+    private ColorPicker colorSelector;
+    @FXML
     private VBox fileMenuSelect;
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton;
     @FXML
-    private Button stepButton, addVehicleButton;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus;
     @FXML
     private Spinner <Integer> delaySelect;
     @FXML
@@ -119,7 +126,7 @@ public class GuiController {
     @FXML
     public void initialize() {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min,max, start
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min, max, start
         delaySelect.setValueFactory(valueFactory);
         delaySelect.setEditable(true); // no longer read only
 
@@ -135,6 +142,39 @@ public class GuiController {
                 validateInput(delayTextField);
             }
         });
+
+        // AddMenu's amountField
+        // initializes amountField to spawn with "1"
+        amountField.setText("1");
+        // force our amountField to only accept numerical input based on regex
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*")) { // regex allows only digits 0-9
+                return change;
+            }
+            return null; // regex rejects letters/symbols
+        };
+
+        TextFormatter<Integer> formatter = new TextFormatter<>(
+                new javafx.util.converter.IntegerStringConverter(), // format to integer
+                1, // default value = 1
+                filter // use our regex filter
+        );
+
+        amountField.setTextFormatter(formatter);
+
+        // only allow values from 1 to 1000, excluding adding 0 cars or far too many
+        formatter.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal > 1000) {
+                formatter.setValue(1000);
+            }
+            if (newVal < 1) {
+                formatter.setValue(1);
+            }
+        });
+
+        // set initial colorSelector color to magenta to match our UI
+        colorSelector.setValue(Color.MAGENTA);
 
         rescale();
     }
@@ -168,6 +208,20 @@ public class GuiController {
         menu.setLayoutX(localPos.getX());
         menu.setLayoutY(localPos.getY());
         //menu.toFront();
+    }
+
+    @FXML
+    protected void amountMinus() {
+        String oldVal = amountField.getText();
+        int newVal = Integer.parseInt(oldVal)-1;
+        amountField.setText(String.valueOf(newVal));
+    }
+
+    @FXML
+    protected void amountPlus() {
+        String oldVal = amountField.getText();
+        int newVal = Integer.parseInt(oldVal)+1;
+        amountField.setText(String.valueOf(newVal));
     }
 
     @FXML
@@ -335,9 +389,18 @@ public class GuiController {
     public void addVehicle(){
         // parameters from addMenu components
         // static test
-        int amount = 1;
+        int amount = Integer.parseInt(amountField.getText());
+        Color color = colorSelector.getValue();
         String type = typeSelector.getValue();
-        wrapperController.addVehicle(amount, type);
+        if(type == null) {
+            type = "t_0";
+        }
+        String route = routeSelector.getValue();
+        if(route == null) {
+            route = "r0";
+        }
+
+        wrapperController.addVehicle(amount, type, route, color);
     }
 
     @FXML

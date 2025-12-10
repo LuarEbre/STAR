@@ -5,6 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -111,10 +112,10 @@ public class WrapperController {
 
     // methods controlling the simulation / also connected with the guiController
 
-    public void addVehicle(int amount, String type) { // int number, String type, Color color ,,int amount, String type, String route
+    public void addVehicle(int amount, String type, String route, Color color) { // int number, String type, Color color ,,int amount, String type, String route
         // used by guiController
         // executes addVehicle from WrapperVehicle
-        vl.addVehicle(amount, type);
+        vl.addVehicle(amount, type, route, color);
     }
 
     public void changeDelay(int delay) {

@@ -121,19 +121,47 @@ public class SimulationRenderer {
         renderVehicle();
     }
 
+    public void drawTriangleCar(VehicleWrap v, double width, double length) {
+        double angle = v.getAngle();
+        double posX = v.getPosition().getX();
+        double posY = v.getPosition().getY();
+        gc.setFill(v.getColor());
+
+        double radTip   = Math.toRadians(angle - 90);
+        double radLeft  = Math.toRadians(angle - 90 - 90);
+        double radRight = Math.toRadians(angle - 90 + 90);
+
+        double x1 = posX + length * Math.cos(radTip);
+        double y1 = posY + length * Math.sin(radTip);
+
+        double x2 = posX + width * Math.cos(radLeft);
+        double y2 = posY + width * Math.sin(radLeft);
+
+        double x3 = posX + width * Math.cos(radRight);
+        double y3 = posY + width * Math.sin(radRight);
+
+        double[] xPoints = { x1, x2, x3, x1 };
+        double[] yPoints = { y1, y2, y3, y1 };
+
+        gc.fillPolygon(xPoints, yPoints, 4);
+    }
+
     public void renderVehicle(){
         double angle = 0;
         double posX;
         double posY;
-        gc.setStroke(Color.RED);
 
         for (VehicleWrap v : vl.getVehicles()) {
             if(!v.exists()) continue;
+            gc.setFill(v.getColor());
             angle = v.getAngle();
             posX = v.getPosition().getX();
             posY = v.getPosition().getY();
             // no need to translate coordinates since translation is already applied to graphics context
-            gc.strokeOval(posX, posY, 4, 4); // for now drawing an oval, could be either a svg or other polygon in the future
+            gc.fillOval(posX-2, posY-2, 4, 4); // for now drawing an oval, could be either a svg or other polygon in the future
+            // drawTriangleCar is still experimental as the angles are not accurate when taking turns etc.
+            // this.drawTriangleCar(v,2, 8);
+
         }
     }
 

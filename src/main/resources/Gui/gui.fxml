@@ -212,9 +212,9 @@
                      <children>
                         <HBox prefHeight="26.0" prefWidth="170.0">
                            <children>
-                              <Button fx:id="amountMinus" mnemonicParsing="false" prefHeight="26.0" prefWidth="36.0" text="-" />
+                              <Button fx:id="amountMinus" mnemonicParsing="false" onAction="#amountMinus" prefHeight="26.0" prefWidth="36.0" text="-" />
                               <TextField fx:id="amountField" prefHeight="26.0" prefWidth="122.0" />
-                              <Button fx:id="amountPlus" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="36.0" text="+" />
+                              <Button fx:id="amountPlus" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#amountPlus" prefHeight="26.0" prefWidth="36.0" text="+" />
                            </children>
                         </HBox>
                         <ColorPicker fx:id="colorSelector" prefHeight="26.0" prefWidth="184.0" />
@@ -229,7 +229,7 @@
                   <Font size="23.0" />
                </font>
             </Label>
-            <Button fx:id="generateRoute" layoutX="170.0" layoutY="285.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="27.0" prefWidth="110.0" text="Generate Route" />
+            <Button fx:id="generateRoute" layoutX="170.0" layoutY="285.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="110.0" text="Generate Route" />
            </children>
        </AnchorPane>
 

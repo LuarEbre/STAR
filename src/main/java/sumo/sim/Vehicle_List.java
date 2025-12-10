@@ -3,6 +3,7 @@ package sumo.sim;
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
+import javafx.scene.paint.Color;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -23,15 +24,15 @@ public class Vehicle_List {
         this.con = con;
     }
 
-    public void addVehicle(int n, String type) { // more arguments later? maybe overloaded methods with different args.
+    public void addVehicle(int n, String type, String route, Color color) { // more arguments later? maybe overloaded methods with different args.
         try {
             for (int i=0; i<n; i++) {
-                con.do_job_set(Vehicle.addFull("v" + count, "r0", type, // ids -> latest car id
+                con.do_job_set(Vehicle.addFull("v" + count, route, type, // ids -> latest car id
                         "now", "0", "0", "0",
                         "current", "max", "current", "",
                         "", "", 0, 0)
                 );
-                vehicles.add(new VehicleWrap("v" + count, con, type)); // adds new vehicle
+                vehicles.add(new VehicleWrap("v" + count, con, type, route, color)); // adds new vehicle
                 count++; // increment to prevent identical car ids
             }
         } catch (Exception e) {
