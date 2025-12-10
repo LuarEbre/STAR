@@ -23,7 +23,6 @@ public class SimulationRenderer {
     public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
-        this.zoom = 1;
         this.sl = sl;
         this.jl = jl;
         this.vl = vl;
@@ -33,6 +32,7 @@ public class SimulationRenderer {
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
         scale = 1+(scaleX / scaleY);
         System.out.println("scale: " + scale);
+        zoom = scale+1;
         //scale = 1;
     }
 

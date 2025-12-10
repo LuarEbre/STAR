@@ -17,15 +17,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.StackPane?>
+
 <AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#closeAllMenus" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
-       <HBox fx:id="mainButtonBox" AnchorPane.bottomAnchor="5.0" alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="663.0" spacing="40.0"  xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+       <HBox fx:id="mainButtonBox" alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="750.0" spacing="40.0" AnchorPane.bottomAnchor="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
            <children>
 
                <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
@@ -42,7 +40,8 @@
                   </VBox>
                </graphic></ToggleButton>
                <Button fx:id="stepButton" mnemonicParsing="false" onAction="#onStep" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
-                <ToggleButton fx:id="stressTestButton" onAction="#onStressTest" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+                <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" onAction="#onStressTest" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+            <ToggleButton fx:id="trafficLightButton" layoutX="561.0" layoutY="34.0" mnemonicParsing="false" onAction="#onTrafficLight" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
            </children>
            <padding>
@@ -118,10 +117,6 @@
                </padding>
             </AnchorPane>
 
-             <Circle fx:id="circ1" fill="DODGERBLUE" layoutX="903.0" layoutY="178.0" radius="21.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" AnchorPane.rightAnchor="17.0" />
-            <Circle fx:id="circ2" fill="DODGERBLUE" layoutX="903.0" layoutY="262.0" radius="21.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" AnchorPane.rightAnchor="17.0" />
-             <Rectangle fx:id="rect1" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="82.0" layoutX="882.0" layoutY="178.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="zoomMenu" width="42.0" AnchorPane.rightAnchor="17.0" />
-
                <VBox fx:id="fileMenuSelect" onMouseExited="#closeAllMenus" prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="fileButtonClose" mnemonicParsing="false" onAction="#closeApplication" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Close">
@@ -146,13 +141,46 @@
          </children>
       </AnchorPane>
        <!-- Main Buttons menu -->
-       <AnchorPane fx:id="stressTestMenu" visible="false" layoutX="364.0" layoutY="164.0" prefHeight="275.0" prefWidth="386.0" AnchorPane.bottomAnchor="114.0" >
+       <AnchorPane fx:id="trafficLightMenu" styleClass="mainButtonMenu" layoutX="573.0" layoutY="218.0" prefHeight="275.0" prefWidth="229.0" visible="false">
+           <children>
+               <Label layoutX="19.0" layoutY="9.0" text="Traffic Light Control">
+                   <font>
+                       <Font name="System Bold" size="20.0" />
+                   </font>
+               </Label>
+               <Separator layoutY="38.0" prefHeight="3.0" prefWidth="230.0" />
+               <HBox layoutY="38.0" prefHeight="238.0" prefWidth="230.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                   <children>
+                       <VBox prefHeight="238.0" prefWidth="147.0" spacing="28.0">
+                           <children>
+                               <Label text="Select Traffic Light" />
+                               <Label layoutX="10.0" layoutY="10.0" text="Traffic Light duration " />
+                           </children>
+                           <padding>
+                               <Insets left="5.0" top="20.0" />
+                           </padding>
+                       </VBox>
+                       <VBox prefHeight="238.0" prefWidth="121.0" spacing="20.0">
+                           <children>
+                               <ChoiceBox prefWidth="150.0" />
+                               <Spinner />
+                           </children>
+                           <padding>
+                               <Insets top="15.0" />
+                           </padding>
+                       </VBox>
+                   </children>
+               </HBox>
+           </children>
+       </AnchorPane>
+
+       <AnchorPane fx:id="stressTestMenu" styleClass="mainButtonMenu" layoutX="364.0" layoutY="164.0" prefHeight="275.0" prefWidth="386.0" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
                <HBox layoutX="69.0" layoutY="169.0" prefHeight="91.0" prefWidth="386.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                <Separator layoutY="182.0" prefHeight="3.0" prefWidth="386.0" />
                <Label layoutX="118.0" layoutY="22.0" prefHeight="18.0" prefWidth="94.0" styleClass="addMenu-labels" text="Mode" />
-               <Button layoutX="252.0" layoutY="144.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="110.0" text="Start Test" />
-               <ChoiceBox layoutX="221.0" layoutY="18.0" prefWidth="150.0" />
+               <Button fx:id="startTestButton" onAction="#startStressTest" layoutX="252.0" layoutY="144.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="110.0" text="Start Test" />
+               <ChoiceBox fx:id="stressTestMode" layoutX="221.0" layoutY="18.0" prefWidth="150.0" />
                <ChoiceBox layoutX="221.0" layoutY="61.0" prefWidth="150.0" />
                <Label layoutX="118.0" layoutY="65.0" styleClass="addMenu-labels" text="Extras" />
                <ChoiceBox layoutX="221.0" layoutY="102.0" prefWidth="150.0" />
@@ -172,7 +200,7 @@
                </VBox>
            </children>
        </AnchorPane>
-             <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.0">
+             <AnchorPane fx:id="addMenu" styleClass="mainButtonMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
                <Button fx:id="addVehicleButton" layoutX="181.0" layoutY="339.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="27.0" prefWidth="93.0" text="Add" />
                <Separator layoutY="260.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.bottomAnchor="43.199999999999974" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
