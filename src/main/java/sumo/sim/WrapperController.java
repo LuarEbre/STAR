@@ -32,6 +32,7 @@ public class WrapperController {
     private XML netXml;
 
     public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
+    public static String curr_rou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
