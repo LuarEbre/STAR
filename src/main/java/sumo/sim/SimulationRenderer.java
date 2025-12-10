@@ -3,7 +3,10 @@ package sumo.sim;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.transform.Affine;
+
+import java.awt.geom.Point2D;
 
 public class SimulationRenderer {
     private final GraphicsContext gc;
@@ -13,13 +16,15 @@ public class SimulationRenderer {
     private double camY;
     private final Junction_List jl;
     private final Street_List sl;
+    private final TrafficLights_List tl;
 
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl,  TrafficLights_List tl) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
         this.zoom = 1;
         this.sl = sl;
         this.jl = jl;
+        this.tl = tl;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
         this.camY = jl.getCenterPosY() ;
     }
@@ -32,7 +37,7 @@ public class SimulationRenderer {
         gc.setFill(Color.GREEN);
         gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
         transform();
-        renderMap(jl,sl);
+        renderMap(jl,sl,tl);
     }
 
 
@@ -58,7 +63,7 @@ public class SimulationRenderer {
 
     }
 
-    public void renderMap(Junction_List jl, Street_List sl){
+    public void renderMap(Junction_List jl, Street_List sl, TrafficLights_List tl){
 
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
@@ -103,6 +108,13 @@ public class SimulationRenderer {
                 gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
             }
 
+        }
+
+        for(TrafficLightWrap trafficLight : tl.getTrafficlights()){
+            Point2D.Double pos = trafficLight.getPosition();
+            //Paint color = Paint.valueOf(trafficLight.getPhaseName();
+            //gc.setFill(color);
+            gc. fillOval(pos.x, pos.y, 4, 4);
         }
     }
 

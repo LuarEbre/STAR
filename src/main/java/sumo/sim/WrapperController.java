@@ -89,6 +89,7 @@ public class WrapperController {
                     System.out.println(RED + "Time: " + timeSeconds + RESET);
 
                     vl.updateAllVehicles();
+                    tl.updateTLs();
                     vl.printVehicles();
                     System.out.println("Delay:" + delay);
 
@@ -175,6 +176,8 @@ public class WrapperController {
     public Street_List get_sl() {
         return sl;
     }
+
+    public TrafficLights_List get_tl() { return tl; }
 
     //setter
 

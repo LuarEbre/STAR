@@ -276,7 +276,7 @@ public class GuiController {
 
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl());
+        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(), wrapperController.get_tl());
         renderUpdate();
     }
 
