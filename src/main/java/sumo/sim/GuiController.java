@@ -16,7 +16,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-
 public class GuiController {
 
     @FXML
@@ -43,16 +42,27 @@ public class GuiController {
     private ListView<String> listData; // list displaying data as a string
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector;
+    @FXML
+    private TextField amountField;
+
     private final int defaultDelay;
     private final int maxDelay;
     private GraphicsContext gc;
     private SimulationRenderer sr;
+
+    // panning
+    private double mousePressedXOld;
+    private double mousePressedYOld;
+    private double mousePressedXNew;
+    private double mousePressedYNew;
+    private double panSen; // sensitivity
 
     private WrapperController wrapperController;
 
     public GuiController() {
         defaultDelay = 50;
         maxDelay = 999;
+        panSen = 2;
     }
 
     public void initializeCon(WrapperController wrapperController) {
@@ -73,6 +83,7 @@ public class GuiController {
         }
 
         //routeSelector.setItems("Custom");
+        mapPan();
     }
 
     public void closeAllMenus() {
@@ -121,7 +132,6 @@ public class GuiController {
         // scales map based on pane width and height
         map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
         map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
-
 
     }
 
@@ -285,7 +295,7 @@ public class GuiController {
 
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl());
+        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(), wrapperController.get_vl());
         renderUpdate();
     }
 
@@ -304,7 +314,7 @@ public class GuiController {
 
     @FXML
     protected void mapClick(){
-        sr.moveX(100);
+
     }
 
     @FXML
@@ -312,14 +322,35 @@ public class GuiController {
 
         if (event.getDeltaY() > 0) { // delta y vertical
             sr.zoomMap(1.2);
-            System.out.println("zoom");
+            //System.out.println("zoom");
         } else  {
-            System.out.println("zoomout");
+            //System.out.println("zoomout");
             sr.zoomMap(0.8);
         }
     }
 
+    public void mapPan() {
+        map.setOnMousePressed(event -> {
+            mousePressedXOld = event.getX(); // old
+            mousePressedYOld = event.getY();
+            //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
+        });
+        // drag start with pressed -> then this follows
+        map.setOnMouseDragged(e->{
+            mousePressedXNew = e.getX();
+            mousePressedYNew = e.getY();
+            //System.out.println("NewX"+mousePressedXNew + " NewY " + mousePressedYNew);
+            double panX =-1* (mousePressedXNew - mousePressedXOld) / panSen; // -1 so that panning to the left swipes to the right
+            double panY = (mousePressedYNew - mousePressedYOld) / panSen; // already reversed
+            sr.padMad(panX,panY);
+            mousePressedXOld = e.getX(); // resetting old values
+            mousePressedYOld = e.getY();
+        });
+    }
 
+    public void setPanSens(double s) {
+        panSen = s;
+    }
 
 }
 
