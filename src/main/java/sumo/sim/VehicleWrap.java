@@ -38,6 +38,7 @@ public class VehicleWrap {
     private int activeTime;
     private int totalLifetime; // = waitingTime + activeTime;
     private boolean activeLastFrame; // using oldSpeed could render activeLastFrame useless
+    private boolean exists; // check for despawning in gui?
 
     // could be used for selecting in the GUI later on
     private boolean selected;

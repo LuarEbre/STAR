@@ -88,8 +88,6 @@ public class WrapperController {
                     double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
                     System.out.println(RED + "Time: " + timeSeconds + RESET);
 
-                    vl.updateAllVehicles();
-                    vl.printVehicles();
                     System.out.println("Delay:" + delay);
 
                     doStepUpdate();
@@ -139,6 +137,8 @@ public class WrapperController {
         // updating gui and simulation
         try {
             connection.do_timestep();
+            vl.updateAllVehicles();
+            vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
@@ -174,6 +174,10 @@ public class WrapperController {
 
     public Street_List get_sl() {
         return sl;
+    }
+
+    public Vehicle_List get_vl() {
+        return vl;
     }
 
     //setter

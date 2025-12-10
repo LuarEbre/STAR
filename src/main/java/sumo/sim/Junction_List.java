@@ -111,6 +111,22 @@ public class Junction_List {
         return minY;
     }
 
+    public double getMaxPosY(){
+        double maxY = -Double.MAX_VALUE;
+        for (JunctionWrap jw : junctions) {
+            if (jw.getPosition().y > maxY) maxY = jw.getPosition().y;
+        }
+        return maxY;
+    }
+
+    public double getMaxPosX(){
+        double maxX = -Double.MAX_VALUE;
+        for (JunctionWrap jw : junctions) {
+            if (jw.getPosition().x > maxX) maxX = jw.getPosition().x;
+        }
+        return maxX;
+    }
+
 
     public double getCenterPosX() {
         if (junctions.isEmpty()) return 0;
