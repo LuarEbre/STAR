@@ -10,8 +10,4 @@
       
     </input>
 
-    <time>
-        <begin value="0"/>
-    </time>
-
 </sumoConfiguration>
