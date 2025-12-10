@@ -2,35 +2,44 @@ package sumo.sim;
 
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.text.SimpleDateFormat;
+import java.util.function.UnaryOperator;
 
 public class GuiController {
 
     @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect;
+    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu;
+
+    // performance update -> addMenu and StressTestMenu in separate fxml files
+
+    @FXML
+    private ColorPicker colorSelector;
     @FXML
     private VBox fileMenuSelect;
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton;
     @FXML
-    private Button stepButton, addVehicleButton;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus;
     @FXML
     private Spinner <Integer> delaySelect;
     @FXML
@@ -46,25 +55,51 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector;
+    private ChoiceBox<String> typeSelector, routeSelector;
+    @FXML
+    private TextField amountField;
+    @FXML
+    private HBox mainButtonBox;
+
     private final int defaultDelay;
     private final int maxDelay;
     private GraphicsContext gc;
     private SimulationRenderer sr;
+
+    // panning
+    private double mousePressedXOld;
+    private double mousePressedYOld;
+    private double mousePressedXNew;
+    private double mousePressedYNew;
+    private double panSen; // sensitivity
 
     private WrapperController wrapperController;
 
     public GuiController() {
         defaultDelay = 50;
         maxDelay = 999;
+        panSen = 2;
     }
 
-    public void setConnectionToWrapperCon(WrapperController wrapperController) {
+    public void initializeCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
         initializeRender();
 
+        // displays all available types found in xml
         String[] arr = wrapperController.setTypeList();
         typeSelector.setItems(FXCollections.observableArrayList(arr));
+        int i = 0;
+        boolean found = false;
+        while (i< arr.length && !found ) {
+            if (arr[i].equals("DEFAULT_VEHTYPE")) {
+                found = true;
+                typeSelector.setValue(arr[i]); // default vehtype standard
+            }
+            i++;
+        }
+
+        //routeSelector.setItems("Custom");
+        mapPan();
     }
 
     public void closeAllMenus() {
@@ -91,12 +126,10 @@ public class GuiController {
     @FXML
     public void initialize() {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min,max, start
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min, max, start
         delaySelect.setValueFactory(valueFactory);
         delaySelect.setEditable(true); // no longer read only
 
-        // scales data field
-        dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
         updateDataList();
 
         TextField delayTextField = delaySelect.getEditor(); // split spinner into its components -> text field
@@ -110,10 +143,85 @@ public class GuiController {
             }
         });
 
-        map.widthProperty().bind(middlePane.widthProperty().multiply(0.79));
-        map.heightProperty().bind(middlePane.heightProperty());
+        // AddMenu's amountField
+        // initializes amountField to spawn with "1"
+        amountField.setText("1");
+        // force our amountField to only accept numerical input based on regex
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*")) { // regex allows only digits 0-9
+                return change;
+            }
+            return null; // regex rejects letters/symbols
+        };
 
+        TextFormatter<Integer> formatter = new TextFormatter<>(
+                new javafx.util.converter.IntegerStringConverter(), // format to integer
+                1, // default value = 1
+                filter // use our regex filter
+        );
 
+        amountField.setTextFormatter(formatter);
+
+        // only allow values from 1 to 1000, excluding adding 0 cars or far too many
+        formatter.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal > 1000) {
+                formatter.setValue(1000);
+            }
+            if (newVal < 1) {
+                formatter.setValue(1);
+            }
+        });
+
+        // set initial colorSelector color to magenta to match our UI
+        colorSelector.setValue(Color.MAGENTA);
+
+        rescale();
+    }
+
+    private void rescale(){
+        // scales data field
+        dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
+        // scales map based on pane width and height
+        map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
+        map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+        mainButtonBox.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.7));
+
+       // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
+    }
+
+    private void toggleMenuAtButton(Pane menu, Node button) {
+        if (menu.isVisible()) {
+            menu.setVisible(false);
+            return;
+        }
+        menu.setVisible(true);
+        //menu.applyCss();
+        //menu.layout();
+
+        Bounds buttonBounds = button.localToScene(button.getBoundsInLocal()); // position of buttons bound to screen
+        double buttonCenterX = buttonBounds.getMinX() + (buttonBounds.getWidth() / 2); // middle position of button
+        double menuX = buttonCenterX - (menu.getWidth() / 2);
+        double menuY = buttonBounds.getMinY() - menu.getHeight() - 10;
+        Point2D localPos = root.sceneToLocal(menuX, menuY);
+
+        menu.setLayoutX(localPos.getX());
+        menu.setLayoutY(localPos.getY());
+        //menu.toFront();
+    }
+
+    @FXML
+    protected void amountMinus() {
+        String oldVal = amountField.getText();
+        int newVal = Integer.parseInt(oldVal)-1;
+        amountField.setText(String.valueOf(newVal));
+    }
+
+    @FXML
+    protected void amountPlus() {
+        String oldVal = amountField.getText();
+        int newVal = Integer.parseInt(oldVal)+1;
+        amountField.setText(String.valueOf(newVal));
     }
 
     @FXML
@@ -144,20 +252,8 @@ public class GuiController {
     }
 
     @FXML
-    protected void onAdd(){ // experimental animation
-        FadeTransition fade = new FadeTransition(Duration.millis(200), addMenu);
-        if (addButton.isSelected()) { // toggled
-            addMenu.setVisible(true);
-            fade.setFromValue(0);
-            fade.setToValue(1);
-            fade.play();
-        } else {
-            fade.setFromValue(1);
-            fade.setToValue(0);
-            fade.play();
-            addMenu.setVisible(false);
-            //enableAllButtons();
-        }
+    protected void onAdd(){
+        toggleMenuAtButton(addMenu, addButton);
     }
 
     @FXML
@@ -188,6 +284,11 @@ public class GuiController {
         closeAllMenus();
         closeZoomMenu();
         fileMenuSelect.setVisible(true);
+    }
+
+    @FXML
+    protected void onStressTest(){
+        toggleMenuAtButton(stressTestMenu, stressTestButton);
     }
 
     @FXML
@@ -276,7 +377,7 @@ public class GuiController {
 
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl());
+        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(), wrapperController.get_vl());
         renderUpdate();
     }
 
@@ -288,12 +389,23 @@ public class GuiController {
     public void addVehicle(){
         // parameters from addMenu components
         // static test
-        wrapperController.addVehicle();
+        int amount = Integer.parseInt(amountField.getText());
+        Color color = colorSelector.getValue();
+        String type = typeSelector.getValue();
+        if(type == null) {
+            type = "t_0";
+        }
+        String route = routeSelector.getValue();
+        if(route == null) {
+            route = "r0";
+        }
+
+        wrapperController.addVehicle(amount, type, route, color);
     }
 
     @FXML
     protected void mapClick(){
-        sr.moveX(100);
+
     }
 
     @FXML
@@ -301,14 +413,35 @@ public class GuiController {
 
         if (event.getDeltaY() > 0) { // delta y vertical
             sr.zoomMap(1.2);
-            System.out.println("zoom");
+            //System.out.println("zoom");
         } else  {
-            System.out.println("zoomout");
+            //System.out.println("zoomout");
             sr.zoomMap(0.8);
         }
     }
 
+    public void mapPan() {
+        map.setOnMousePressed(event -> {
+            mousePressedXOld = event.getX(); // old
+            mousePressedYOld = event.getY();
+            //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
+        });
+        // drag start with pressed -> then this follows
+        map.setOnMouseDragged(e->{
+            mousePressedXNew = e.getX();
+            mousePressedYNew = e.getY();
+            //System.out.println("NewX"+mousePressedXNew + " NewY " + mousePressedYNew);
+            double panX =-1* (mousePressedXNew - mousePressedXOld) / panSen; // -1 so that panning to the left swipes to the right
+            double panY = (mousePressedYNew - mousePressedYOld) / panSen; // already reversed
+            sr.padMad(panX,panY);
+            mousePressedXOld = e.getX(); // resetting old values
+            mousePressedYOld = e.getY();
+        });
+    }
 
+    public void setPanSens(double s) {
+        panSen = s;
+    }
 
 }
 

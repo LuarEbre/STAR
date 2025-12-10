@@ -5,6 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -42,9 +43,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -88,8 +89,6 @@ public class WrapperController {
                     double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
                     System.out.println(RED + "Time: " + timeSeconds + RESET);
 
-                    vl.updateAllVehicles();
-                    vl.printVehicles();
                     System.out.println("Delay:" + delay);
 
                     doStepUpdate();
@@ -113,10 +112,10 @@ public class WrapperController {
 
     // methods controlling the simulation / also connected with the guiController
 
-    public void addVehicle() { // int number, String type, Color color ,,int amount, String type, String route
+    public void addVehicle(int amount, String type, String route, Color color) { // int number, String type, Color color ,,int amount, String type, String route
         // used by guiController
         // executes addVehicle from WrapperVehicle
-        vl.addVehicle(1, "t_0"); // type t_0 (can be chosen)
+        vl.addVehicle(amount, type, route, color);
     }
 
     public void changeDelay(int delay) {
@@ -139,6 +138,8 @@ public class WrapperController {
         // updating gui and simulation
         try {
             connection.do_timestep();
+            vl.updateAllVehicles();
+            vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
@@ -174,6 +175,10 @@ public class WrapperController {
 
     public Street_List get_sl() {
         return sl;
+    }
+
+    public Vehicle_List get_vl() {
+        return vl;
     }
 
     //setter
