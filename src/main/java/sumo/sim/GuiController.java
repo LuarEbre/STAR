@@ -87,7 +87,7 @@ public class GuiController {
             i++;
         }
 
-        String[] modes = { "Light_Test" , "Medium_Test" , "Hard_Test" };
+        String[] modes = { "Light_Test (10)" , "Medium_Test (100)" , "Heavy_Test (1000)" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         //routeSelector.setItems("Custom");
         mapPan();
@@ -230,7 +230,7 @@ public class GuiController {
             wrapperController.addVehicle(10, typeSelector.getValue());
         } else if (mode.equals("Medium_Test")) {
             wrapperController.addVehicle(100, typeSelector.getValue());
-        } else if (mode.equals("Hard_Test")) {
+        } else if (mode.equals("Heavy_Test")) {
             wrapperController.addVehicle(1000, typeSelector.getValue());
         }
     }
@@ -322,7 +322,8 @@ public class GuiController {
 
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(), wrapperController.get_vl());
+        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(),
+                wrapperController.get_vl(), wrapperController.get_tl());
         renderUpdate();
     }
 
