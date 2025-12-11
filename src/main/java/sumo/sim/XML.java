@@ -113,7 +113,7 @@ public class XML {
             reader.close();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error readind XML file.", e);
+            throw new RuntimeException("Error reading XML file.", e);
         }
         return map;
     }
