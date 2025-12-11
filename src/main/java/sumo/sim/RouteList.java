@@ -16,10 +16,10 @@ public class RouteList {
         // map of routes(using getRoutes from XML class)
         Map<String, List<String>> routeMap = xmlReader.getRoutes();
 
-        // converting to list of RouteWhrap objects
+        // converting to list of RouteWrap objects
         this.allRoutes = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : routeMap.entrySet()) {
-            // using RouteWhrap constructor
+            // using RouteWrap constructor
             RouteWrap route = new RouteWrap(entry.getKey(), entry.getValue());
             this.allRoutes.add(route);
         }
