@@ -19,20 +19,22 @@ public class SimulationRenderer {
     private final Junction_List jl;
     private final Street_List sl;
     private final Vehicle_List vl;
+    private final TrafficLights_List tls;
 
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl, TrafficLights_List tls) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
-        this.zoom = 1;
         this.sl = sl;
         this.jl = jl;
         this.vl = vl;
+        this.tls = tls;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
         this.camY = jl.getCenterPosY() ;
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
         scale = 1+(scaleX / scaleY);
         System.out.println("scale: " + scale);
+        zoom = scale+1;
         //scale = 1;
     }
 

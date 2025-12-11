@@ -18,10 +18,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+
+public class GuiController {
+
+    @FXML
+    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu;
+
+    // performance update -> addMenu and StressTestMenu in separate fxml files
 
 import java.util.function.UnaryOperator;
 
@@ -37,15 +43,11 @@ public class GuiController {
     @FXML
     private VBox fileMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton, stressTestButton;
+    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus;
     @FXML
     private Spinner <Integer> delaySelect;
-    @FXML
-    private Circle circ1, circ2;
-    @FXML
-    private Rectangle rect1;
     @FXML
     private Canvas map;
     @FXML
@@ -55,7 +57,7 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector, routeSelector;
+    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode;
     @FXML
     private TextField amountField;
     @FXML
@@ -98,6 +100,8 @@ public class GuiController {
             i++;
         }
 
+        String[] modes = { "Light_Test (10)" , "Medium_Test (100)" , "Heavy_Test (1000)" };
+        stressTestMode.setItems(FXCollections.observableArrayList(modes));
         //routeSelector.setItems("Custom");
         mapPan();
     }
@@ -106,21 +110,8 @@ public class GuiController {
         if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
-        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);
-        openZoomMenu();
+        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
         // still needs fix for small gap between buttons and menus at the top
-    }
-
-    public void closeZoomMenu() {
-        circ1.setVisible(false);
-        circ2.setVisible(false);
-        rect1.setVisible(false);
-    }
-
-    public void openZoomMenu() {
-        circ1.setVisible(true);
-        circ2.setVisible(true);
-        rect1.setVisible(true);
     }
 
     @FXML
@@ -185,7 +176,7 @@ public class GuiController {
         // scales map based on pane width and height
         map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
         map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
-        mainButtonBox.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.7));
+        mainButtonBox.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.8));
 
        // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
     }
@@ -239,6 +230,11 @@ public class GuiController {
     }
 
     @FXML
+    protected void onTrafficLight() {
+        toggleMenuAtButton(trafficLightMenu, trafficLightButton);
+    }
+
+    @FXML
     protected void onSelect(){
         if (selectButton.isSelected()) { // toggled
         } else {
@@ -259,7 +255,6 @@ public class GuiController {
     @FXML
     protected void onFiltersHover(MouseEvent event){
         closeAllMenus();
-        closeZoomMenu();
         filtersMenuSelect.setVisible(true);
     }
 
@@ -267,7 +262,6 @@ public class GuiController {
     protected void onMapsHover(MouseEvent event){
         // deactivate all menus
         closeAllMenus();
-        closeZoomMenu();
         // activate Map menu
         mapMenuSelect.setVisible(true);
     }
@@ -275,14 +269,12 @@ public class GuiController {
     @FXML
     protected void onViewHover(MouseEvent event){
         closeAllMenus();
-        closeZoomMenu();
         viewMenuSelect.setVisible(true);
     }
 
     @FXML
     protected void onFileHover(MouseEvent event){
         closeAllMenus();
-        closeZoomMenu();
         fileMenuSelect.setVisible(true);
     }
 
@@ -290,6 +282,19 @@ public class GuiController {
     protected void onStressTest(){
         toggleMenuAtButton(stressTestMenu, stressTestButton);
     }
+
+    @FXML
+    protected void startStressTest(){
+        String mode = stressTestMode.getValue();
+        if (mode.equals("Light_Test")) {
+            wrapperController.addVehicle(10, typeSelector.getValue());
+        } else if (mode.equals("Medium_Test")) {
+            wrapperController.addVehicle(100, typeSelector.getValue());
+        } else if (mode.equals("Heavy_Test")) {
+            wrapperController.addVehicle(1000, typeSelector.getValue());
+        }
+    }
+
 
     @FXML
     protected void onMiddlePaneHover(){
@@ -377,7 +382,8 @@ public class GuiController {
 
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(), wrapperController.get_vl());
+        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(),
+                wrapperController.get_vl(), wrapperController.get_tl());
         renderUpdate();
     }
 
@@ -392,12 +398,9 @@ public class GuiController {
         int amount = Integer.parseInt(amountField.getText());
         Color color = colorSelector.getValue();
         String type = typeSelector.getValue();
-        if(type == null) {
-            type = "t_0";
-        }
         String route = routeSelector.getValue();
         if(route == null) {
-            route = "r0";
+            route = "r0"; // if route count == 0 -> disable add button, disable stress test start
         }
 
         wrapperController.addVehicle(amount, type, route, color);

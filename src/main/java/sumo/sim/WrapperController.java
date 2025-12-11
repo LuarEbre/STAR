@@ -181,6 +181,10 @@ public class WrapperController {
         return vl;
     }
 
+    public TrafficLights_List get_tl() {
+        return tl;
+    }
+
     //setter
 
     public String[] setTypeList() {
