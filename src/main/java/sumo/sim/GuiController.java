@@ -281,15 +281,13 @@ public class GuiController {
     @FXML
     protected void startStressTest(){
         String mode = stressTestMode.getValue();
-        System.out.println("jdaubfuawbf");
         // experimental
         if (mode.equals("Light_Test")) {
-            System.out.println("jdaubfuawbf");
-            wrapperController.addVehicle(10, "t_0", "r0", Color.GREEN);
+            wrapperController.addVehicle(10, "DEFAULT_VEHTYPE", "r0", Color.GREEN);
         } else if (mode.equals("Medium_Test")) {
-            wrapperController.addVehicle(100, "DEFAULT_VEH", "r0", Color.YELLOW);
+            wrapperController.addVehicle(100, "DEFAULT_VEHTYPE", "r0", Color.YELLOW);
         } else if (mode.equals("Heavy_Test")) {
-            wrapperController.addVehicle(1000, "DEFAULT_VEH", "r0", Color.RED);
+            wrapperController.addVehicle(1000, "DEFAULT_VEHTYPE", "r0", Color.RED);
 
         }
     }
