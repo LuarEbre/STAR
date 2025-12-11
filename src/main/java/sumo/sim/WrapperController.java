@@ -24,6 +24,7 @@ public class WrapperController {
     private VehicleList vl;
     private JunctionList jl;
     private TypeList typel;
+    private RouteList rl;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
@@ -31,7 +32,9 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
-    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
+    public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
+    public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -70,7 +73,13 @@ public class WrapperController {
         sl = new StreetList(this.connection);
         tl = new TrafficLightList(connection, sl);
         jl = new JunctionList(connection, sl);
+        try {
+            rl = new RouteList(currentRou);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         typel = new TypeList(connection);
+
         TypeList types = new TypeList(connection);
         start();
         startRenderer();
@@ -182,6 +191,18 @@ public class WrapperController {
 
     public TrafficLightList getTrafficLights() {
         return tl;
+    }
+
+    public String[] getTypeList() {
+        return typel.getAllTypes();
+    }
+
+    public String[] getRouteList() {
+        return rl.getAllRoutesID();
+    }
+
+    public boolean isRouteListEmpty() {
+        return rl.isRouteListEmpty();
     }
 
     //setter

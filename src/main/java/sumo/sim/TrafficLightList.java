@@ -6,6 +6,7 @@ import de.tudresden.sumo.cmd.Trafficlight;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -36,6 +37,10 @@ public class TrafficLightList {
             }
         }
         return null; // if not existent
+    }
+
+    public ArrayList<TrafficLightWrap> getTrafficlights() {
+        return trafficlights;
     }
 
     public int getCount() { return count; }
@@ -99,5 +104,13 @@ public class TrafficLightList {
         for (TrafficLightWrap tl : trafficlights) {
             tl.printControlledStreets();
         }
+    }
+
+    public void updateTLs(){
+        for(TrafficLightWrap tl : trafficlights ){
+
+
+        }
+
     }
 }
