@@ -181,8 +181,6 @@
                <Label layoutX="118.0" layoutY="22.0" prefHeight="18.0" prefWidth="94.0" styleClass="addMenu-labels" text="Mode" />
                <Button fx:id="startTestButton" onAction="#startStressTest" layoutX="252.0" layoutY="144.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="110.0" text="Start Test" />
                <ChoiceBox fx:id="stressTestMode" layoutX="221.0" layoutY="18.0" prefWidth="150.0" />
-               <Button layoutX="252.0" layoutY="144.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="110.0" text="Start Test" />
-               <ChoiceBox layoutX="221.0" layoutY="18.0" prefWidth="150.0" />
                <ChoiceBox layoutX="221.0" layoutY="61.0" prefWidth="150.0" />
                <Label layoutX="118.0" layoutY="65.0" styleClass="addMenu-labels" text="Extras" />
                <ChoiceBox layoutX="221.0" layoutY="102.0" prefWidth="150.0" />
@@ -202,7 +200,7 @@
                </VBox>
            </children>
        </AnchorPane>
-             <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.0">
+             <AnchorPane fx:id="addMenu" styleClass="mainButtonMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
                <Button fx:id="addVehicleButton" layoutX="181.0" layoutY="339.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="27.0" prefWidth="93.0" text="Add" />
                <Separator layoutY="260.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.bottomAnchor="43.199999999999974" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
