@@ -38,7 +38,7 @@ public class TrafficLightList {
         return null; // if not existent
     }
 
-    public List<TrafficLightWrap> getTrafficlights() {
+    public ArrayList<TrafficLightWrap> getTrafficlights() {
         return trafficlights;
     }
 

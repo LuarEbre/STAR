@@ -76,7 +76,7 @@ public class GuiController {
         initializeRender();
 
         // displays all available types found in xml
-        String[] arr = wrapperController.setTypeList();
+        String[] arr = wrapperController.getTypeList();
         typeSelector.setItems(FXCollections.observableArrayList(arr));
         int i = 0;
         boolean found = false;
@@ -91,7 +91,9 @@ public class GuiController {
         String[] modes = { "Light Test" , "Medium Test" , "Heavy Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         stressTestMode.setValue(modes[0]);
-        //routeSelector.setItems("Custom");
+
+
+        routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         mapPan();
     }
 
@@ -155,6 +157,8 @@ public class GuiController {
 
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
+
+        // if no routes exist in .rou files -> cant add vehicles
 
         rescale();
     }

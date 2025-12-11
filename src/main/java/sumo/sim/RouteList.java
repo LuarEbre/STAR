@@ -1,64 +1,50 @@
 package sumo.sim;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RouteList {
-    // stores all routes: key = route ID(e.g. "r_0.0", value = RouteWrap-object
-    private final Map<String, RouteWrap> routes = new HashMap<>();
 
-    // stores the edge IDs which ar defined as starting points (set for fast checking)
-    private final Set<String> validStartEdgeIDs = new HashSet<>();
+    private final List<RouteWrap> allRoutes;
 
-    private final XML routesXML; // instance of xml.java
+    public RouteList(String rouXmlFilePath) throws Exception {
 
-    public RouteList(String routesFilePath) throws Exception {
-        this.routesXML = new XML(routesFilePath);
-        loadRoutesFromXML();
-    }
+        // parssing the xml file
+        XML xmlReader = new XML(rouXmlFilePath);
 
-    private void loadRoutesFromXML() throws Exception {
-        Map<String, List<String>> loadedRoutes = routesXML.getRoutes();
+        // map of routes(using getRoutes from XML class)
+        Map<String, List<String>> routeMap = xmlReader.getRoutes();
 
-        for (Map.Entry<String, List<String>> entry : loadedRoutes.entrySet()) {
-            String id = entry.getKey();
-            List<String> edges = entry.getValue();
-
-            if (!edges.isEmpty()) {
-                // 1. store the route
-                RouteWrap routeWrap = new RouteWrap(edges);
-                routes.put(id, routeWrap);
-
-                // 2. Store the first edge of the route as valid starting point
-                String startEdgeId = edges.get(0);
-                validStartEdgeIDs.add(startEdgeId);
-            }
+        // converting to list of RouteWhrap objects
+        this.allRoutes = new ArrayList<>();
+        for (Map.Entry<String, List<String>> entry : routeMap.entrySet()) {
+            // using RouteWhrap constructor
+            RouteWrap route = new RouteWrap(entry.getKey(), entry.getValue());
+            this.allRoutes.add(route);
         }
 
-        System.out.println("RouteList loaded: " + routes.size() + " routes, "
-                + validStartEdgeIDs.size() + " valid starting points found.");
+    }
+    public String[] getAllRoutes() {
+        String[] ret = new String[allRoutes.size()];
+        for (int i = 0; i < allRoutes.size(); i++) {
+            RouteWrap route = allRoutes.get(i);
+            ret[i] = route.getId();
+        }
+
+        return ret;
     }
 
-    // public methods for gui implementation
-    public List<String> getAllValidStartEdgeIDs() {
-        return new ArrayList<>(validStartEdgeIDs);
-    }
-
-    public boolean isValidStartEdge(String edgeId) {
-        return validStartEdgeIDs.contains(edgeId);
-    }
-
-
-    public String getRouteStartingWithEdge(String startEdgeId) {
-        // searching the routes and return ID of the first route which starts with this edge
-        for (Map.Entry<String, RouteWrap> entry : routes.entrySet()) {
-            if (entry.getValue().getStartEdgeID().equals(startEdgeId)) {
-                return entry.getKey(); // return the route ID
+    public RouteWrap getRouteById(String id) {
+        for (RouteWrap route : allRoutes) {
+            if (route.getId().equals(id)) {
+                return route;
             }
         }
-        return null; // no route found which starts at this edge
+        return null;
     }
-
-    public Map<String, RouteWrap> getRoutes() {
-        return routes;
+    //getter for routecount(use in logic to check if any route is availabl)
+    public boolean isRouteListEmpty() {
+        return (this.allRoutes.isEmpty());
     }
 }
