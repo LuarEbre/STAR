@@ -25,9 +25,15 @@ public class RouteList {
         }
 
     }
-    public List<RouteWrap> getAllRoutes() {
-        return this.allRoutes;
+    public String[] getAllRoutes() {
+        String[] ret = new String[allRoutes.size()];
+        for (int i = 0; i < allRoutes.size(); i++) {
+            RouteWrap route = allRoutes.get(i);
+            ret[i] = route.getId();
+        }
+        return ret;
     }
+
     public RouteWrap getRouteById(String id) {
         for (RouteWrap route : allRoutes) {
             if (route.getId().equals(id)) {
