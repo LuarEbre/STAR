@@ -6,6 +6,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class StreetList {
     // List of streets (like TL_List)
@@ -15,13 +16,12 @@ public class StreetList {
 
     public StreetList(SumoTraciConnection con) {
         try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array
+            XML xml = new XML(WrapperController.getCurrentNet());
+            Map<String, List<String>> data = xml.getStreetsData();
+
             this.connection = con;
-            for (String id : list) {
-                if(!id.startsWith(":")) {
-                    streets.add(new Street(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
-                    count++;
-                }
+            for(Map.Entry<String, List<String>> entry : data.entrySet()) {
+                streets.add(new Street(entry.getKey(),entry.getValue(), con));
             }
 
         } catch (Exception e) {
