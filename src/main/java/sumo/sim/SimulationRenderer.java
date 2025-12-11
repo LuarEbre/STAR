@@ -5,8 +5,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
-import java.awt.geom.Point2D;
-
 import static java.lang.Math.abs;
 
 public class SimulationRenderer {
@@ -16,12 +14,12 @@ public class SimulationRenderer {
     private double camX;
     private double camY;
     private double scale; // should depend on how big the map is -> difference between max and min?
-    private final Junction_List jl;
-    private final Street_List sl;
-    private final Vehicle_List vl;
-    private final TrafficLights_List tls;
+    private final JunctionList jl;
+    private final StreetList sl;
+    private final VehicleList vl;
+    private final TrafficLightList tls;
 
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl, Vehicle_List vl, TrafficLights_List tls) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
         this.sl = sl;

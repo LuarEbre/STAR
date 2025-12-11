@@ -1,7 +1,5 @@
 package sumo.sim;
 
-import com.sun.jdi.connect.spi.TransportService;
-
 import java.util.*;
 
 public class Util {
@@ -17,7 +15,7 @@ public class Util {
         }
     }
 
-    public static RouteWrap generate_route(String start, String end, Junction_List jl) {
+    public static RouteWrap generateRoute(String start, String end, JunctionList jl) {
 
         // --- Initialize ---
         for (JunctionWrap jw : jl.getJunctions()) {
@@ -53,7 +51,7 @@ public class Util {
                 JunctionWrap v = jl.getJunction(neighbourID);
                 if (v == null) continue;
 
-                double weight = u.distance_to(v);
+                double weight = u.distanceTo(v);
                 double alt = u.getDistance() + weight;
 
                 if (alt < v.getDistance()) {
@@ -65,20 +63,20 @@ public class Util {
         }
 
         // RECONSTRUCT NODE PATH (Junctions)
-        List<String> junction_Path = new LinkedList<>();
+        List<String> junctionPath = new LinkedList<>();
         JunctionWrap step = endNode;
 
         while (step != null) {
-            junction_Path.add(0, step.getID());
+            junctionPath.add(0, step.getID());
             step = jl.getJunction(step.getPredecessor());
         }
 
         // RECONSTRUCT EDGE LIST
-        List<String> edge_List = new ArrayList<>();
+        List<String> edgeList = new ArrayList<>();
 
-        for (int i = 0; i < junction_Path.size() - 1; i++) {
-            String from = junction_Path.get(i);
-            String to = junction_Path.get(i + 1);
+        for (int i = 0; i < junctionPath.size() - 1; i++) {
+            String from = junctionPath.get(i);
+            String to = junctionPath.get(i + 1);
 
             String edgeID = jl.findEdgeID(from, to);
 
@@ -87,11 +85,11 @@ public class Util {
                 continue;
             }
 
-            edge_List.add(edgeID);
+            edgeList.add(edgeID);
 
         }
 
-        return new RouteWrap(edge_List);
+        return new RouteWrap(edgeList);
     }
 
 
