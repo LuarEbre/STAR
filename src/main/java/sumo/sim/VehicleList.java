@@ -3,35 +3,32 @@ package sumo.sim;
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
+import javafx.scene.paint.Color;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 
-public class Vehicle_List {
+public class VehicleList {
     private final ArrayList<VehicleWrap> vehicles = new ArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     // needs possible routes maybe? for car creation
 
-    public Vehicle_List(SumoTraciConnection con) {
+    public VehicleList(SumoTraciConnection con) {
         this.count = 0;
         this.con = con;
     }
 
-    public void addVehicle(int n, String type) { // more arguments later? maybe overloaded methods with different args.
+    public void addVehicle(int n, String type, String route, Color color) { // more arguments later? maybe overloaded methods with different args.
         try {
             for (int i=0; i<n; i++) {
-                con.do_job_set(Vehicle.addFull("v" + count, "r1", type, // ids -> latest car id
+                con.do_job_set(Vehicle.addFull("v" + count, route, type, // ids -> latest car id
                         "now", "0", "0", "0",
                         "current", "max", "current", "",
                         "", "", 0, 0)
                 );
-                vehicles.add(new VehicleWrap("v" + count, con, type)); // adds new vehicle
+                vehicles.add(new VehicleWrap("v" + count, con, type, route, color)); // adds new vehicle
                 count++; // increment to prevent identical car ids
             }
         } catch (Exception e) {
@@ -56,52 +53,55 @@ public class Vehicle_List {
         }
     }
 
-    public boolean exists(String ID){
-        try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList()); // all current cars
-            for (String id : list) {
-               if  (id.equals(ID)) { // if car with certain id is still on the road
-                   return true;
-               }
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return false; // if despawned , delete from list?
+    public boolean exists(String ID) {
+        return this.getVehicle(ID).exists();
     }
 
     public void updateAllVehicles() {
-        for (int i = 0; i < this.count; i++) {
-            if (this.exists("v"+i)) { // if still exists
-                this.vehicles.get(i).updateVehicle();
+        try {
+            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList()); // all current cars
+            for (VehicleWrap v : vehicles) {
+                if(list.contains(v.getID())) {
+                    v.setExists(true);
+                    v.updateVehicle();
+                }
+                else v.setExists(false);
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void printVehicles() {
-        for (int i = 0; i < this.count; i++) { // for all vehicles in the list, later via gui without this loop
-            if (this.exists("v"+i)) {
+    public ArrayList<Point2D.Double> getAllPositions() {
+        ArrayList<Point2D.Double> positions = new ArrayList<>();
+        for (VehicleWrap v : vehicles) {
+            positions.add(v.getPosition());
+        }
+        return positions;
+    }
 
-                VehicleWrap currVehicle = this.getVehicle("v"+i);
-                Point2D.Double pos = currVehicle.getPosition();
+    public void printVehicles() {
+        for (VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                Point2D.Double pos = v.getPosition();
 
                 System.out.printf(
                         // forces US locale, making double values be separated via period, rather than comma
                         Locale.US,
                         // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
-                        "            %s: speed = %f, position = (%06.2f | %06.2f), angle = %06.2f, avgSpeed = %f, accel = %f%n               waited %.0fs, active for %ds, stopped %d times, alive for %ds%n",
-                        currVehicle.getID(),
-                        currVehicle.getSpeed(),
+                        "             %s: type =  %s, speed = %f, position = (%06.2f | %06.2f), angle = %06.2f, avgSpeed = %f, accel = %f%n               waited %.0fs, active for %ds, stopped %d times, alive for %ds%n",
+                        v.getID(),
+                        v.getType(),
+                        v.getSpeed(),
                         pos.x,
                         pos.y,
-                        currVehicle.getAngle(),
-                        currVehicle.getAvgSpeed(),
-                        currVehicle.getAccel(),
-                        currVehicle.getWaitingTime(),
-                        currVehicle.getActiveTime(),
-                        currVehicle.getnStops(),
-                        currVehicle.getTotalLifetime()
+                        v.getAngle(),
+                        v.getAvgSpeed(),
+                        v.getAccel(),
+                        v.getWaitingTime(),
+                        v.getActiveTime(),
+                        v.getnStops(),
+                        v.getTotalLifetime()
                 );
             }
         }
@@ -134,5 +134,9 @@ public class Vehicle_List {
 
     public int getCount() {
         return count;
+    }
+
+    public ArrayList<VehicleWrap> getVehicles() {
+        return vehicles;
     }
 }

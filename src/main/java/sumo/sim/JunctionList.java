@@ -1,25 +1,21 @@
 package sumo.sim;
 
-import de.tudresden.sumo.cmd.Edge;
 import de.tudresden.sumo.cmd.Junction;
-import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.*;
 
-public class Junction_List {
+public class JunctionList {
     //private final Set<JunctionWrap> junctions = new HashSet<>();
     private final ArrayList<JunctionWrap> junctions = new ArrayList<>(); // List of TrafficLights
     private int count;
     private Map<String, Set<String>> adjacency = new HashMap<>();
-    private final Street_List streets;
+    private final StreetList streets;
 
 
-    public Junction_List(SumoTraciConnection con, Street_List streets) {
+    public JunctionList(SumoTraciConnection con, StreetList streets) {
         this.streets = streets;
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Junction.getIDList()); // returns string array
@@ -27,14 +23,14 @@ public class Junction_List {
                 junctions.add(new JunctionWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
                 count++;
             }
-            update_adjacency();
+            updateAdjacency();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void update_adjacency(){
+    public void updateAdjacency(){
 
         adjacency.clear();
 
@@ -56,7 +52,7 @@ public class Junction_List {
     }
 
 
-    public void print_adjacency() {
+    public void printAdjacency() {
         for (String j : adjacency.keySet()) {
             System.out.println(j + " → " + adjacency.get(j));
         }
@@ -109,6 +105,22 @@ public class Junction_List {
             if (jw.getPosition().y < minY) minY = jw.getPosition().y;
         }
         return minY;
+    }
+
+    public double getMaxPosY(){
+        double maxY = -Double.MAX_VALUE;
+        for (JunctionWrap jw : junctions) {
+            if (jw.getPosition().y > maxY) maxY = jw.getPosition().y;
+        }
+        return maxY;
+    }
+
+    public double getMaxPosX(){
+        double maxX = -Double.MAX_VALUE;
+        for (JunctionWrap jw : junctions) {
+            if (jw.getPosition().x > maxX) maxX = jw.getPosition().x;
+        }
+        return maxX;
     }
 
 

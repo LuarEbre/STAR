@@ -196,6 +196,15 @@
     -fx-font-weight: bold;
 }
 
+#amountPlus:pressed {
+    -fx-background-color: -fx-color-grey-light-selected;
+}
+
+#amountMinus:pressed {
+    -fx-background-color: -fx-color-grey-light-selected;
+}
+
+
 #amountField {
     -fx-background-radius: 0 0 0 0;
     -fx-background-color: -fx-color-grey-lightest;
@@ -268,7 +277,7 @@
 }
 
 /* Main Button menus*/
-#addMenu {
+.mainButtonMenu {
     /* add vehicle button */
     -fx-background-color: -fx-color-grey-dark;
     -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
@@ -282,6 +291,16 @@
 .addMenu-labels {
     -fx-text-fill: -fx-color-magenta;
     -fx-font-family:"Arial Black";
+}
+
+#stressTestMenu {
+    -fx-background-color: -fx-color-grey-dark;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 3, 2;
+    -fx-border-insets: 0, 3;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15,13;
+    -fx-background-radius: 15;
 }
 
 /* style class for buttons*/

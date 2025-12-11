@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.stage.StageStyle;
@@ -30,6 +32,11 @@ public class GuiApplication extends Application {
 
         // stage (frame)
         stage.setFullScreen(true); //needs escape button to close the appl.
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (KeyCode.F11.equals(event.getCode())) {
+                stage.setFullScreen(!stage.isFullScreen());
+            }
+        });
         stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
         stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
@@ -37,7 +44,7 @@ public class GuiApplication extends Application {
 
         // Establishing connection between WrappCon and GuiCon
         WrapperController wrapper = new WrapperController(guiController);
-        guiController.setConnectionToWrapperCon(wrapper);
+        guiController.initializeCon(wrapper);
 
     }
 }

@@ -7,6 +7,7 @@ import de.tudresden.sumo.objects.SumoColor;
 import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.subscription.*;
 import it.polito.appeal.traci.SumoTraciConnection;
+import javafx.scene.paint.Color;
 
 import java.awt.geom.Point2D;
 
@@ -21,8 +22,8 @@ public class VehicleWrap {
     private String name; // name = id; -> but can be customized for searching
     private final String type;
     private final SumoTraciConnection con;
-    private SumoColor color;
-    private int routeId; // which route the car is assigned to (could be of RouteWrap if implemented)
+    private Color color;
+    private String routeID; // which route the car is assigned to (could be of RouteWrap if implemented)
 
     // values tracked via subscription
     private double speed; // m/s
@@ -38,16 +39,17 @@ public class VehicleWrap {
     private int activeTime;
     private int totalLifetime; // = waitingTime + activeTime;
     private boolean activeLastFrame; // using oldSpeed could render activeLastFrame useless
+    private boolean exists; // check for despawning in gui?
 
     // could be used for selecting in the GUI later on
     private boolean selected;
 
-    public VehicleWrap(String id , SumoTraciConnection con, String type) {
+    public VehicleWrap(String id , SumoTraciConnection con, String type, String route, Color color) {
         this.id = id;
         this.type = type;
         this.con = con;
-        // this.color =
-        // this.routeID =
+        this.color = color;
+        this.routeID = route;
         this.speed = 0.0;
         // this.position = new Point2D.Double(0.0,0.0);
         // this.angle = 0.0;
@@ -138,6 +140,10 @@ public class VehicleWrap {
     public double getMaxSpeed() {return maxSpeed;}
     public int getActiveTime() {return activeTime;}
     public int getTotalLifetime() {return totalLifetime;}
+    public boolean exists() {return exists;}
+    public void setExists(boolean exists) {this.exists = exists;}
+    public Color  getColor() {return color;}
+    public String getRouteID() {return routeID;}
 
     public void setSpeed(double speed) {
         try {

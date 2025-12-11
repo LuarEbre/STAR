@@ -2,25 +2,23 @@ package sumo.sim;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CSV {
 
     private final String File;
     private final FileWriter fw;
 
-    public CSV(String csv_file) throws IOException {
-        this.File = csv_file;
+    public CSV(String csvFile) throws IOException {
+        this.File = csvFile;
         fw = new FileWriter(this.File, true);
         fw.write("\n");
     }
 
 
-    public void add_to_CsvFile(String[] new_data) {
+    public void addToCSV(String[] newData) {
         try {
-            for(int i = 0; i < new_data.length; i++){
-                fw.write(new_data[i]);
+            for(int i = 0; i < newData.length; i++){
+                fw.write(newData[i]);
                 fw.write("\n");
             }
 
