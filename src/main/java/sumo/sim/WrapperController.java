@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +26,7 @@ public class WrapperController {
     private Vehicle_List vl;
     private Junction_List jl;
     private Type_List typel;
+    private RouteList rl;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
@@ -52,10 +54,14 @@ public class WrapperController {
         this.terminated = false;
         this.paused = true;
         this.simTime = 0;
-        connectionConfig();
+        try {
+            connectionConfig();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void connectionConfig() {
+    public void connectionConfig() throws Exception {
         // add various connection options
         //connection.addOption("delay", "50");
         connection.addOption("start", "true");
@@ -71,6 +77,7 @@ public class WrapperController {
         sl = new Street_List(this.connection);
         tl = new TrafficLights_List(connection, sl);
         jl = new Junction_List(connection, sl);
+        //rl = new RouteList("src/main/resources/SumoConfig/Map_2/routes.xml");
         typel = new Type_List(connection);
         Type_List types = new Type_List(connection);
         start();
@@ -185,9 +192,13 @@ public class WrapperController {
         return tl;
     }
 
-    //setter
-
-    public String[] setTypeList() {
+    public String[] getTypeList() {
         return typel.getAllTypes();
     }
+
+    public String[] getRouteList() {
+        return rl.getAllRoutes();
+    }
+    //setter
+
 }

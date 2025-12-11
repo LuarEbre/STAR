@@ -82,7 +82,7 @@ public class GuiController {
         initializeRender();
 
         // displays all available types found in xml
-        String[] arr = wrapperController.setTypeList();
+        String[] arr = wrapperController.getTypeList();
         typeSelector.setItems(FXCollections.observableArrayList(arr));
         int i = 0;
         boolean found = false;
@@ -97,7 +97,9 @@ public class GuiController {
         String[] modes = { "Light_Test" , "Medium_Test" , "Heavy_Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         stressTestMode.setValue(modes[0]);
-        //routeSelector.setItems("Custom");
+
+
+        //routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         mapPan();
     }
 
