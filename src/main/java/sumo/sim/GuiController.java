@@ -93,7 +93,7 @@ public class GuiController {
         stressTestMode.setValue(modes[0]);
 
 
-        //routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
+        routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         mapPan();
     }
 
@@ -157,6 +157,8 @@ public class GuiController {
 
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
+
+        // if no routes exist in .rou files -> cant add vehicles
 
         rescale();
     }

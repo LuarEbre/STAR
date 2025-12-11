@@ -122,18 +122,6 @@ public class SimulationRenderer {
         renderVehicle();
     }
 
-    public void drawTriangleCar(VehicleWrap v, double width, double length) {
-        gc.save(); // saves previous gc state
-        gc.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
-        gc.rotate(-v.getAngle()+180); // mirror along x -> rotate 180 degree
-        gc.setFill(v.getColor());
-        double[] xPoints = { 0, -width, width }; // width relative to start point 0 , 0
-        double[] yPoints = { -length, length, length }; // set 3 Polygon point relative to car position
-        gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
-
-        gc.restore(); // restores previous
-    }
-
     public void renderVehicle(){
         double angle = 0;
         double posX;
@@ -149,8 +137,19 @@ public class SimulationRenderer {
             //gc.fillOval(posX-2, posY-2, 4, 4); // for now drawing an oval, could be either a svg or other polygon in the future
             // drawTriangleCar is still experimental as the angles are not accurate when taking turns etc.
             this.drawTriangleCar(v,1.5, 3); // set length / widht in vehicle class -> internal
-
         }
+    }
+
+    public void drawTriangleCar(VehicleWrap v, double width, double length) {
+        gc.save(); // saves previous gc state
+        gc.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
+        gc.rotate(-v.getAngle()+180); // mirror along x -> rotate 180 degree
+        gc.setFill(v.getColor());
+        double[] xPoints = { 0, -width, width }; // width relative to start point 0 , 0
+        double[] yPoints = { -length, length, length }; // set 3 Polygon point relative to car position
+        gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
+
+        gc.restore(); // restores previous
     }
 
     public void padMad(double x, double y) {
