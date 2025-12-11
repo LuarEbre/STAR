@@ -4,7 +4,7 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -19,11 +19,12 @@ public class WrapperController {
     public static final String RESET = "\u001B[0m"; // white
     private final SumoTraciConnection connection;
     private final GuiController guiController;
-    private Street_List sl;
-    private TrafficLights_List tl;
-    private Vehicle_List vl;
-    private Junction_List jl;
-    private Type_List typel;
+    private StreetList sl;
+    private TrafficLightList tl;
+    private VehicleList vl;
+    private JunctionList jl;
+    private TypeList typel;
+    private RouteList rl;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
@@ -31,8 +32,9 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
-    public static String curr_net = "src/main/resources/SumoConfig/Map_2/test.net.xml";
-    public static String curr_rou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
+    public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -67,12 +69,18 @@ public class WrapperController {
         }
         // Connection has been established
         System.out.println("Connected to Sumo.");
-        vl = new Vehicle_List(connection);
-        sl = new Street_List(this.connection);
-        tl = new TrafficLights_List(connection, sl);
-        jl = new Junction_List(connection, sl);
-        typel = new Type_List(connection);
-        Type_List types = new Type_List(connection);
+        vl = new VehicleList(connection);
+        sl = new StreetList(this.connection);
+        tl = new TrafficLightList(connection, sl);
+        jl = new JunctionList(connection, sl);
+        try {
+            rl = new RouteList(currentRou);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        typel = new TypeList(connection);
+
+        TypeList types = new TypeList(connection);
         start();
         startRenderer();
     }
@@ -89,8 +97,6 @@ public class WrapperController {
                     double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
                     System.out.println(RED + "Time: " + timeSeconds + RESET);
 
-                    vl.updateAllVehicles();
-                    vl.printVehicles();
                     System.out.println("Delay:" + delay);
 
                     doStepUpdate();
@@ -114,10 +120,10 @@ public class WrapperController {
 
     // methods controlling the simulation / also connected with the guiController
 
-    public void addVehicle() { // int number, String type, Color color ,,int amount, String type, String route
+    public void addVehicle(int amount, String type, String route, Color color) { // int number, String type, Color color ,,int amount, String type, String route
         // used by guiController
         // executes addVehicle from WrapperVehicle
-        vl.addVehicle(1, "t_0"); // type t_0 (can be chosen)
+        vl.addVehicle(amount, type, route, color);
     }
 
     public void changeDelay(int delay) {
@@ -140,6 +146,8 @@ public class WrapperController {
         // updating gui and simulation
         try {
             connection.do_timestep();
+            vl.updateAllVehicles();
+            vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
@@ -157,8 +165,8 @@ public class WrapperController {
 
     // getter
 
-    public static String get_current_net(){
-        return curr_net;
+    public static String getCurrentNet(){
+        return currentNet;
     }
 
     public double getTime() {
@@ -169,12 +177,32 @@ public class WrapperController {
         return delay;
     }
 
-    public Junction_List get_junction() {
+    public JunctionList getJunctions() {
         return jl;
     }
 
-    public Street_List get_sl() {
+    public StreetList getStreets() {
         return sl;
+    }
+
+    public VehicleList getVehicles() {
+        return vl;
+    }
+
+    public TrafficLightList getTrafficLights() {
+        return tl;
+    }
+
+    public String[] getTypeList() {
+        return typel.getAllTypes();
+    }
+
+    public String[] getRouteList() {
+        return rl.getAllRoutesID();
+    }
+
+    public boolean isRouteListEmpty() {
+        return rl.isRouteListEmpty();
     }
 
     //setter

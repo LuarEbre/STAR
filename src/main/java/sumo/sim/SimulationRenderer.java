@@ -5,23 +5,35 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
+import static java.lang.Math.abs;
+
 public class SimulationRenderer {
     private final GraphicsContext gc;
     private final Canvas map;
     private double zoom;
     private double camX;
     private double camY;
-    private final Junction_List jl;
-    private final Street_List sl;
+    private double scale; // should depend on how big the map is -> difference between max and min?
+    private final JunctionList jl;
+    private final StreetList sl;
+    private final VehicleList vl;
+    private final TrafficLightList tls;
 
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, Junction_List jl, Street_List sl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls) {
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
-        this.zoom = 1;
         this.sl = sl;
         this.jl = jl;
+        this.vl = vl;
+        this.tls = tls;
         this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
         this.camY = jl.getCenterPosY() ;
+        double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
+        double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
+        scale = 1+(scaleX / scaleY);
+        System.out.println("scale: " + scale);
+        zoom = scale+1;
+        //scale = 1;
     }
 
     public void initRender(){
@@ -32,7 +44,7 @@ public class SimulationRenderer {
         gc.setFill(Color.GREEN);
         gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
         transform();
-        renderMap(jl,sl);
+        renderMap();
     }
 
 
@@ -58,12 +70,14 @@ public class SimulationRenderer {
 
     }
 
-    public void renderMap(Junction_List jl, Street_List sl){
+
+    public void renderMap(){
 
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1.0);
+        gc.setLineWidth(scale);
         for (Street s : sl.getStreets()) { // streets
+            // stroke Polyline for lanes
             for (LaneWrap l : s.getLanes()) { // lanes of streets
 
                 double[] rawX = l.getShapeX();
@@ -83,7 +97,9 @@ public class SimulationRenderer {
         }
 
         for(JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
-            gc.setLineWidth(1);
+            gc.setFill(Color.RED);
+            gc.setStroke(Color.RED);
+            gc.setLineWidth(scale);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
 
@@ -94,29 +110,57 @@ public class SimulationRenderer {
             // [54.7, 38.75] 2 -> line
             // > 3 elements in array : polygon
             if (rawX.length >= 3) {
-                gc.fillPolygon(rawX, rawY, rawX.length); // fills polygon
-                gc.strokePolygon(rawX, rawY, rawX.length); // border
+                gc.fillPolygon(rawX, rawY, rawX.length ); // fills polygon
+                //gc.strokePolygon(rawX, rawY, rawX.length); // border
             } else if (rawX.length == 2) {
-                /*
-                gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]); */
+                //gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]);
             } else {
-                gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
+               gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
             }
 
         }
+        renderVehicle();
     }
 
-    public void moveX(double pad) {
-        camX += pad;
+    public void renderVehicle(){
+        double angle = 0;
+        double posX;
+        double posY;
+
+        for (VehicleWrap v : vl.getVehicles()) {
+            if(!v.exists()) continue;
+            gc.setFill(v.getColor());
+            angle = v.getAngle();
+            posX = v.getPosition().getX();
+            posY = v.getPosition().getY();
+            // no need to translate coordinates since translation is already applied to graphics context
+            //gc.fillOval(posX-2, posY-2, 4, 4); // for now drawing an oval, could be either a svg or other polygon in the future
+            // drawTriangleCar is still experimental as the angles are not accurate when taking turns etc.
+            this.drawTriangleCar(v,1.5, 3); // set length / widht in vehicle class -> internal
+        }
     }
 
-    public void moveY(double pad) {
-        camY += pad;
+    public void drawTriangleCar(VehicleWrap v, double width, double length) {
+        gc.save(); // saves previous gc state
+        gc.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
+        gc.rotate(-v.getAngle()+180); // mirror along x -> rotate 180 degree
+        gc.setFill(v.getColor());
+        double[] xPoints = { 0, -width, width }; // width relative to start point 0 , 0
+        double[] yPoints = { -length, length, length }; // set 3 Polygon point relative to car position
+        gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
+
+        gc.restore(); // restores previous
+    }
+
+    public void padMad(double x, double y) {
+        camX += x/(zoom/2); // zoom / 2 -> if zoomed out -> x gets bigger
+        camY += y/(zoom/2);
     }
 
     public void zoomMap(double z) {
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
+
 
 
 }

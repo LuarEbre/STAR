@@ -1,15 +1,13 @@
 package sumo.sim;
 
-import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.cmd.Vehicletype;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Type_List {
+public class TypeList {
     // has a list of all current (and newly created) Vehicle types
 
     private final Map<String, Type> types = new HashMap<>(); // string key unique: type id
@@ -18,7 +16,7 @@ public class Type_List {
     /*
     type_id -> list(color,max speed)
      */
-    public Type_List(SumoTraciConnection connection) {
+    public TypeList(SumoTraciConnection connection) {
         this.connection = connection;
         try {
             SumoStringList list = (SumoStringList) connection.do_job_get(Vehicletype.getIDList());

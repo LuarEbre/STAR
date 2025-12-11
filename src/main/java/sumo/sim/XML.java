@@ -7,21 +7,22 @@ import java.util.*;
 
 public class XML {
 // XML file read/write class
-    private static FileInputStream file;
+    private FileInputStream file;
     //private static SAXBuilder saxBuilder;
     //private static Document document;
     private static XMLInputFactory factory = null;
-    private static XMLStreamReader reader = null;
+    private String path;
 
     public XML(String path) throws Exception{
+        this.path = path;
         file = new FileInputStream(path);
         factory = XMLInputFactory.newInstance();
-        reader = factory.createXMLStreamReader(file);
 
     }
 
     public String get_from_junction(String id){
-        try{
+        try (FileInputStream file = new FileInputStream(path)){
+            XMLStreamReader reader = factory.createXMLStreamReader(file);
             while(reader.hasNext()){
                 int event =  reader.next();
                 //reads all entries of the xml till the children are edges
@@ -41,7 +42,8 @@ public class XML {
     }
 
     public String get_to_junction(String id) {
-        try {
+        try (FileInputStream file = new FileInputStream(path)){
+            XMLStreamReader reader = factory.createXMLStreamReader(file);
             while (reader.hasNext()) {
                 int event = reader.next();
                 //reads all entries of the xml till the children are edges
@@ -65,7 +67,8 @@ public class XML {
     public Map<String, String[]> readAllEdges() {
         Map<String, String[]> map = new HashMap<>();
 
-        try {
+        try (FileInputStream file = new FileInputStream(path)){
+            XMLStreamReader reader = factory.createXMLStreamReader(file);
             while (reader.hasNext()) {
                 int event = reader.next();
 
@@ -91,14 +94,14 @@ public class XML {
 
     public Map<String, List<String>> getRoutes(){
         Map<String, List<String>> map = new HashMap<>();
-        try{
-            XMLStreamReader localReader = factory.createXMLStreamReader(new FileInputStream(file.getFD()));
-            while (localReader.hasNext()) {
-                int event = localReader.next();
+        try(FileInputStream file = new FileInputStream(path)){
+            XMLStreamReader reader = factory.createXMLStreamReader(file);
+            while (reader.hasNext()) {
+                int event = reader.next();
 
-                if (event == XMLStreamConstants.START_ELEMENT && localReader.getLocalName().equals("route")) {
-                    String id = localReader.getAttributeValue(null, "id");
-                    String edges = localReader.getAttributeValue(null, "edges");
+                if (event == XMLStreamConstants.START_ELEMENT && reader.getLocalName().equals("route")) {
+                    String id = reader.getAttributeValue(null, "id");
+                    String edges = reader.getAttributeValue(null, "edges");
 
                     if (id != null && edges != null) {
                         // Split the string by space and convert to List
@@ -107,10 +110,10 @@ public class XML {
                     }
                 }
             }
-            localReader.close();
+            reader.close();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error readind XML file.", e);
+            throw new RuntimeException("Error reading XML file.", e);
         }
         return map;
     }
