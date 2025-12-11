@@ -52,7 +52,7 @@ public class SimulationRenderer {
     // [  0  ,  0  ,  1 ]
     // m matrix , t translate, first letter: target; second letter: source ( which to mult)
 
-    public void transform(){
+    private void transform(){
         Affine transform = new Affine();
         transform.appendTranslation(map.getWidth()/2, map.getHeight()/2); // moves 0,0 to map middle : add/sub
         // [ 1 , 0 , width ]        [ x + w ] <-- this is our point x -> + is to the right on x
@@ -69,11 +69,12 @@ public class SimulationRenderer {
     }
 
 
-    public void renderMap(){
+    private void renderMap(){
 
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(scale);
+
         for (Street s : sl.getStreets()) { // streets
             // stroke Polyline for lanes
             for (LaneWrap l : s.getLanes()) { // lanes of streets
@@ -95,8 +96,8 @@ public class SimulationRenderer {
         }
 
         for(JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
-            gc.setFill(Color.RED);
-            gc.setStroke(Color.RED);
+            gc.setFill(Color.BLACK);
+            gc.setStroke(Color.BLACK);
             gc.setLineWidth(scale);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
@@ -118,9 +119,10 @@ public class SimulationRenderer {
 
         }
         renderVehicle();
+        renderTrafficLight();
     }
 
-    public void renderVehicle(){
+    private void renderVehicle(){
         double angle = 0;
         double posX;
         double posY;
@@ -138,16 +140,70 @@ public class SimulationRenderer {
         }
     }
 
-    public void drawTriangleCar(VehicleWrap v, double width, double length) {
-        gc.save(); // saves previous gc state
-        gc.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
-        gc.rotate(-v.getAngle()+180); // mirror along x -> rotate 180 degree
-        gc.setFill(v.getColor());
-        double[] xPoints = { 0, -width, width }; // width relative to start point 0 , 0
-        double[] yPoints = { -length, length, length }; // set 3 Polygon point relative to car position
-        gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
+    private void drawTriangleCar(VehicleWrap v, double width, double length) {
+        if(v.exists()) {
+            gc.save(); // saves previous gc state
+            gc.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
+            gc.rotate(-v.getAngle() + 180); // mirror along x -> rotate 180 degree
+            gc.setFill(v.getColor());
+            double[] xPoints = {0, -width, width}; // width relative to start point 0 , 0
+            double[] yPoints = {-length, length, length}; // set 3 Polygon point relative to car position
+            gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
 
-        gc.restore(); // restores previous
+            gc.restore(); // restores previous
+        }
+    }
+
+    private void renderTrafficLight() {
+        for (TrafficLightWrap tl : tls.getTrafficlights()) {
+
+            Color lightColor = Color.RED; // Default
+            int phase = tl.getPhaseNumber();
+            if (phase == 1) {
+                lightColor = Color.YELLOW;
+            } else if (phase == 2) {
+                lightColor = Color.LIGHTGREEN;
+            }
+            gc.setStroke(lightColor);
+
+            gc.setLineWidth(2.0);
+            for (Street controlledStreet : tl.getControlledStreets()) {
+                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets
+
+                    double[] rawX = l.getShapeX();
+                    double[] rawY = l.getShapeY();
+
+                    double endX = rawX[rawX.length - 1];
+                    double endY = rawY[rawX.length - 1];
+
+                    double prevX = rawX[rawX.length - 2];
+                    double prevY = rawY[rawX.length - 2];
+
+                    //(P_prev -> P_end)
+                    double dx = endX - prevX;
+                    double dy = endY - prevY;
+
+                    // normalize length
+                    double length = Math.sqrt(dx * dx + dy * dy);
+
+                    double ndx = dx / length;
+                    double ndy = dy / length;
+
+                    double perpX = -ndy;
+                    double perpY = ndx;
+
+                    double halfWidth = 3.5 / 2.0;
+
+                    double lineX1 = endX + (perpX * halfWidth);
+                    double lineY1 = endY + (perpY * halfWidth);
+
+                    double lineX2 = endX - (perpX * halfWidth);
+                    double lineY2 = endY - (perpY * halfWidth);
+
+                    gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
+                }
+            }
+        }
     }
 
     public void padMad(double x, double y) {

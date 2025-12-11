@@ -2,21 +2,17 @@ package sumo.sim;
 
 import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.cmd.Trafficlight;
-import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoPosition2D;
-import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private final SumoTraciConnection con;
     private final String id;
-    private Set<Street> controlledStreets;
+    private final Set<Street> controlledStreets;
     private int phase; // color switch e.g. "GGGrrrrr"
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
@@ -39,13 +35,7 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
-    public int getPhaseNumber() {
-        try {
-            return (int) con.do_job_get(Trafficlight.getPhase(id)); // gets phase of tl = 1, 2, 3
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    // setter
 
     public void setPhaseNumber(int index) {
         //TODO: check if index exists in TL
@@ -90,6 +80,21 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
+    public void setControlledStreets(Street s) {
+        this.controlledStreets.add(s);
+        printControlledStreets();
+    }
+
+    // getter
+
+    public int getPhaseNumber() {
+        try {
+            return (int) con.do_job_get(Trafficlight.getPhase(id)); // gets phase of tl = 1, 2, 3
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public String getPhaseName() {
         try {
             return (String) con.do_job_get(Trafficlight.getPhaseName(id));
@@ -109,14 +114,17 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     public String getId() {
         return id;
     }
-
+    public int get_Phase(){
+        return this.phase;
+    }
     public Point2D.Double getPosition() {
         return position;
     }
-
-    public void setControlledStreets(Street s) {
-        this.controlledStreets.add(s);
+    public Set<Street> getControlledStreets() {
+        return controlledStreets;
     }
+
+    // other
 
     public void printControlledStreets() {
         for (Street s : controlledStreets) {
@@ -133,7 +141,4 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
 
     }
 
-    public int get_Phase(){
-        return this.phase;
-    }
 }

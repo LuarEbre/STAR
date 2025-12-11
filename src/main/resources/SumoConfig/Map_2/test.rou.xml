@@ -4,55 +4,15 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <!-- Vehicles, persons and containers (sorted by depart) -->
-    <trip id="t_001" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_002" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_003" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_004" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_005" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_006" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_007" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_008" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_009" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_010" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_011" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_012" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_013" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_014" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_015" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_016" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_017" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_018" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_019" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_020" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_021" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_022" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_023" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_024" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_025" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_026" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_027" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_028" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_029" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_030" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_031" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_032" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_033" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_034" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_035" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_036" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_037" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_038" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_039" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_040" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_041" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_042" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_043" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_044" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_045" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_046" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_047" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_048" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_049" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
-    <trip id="t_050" depart="0.00" from="E3" to="E8" via="E2 E4 E5 E6 E0 E1 E2 E4 E5"/>
+    <!-- VTypes -->
+    <vType id="grey_car" color="69,69,69"/>
+    <vType id="t_0"/>
+    <vType id="t_1"/>
+    <vType id="t_2"/>
+    <vType id="t_3"/>
+    <vType id="t_4"/>
+    <vType id="t_5"/>
+    <!-- Routes -->
+    <route id="r0" edges="E7 E0 E1 E2 E4 E5 E8"/>
+    <route id="r1" edges="E3 E2 E4 E5 E6 E0 E1 E2 E4 E5 E8"/>
 </routes>
