@@ -18,6 +18,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import java.util.function.UnaryOperator;
+
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -26,15 +29,6 @@ public class GuiController {
 
     @FXML
     private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu;
-
-    // performance update -> addMenu and StressTestMenu in separate fxml files
-
-import java.util.function.UnaryOperator;
-
-public class GuiController {
-
-    @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu;
 
     // performance update -> addMenu and StressTestMenu in separate fxml files
 
@@ -100,8 +94,9 @@ public class GuiController {
             i++;
         }
 
-        String[] modes = { "Light_Test (10)" , "Medium_Test (100)" , "Heavy_Test (1000)" };
+        String[] modes = { "Light_Test" , "Medium_Test" , "Heavy_Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
+        stressTestMode.setValue(modes[0]);
         //routeSelector.setItems("Custom");
         mapPan();
     }
@@ -286,12 +281,16 @@ public class GuiController {
     @FXML
     protected void startStressTest(){
         String mode = stressTestMode.getValue();
+        System.out.println("jdaubfuawbf");
+        // experimental
         if (mode.equals("Light_Test")) {
-            wrapperController.addVehicle(10, typeSelector.getValue());
+            System.out.println("jdaubfuawbf");
+            wrapperController.addVehicle(10, "t_0", "r0", Color.GREEN);
         } else if (mode.equals("Medium_Test")) {
-            wrapperController.addVehicle(100, typeSelector.getValue());
+            wrapperController.addVehicle(100, "DEFAULT_VEH", "r0", Color.YELLOW);
         } else if (mode.equals("Heavy_Test")) {
-            wrapperController.addVehicle(1000, typeSelector.getValue());
+            wrapperController.addVehicle(1000, "DEFAULT_VEH", "r0", Color.RED);
+
         }
     }
 
