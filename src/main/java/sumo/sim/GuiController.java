@@ -1,9 +1,6 @@
 package sumo.sim;
 
-import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
@@ -21,9 +18,6 @@ import javafx.scene.layout.VBox;
 import java.util.function.UnaryOperator;
 
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 public class GuiController {
 
@@ -94,7 +88,7 @@ public class GuiController {
             i++;
         }
 
-        String[] modes = { "Light_Test" , "Medium_Test" , "Heavy_Test" };
+        String[] modes = { "Light Test" , "Medium Test" , "Heavy Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         stressTestMode.setValue(modes[0]);
 
@@ -284,11 +278,11 @@ public class GuiController {
     protected void startStressTest(){
         String mode = stressTestMode.getValue();
         // experimental
-        if (mode.equals("Light_Test")) {
+        if (mode.equals("Light Test")) {
             wrapperController.addVehicle(10, "DEFAULT_VEHTYPE", "r0", Color.GREEN);
-        } else if (mode.equals("Medium_Test")) {
+        } else if (mode.equals("Medium Test")) {
             wrapperController.addVehicle(100, "DEFAULT_VEHTYPE", "r0", Color.YELLOW);
-        } else if (mode.equals("Heavy_Test")) {
+        } else if (mode.equals("Heavy Test")) {
             wrapperController.addVehicle(1000, "DEFAULT_VEHTYPE", "r0", Color.RED);
 
         }
@@ -381,8 +375,8 @@ public class GuiController {
 
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.get_junction(),wrapperController.get_sl(),
-                wrapperController.get_vl(), wrapperController.get_tl());
+        sr = new SimulationRenderer(map,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
+                wrapperController.getVehicles(), wrapperController.getTrafficLights());
         renderUpdate();
     }
 

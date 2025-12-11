@@ -4,11 +4,9 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,12 +19,11 @@ public class WrapperController {
     public static final String RESET = "\u001B[0m"; // white
     private final SumoTraciConnection connection;
     private final GuiController guiController;
-    private Street_List sl;
-    private TrafficLights_List tl;
-    private Vehicle_List vl;
-    private Junction_List jl;
-    private Type_List typel;
-    private RouteList rl;
+    private StreetList sl;
+    private TrafficLightList tl;
+    private VehicleList vl;
+    private JunctionList jl;
+    private TypeList typel;
     private boolean terminated;
     private ScheduledExecutorService executor;
     private int delay = 50;
@@ -34,7 +31,7 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
-    public static String curr_net = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
+    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -54,14 +51,10 @@ public class WrapperController {
         this.terminated = false;
         this.paused = true;
         this.simTime = 0;
-        try {
-            connectionConfig();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        connectionConfig();
     }
 
-    public void connectionConfig() throws Exception {
+    public void connectionConfig() {
         // add various connection options
         //connection.addOption("delay", "50");
         connection.addOption("start", "true");
@@ -73,13 +66,12 @@ public class WrapperController {
         }
         // Connection has been established
         System.out.println("Connected to Sumo.");
-        vl = new Vehicle_List(connection);
-        sl = new Street_List(this.connection);
-        tl = new TrafficLights_List(connection, sl);
-        jl = new Junction_List(connection, sl);
-        //rl = new RouteList("src/main/resources/SumoConfig/Map_2/routes.xml");
-        typel = new Type_List(connection);
-        Type_List types = new Type_List(connection);
+        vl = new VehicleList(connection);
+        sl = new StreetList(this.connection);
+        tl = new TrafficLightList(connection, sl);
+        jl = new JunctionList(connection, sl);
+        typel = new TypeList(connection);
+        TypeList types = new TypeList(connection);
         start();
         startRenderer();
     }
@@ -164,8 +156,8 @@ public class WrapperController {
 
     // getter
 
-    public static String get_current_net(){
-        return curr_net;
+    public static String getCurrentNet(){
+        return currentNet;
     }
 
     public double getTime() {
@@ -176,29 +168,25 @@ public class WrapperController {
         return delay;
     }
 
-    public Junction_List get_junction() {
+    public JunctionList getJunctions() {
         return jl;
     }
 
-    public Street_List get_sl() {
+    public StreetList getStreets() {
         return sl;
     }
 
-    public Vehicle_List get_vl() {
+    public VehicleList getVehicles() {
         return vl;
     }
 
-    public TrafficLights_List get_tl() {
+    public TrafficLightList getTrafficLights() {
         return tl;
     }
 
-    public String[] getTypeList() {
-        return typel.getAllTypes();
-    }
-
-    public String[] getRouteList() {
-        return rl.getAllRoutes();
-    }
     //setter
 
+    public String[] setTypeList() {
+        return typel.getAllTypes();
+    }
 }

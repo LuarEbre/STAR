@@ -3,7 +3,6 @@ package sumo.sim;
 import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.objects.SumoGeometry;
 import de.tudresden.sumo.objects.SumoPosition2D;
-import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
@@ -64,7 +63,7 @@ public class JunctionWrap {
         return predecessor;
     }
 
-    public double distance_to(JunctionWrap u) {
+    public double distanceTo(JunctionWrap u) {
         return abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
     }
 

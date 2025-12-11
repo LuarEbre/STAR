@@ -1,21 +1,19 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-public class Street_List {
+public class StreetList {
     // List of streets (like TL_List)
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
     private SumoTraciConnection connection;
 
-    public Street_List(SumoTraciConnection con) {
+    public StreetList(SumoTraciConnection con) {
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array
             this.connection = con;
@@ -44,7 +42,7 @@ public class Street_List {
         return streets;
     }
 
-    public void test_print() {
+    public void testPrint() {
         for (Street s : streets) {
             System.out.println(s.getFromJunction());
             System.out.println(s.getToJunction());

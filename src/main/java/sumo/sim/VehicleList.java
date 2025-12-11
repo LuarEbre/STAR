@@ -7,19 +7,15 @@ import javafx.scene.paint.Color;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 
-public class Vehicle_List {
+public class VehicleList {
     private final ArrayList<VehicleWrap> vehicles = new ArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     // needs possible routes maybe? for car creation
 
-    public Vehicle_List(SumoTraciConnection con) {
+    public VehicleList(SumoTraciConnection con) {
         this.count = 0;
         this.con = con;
     }
