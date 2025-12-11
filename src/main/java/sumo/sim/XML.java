@@ -117,4 +117,31 @@ public class XML {
         }
         return map;
     }
+
+    public Map<String, List<String>> getStreetsData(){
+        Map<String, List<String>> map = new HashMap<>();
+        try(FileInputStream file = new FileInputStream(path)){
+            XMLStreamReader reader = factory.createXMLStreamReader(file);
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT && reader.getLocalName().equals("edge")) {
+                    String id = reader.getAttributeValue(null, "id");
+                    List<String> attributes = new ArrayList<>();
+                    for(int i = 1; i < reader.getAttributeCount(); i++){
+                        attributes.add(reader.getAttributeValue(i));
+                    }
+
+                    if(id != null && !(attributes.contains("internal"))){
+                        map.put(id, attributes);
+                    }
+                }
+            }
+            reader.close();
+
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+        return map;
+    }
 }
