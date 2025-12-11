@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class RouteList {
 
-    private final List<RouteWrap> allRoutes;
+    private final Map<String, List<String>> allRoutes;
 
     public RouteList(String rouXmlFilePath) throws Exception {
 
@@ -14,37 +14,28 @@ public class RouteList {
         XML xmlReader = new XML(rouXmlFilePath);
 
         // map of routes(using getRoutes from XML class)
-        Map<String, List<String>> routeMap = xmlReader.getRoutes();
-
-        // converting to list of RouteWrap objects
-        this.allRoutes = new ArrayList<>();
-        for (Map.Entry<String, List<String>> entry : routeMap.entrySet()) {
-            // using RouteWrap constructor
-            RouteWrap route = new RouteWrap(entry.getKey(), entry.getValue());
-            this.allRoutes.add(route);
-        }
+        allRoutes = xmlReader.getRoutes();
 
     }
-    public String[] getAllRoutes() {
+
+    public Map<String, List<String>> getAllRoutes() {
+        return allRoutes;
+    }
+
+    public String[] getAllRoutesID() {
         String[] ret = new String[allRoutes.size()];
-        for (int i = 0; i < allRoutes.size(); i++) {
-            RouteWrap route = allRoutes.get(i);
-            ret[i] = route.getId();
-        }
+
+        ret =  allRoutes.keySet().toArray(ret);
 
         return ret;
     }
 
-    public RouteWrap getRouteById(String id) {
-        for (RouteWrap route : allRoutes) {
-            if (route.getId().equals(id)) {
-                return route;
-            }
+    public List<String> getRouteById(String id) {
+            return allRoutes.get(id);
         }
-        return null;
-    }
+
     //getter for routecount(use in logic to check if any route is availabl)
     public boolean isRouteListEmpty() {
-        return (this.allRoutes.isEmpty());
+        return allRoutes.isEmpty();
     }
 }

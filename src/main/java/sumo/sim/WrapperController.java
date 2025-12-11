@@ -32,7 +32,7 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
-    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
+    public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
     public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
 
 
@@ -198,7 +198,7 @@ public class WrapperController {
     }
 
     public String[] getRouteList() {
-        return rl.getAllRoutes();
+        return rl.getAllRoutesID();
     }
 
     public boolean isRouteListEmpty() {
