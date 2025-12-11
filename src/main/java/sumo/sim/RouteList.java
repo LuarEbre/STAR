@@ -31,6 +31,7 @@ public class RouteList {
             RouteWrap route = allRoutes.get(i);
             ret[i] = route.getId();
         }
+
         return ret;
     }
 
@@ -43,7 +44,7 @@ public class RouteList {
         return null;
     }
     //getter for routecount(use in logic to check if any route is availabl)
-    public int getRouteCount() {
-        return this.allRoutes.size();
+    public boolean isRouteListEmpty() {
+        return (this.allRoutes.isEmpty());
     }
 }
