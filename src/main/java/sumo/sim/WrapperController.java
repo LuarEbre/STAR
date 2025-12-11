@@ -32,8 +32,11 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
+    //public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
+    //public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+
     public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
-    public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+    public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_routes_only.xml";
 
 
     public WrapperController(GuiController guiController) {
@@ -64,23 +67,20 @@ public class WrapperController {
         connection.addOption("quit-on-end", "true");
         try {
             connection.runServer(8813);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // Connection has been established
-        System.out.println("Connected to Sumo.");
-        vl = new VehicleList(connection);
-        sl = new StreetList(this.connection);
-        tl = new TrafficLightList(connection, sl);
-        jl = new JunctionList(connection, sl);
-        try {
+
+            // Connection has been established
+            System.out.println("Connected to Sumo.");
+            vl = new VehicleList(connection);
+            sl = new StreetList(this.connection);
+            tl = new TrafficLightList(connection, sl);
+            jl = new JunctionList(connection, sl);
+            typel = new TypeList(connection);
             rl = new RouteList(currentRou);
+            typel = new TypeList(connection);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        typel = new TypeList(connection);
-
-        TypeList types = new TypeList(connection);
         start();
         startRenderer();
     }
@@ -95,10 +95,8 @@ public class WrapperController {
                 }
                 try {
                     double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
-                    System.out.println(RED + "Time: " + timeSeconds + RESET);
-
-                    System.out.println("Delay:" + delay);
-
+                    //System.out.println(RED + "Time: " + timeSeconds + RESET);
+                    //System.out.println("Delay:" + delay);
                     doStepUpdate();
 
                 } catch (Exception e) {
@@ -147,7 +145,7 @@ public class WrapperController {
         try {
             connection.do_timestep();
             vl.updateAllVehicles();
-            vl.printVehicles();
+            //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
