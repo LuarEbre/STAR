@@ -23,9 +23,10 @@ public class Street {
         this.id = id;
         this.con = con;
         try {
-            xml = new XML(WrapperController.getCurrentNet());
+
+            /*xml = new XML(WrapperController.getCurrentNet());
             this.fromJunction = xml.get_from_junction(id);
-            this.toJunction = xml.get_to_junction(id);
+            this.toJunction = xml.get_to_junction(id);*/
             updateStreet();
             int laneCount = (Integer) con.do_job_get(Edge.getLaneNumber(id));
             for (int i = 0; i < laneCount; i++) {
