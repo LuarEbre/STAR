@@ -47,12 +47,10 @@ public class SimulationRenderer {
         renderMap();
     }
 
-
     // [ mxx , mxy , tx ]
     // [ myx , myy , ty ]
     // [  0  ,  0  ,  1 ]
     // m matrix , t translate, first letter: target; second letter: source ( which to mult)
-
 
     public void transform(){
         Affine transform = new Affine();
