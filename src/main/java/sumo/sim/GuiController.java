@@ -1,5 +1,6 @@
 package sumo.sim;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -95,6 +96,17 @@ public class GuiController {
 
         routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         mapPan();
+        startRenderer();
+    }
+
+    public void startRenderer() { // maybe with connection as argument? closing connection opened prior
+        AnimationTimer renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
+            @Override
+            public void handle(long timestamp) {
+                renderUpdate();
+            }
+        };
+        renderLoop.start(); // runs 60 frames per second
     }
 
     public void closeAllMenus() {

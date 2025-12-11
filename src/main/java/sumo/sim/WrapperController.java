@@ -2,11 +2,9 @@ package sumo.sim;
 
 import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
-import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -82,7 +80,6 @@ public class WrapperController {
             throw new RuntimeException(e);
         }
         start();
-        startRenderer();
     }
 
     public void start() { // maybe with connection as argument? closing connection opened prior
@@ -106,15 +103,6 @@ public class WrapperController {
             }, 0, delay, TimeUnit.MILLISECONDS); // initialdelay, delay, unit
     }
 
-    public void startRenderer() { // maybe with connection as argument? closing connection opened prior
-        AnimationTimer renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
-            @Override
-            public void handle(long timestamp) {
-                guiController.renderUpdate();
-            }
-        };
-        renderLoop.start(); // runs 60 frames per second
-    }
 
     // methods controlling the simulation / also connected with the guiController
 
