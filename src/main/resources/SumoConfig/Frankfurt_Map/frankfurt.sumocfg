@@ -7,11 +7,7 @@
 
     <input>
         <net-file value="frankfurt_kfz.net.xml"/>
-        <route-files value="frankfurt_routes_only.xml"/>
+      
     </input>
-
-    <time>
-        <begin value="0"/>
-    </time>
 
 </sumoConfiguration>

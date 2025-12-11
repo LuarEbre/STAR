@@ -92,28 +92,26 @@ public class XML {
     public Map<String, List<String>> getRoutes(){
         Map<String, List<String>> map = new HashMap<>();
         try{
-            while (reader.hasNext()) {
-                int event = reader.next();
+            XMLStreamReader localReader = factory.createXMLStreamReader(new FileInputStream(file.getFD()));
+            while (localReader.hasNext()) {
+                int event = localReader.next();
 
-                if (event == XMLStreamConstants.START_ELEMENT && reader.getLocalName().equals("route")) {
-                    String id = reader.getAttributeValue(null, "id");
-                    String edges = reader.getAttributeValue(null, "edges");
+                if (event == XMLStreamConstants.START_ELEMENT && localReader.getLocalName().equals("route")) {
+                    String id = localReader.getAttributeValue(null, "id");
+                    String edges = localReader.getAttributeValue(null, "edges");
 
-                    List<String> edgesList = new ArrayList<>();
-
-                    for(String edge : edges.split(" ")){
-                        edgesList.add(edge);
+                    if (id != null && edges != null) {
+                        // Split the string by space and convert to List
+                        List<String> edgesList = new ArrayList<>(Arrays.asList(edges.split("\\s+")));
+                        map.put(id, edgesList);
                     }
-
-                    map.put(id, edgesList);
                 }
-                return map;
             }
-        }catch (Exception e){
-            throw new RuntimeException(e);
-        }
+            localReader.close();
 
+        } catch (Exception e) {
+            throw new RuntimeException("Error readind XML file.", e);
+        }
         return map;
     }
-
 }
