@@ -31,7 +31,7 @@ public class GuiApplication extends Application {
         guiController = fxmlLoader.getController();
 
         // stage (frame)
-        stage.setFullScreen(true); //needs escape button to close the appl.
+        //stage.setFullScreen(true); //needs escape button to close the appl.
         stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyCode.F11.equals(event.getCode())) {
                 stage.setFullScreen(!stage.isFullScreen());

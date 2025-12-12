@@ -28,6 +28,7 @@ public class TrafficLightList {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        setAllControlledStreets();
     }
 
     public TrafficLightWrap getTL(String id) {
@@ -108,8 +109,7 @@ public class TrafficLightList {
 
     public void updateTLs(){
         for(TrafficLightWrap tl : trafficlights ){
-
-
+            tl.update_TL();
         }
 
     }

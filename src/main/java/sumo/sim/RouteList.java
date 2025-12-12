@@ -21,9 +21,13 @@ public class RouteList {
     }
 
     public String[] getAllRoutesID() {
-        String[] ret = new String[allRoutes.size()];
-
-        ret =  allRoutes.keySet().toArray(ret);
+        String[] ret = new String[allRoutes.size()+1];
+        ret[0] = "CUSTOM";
+        int i = 1;
+        for (String key : allRoutes.keySet()) {
+            ret[i] = key;
+            i++;
+        }
 
         return ret;
     }
@@ -53,22 +57,15 @@ public class RouteList {
         queue.add(startNode);
 
         while (!queue.isEmpty()) {
-
             JunctionWrap u = queue.poll();
-
             if (u.getDistance() > jl.getJunction(u.getID()).getDistance())
                 continue;
-
             if (u == endNode)
                 break;
-
             for (String neighborID : jl.getAdjacentVertexes(u.getID())) {
-
                 JunctionWrap v = jl.getJunction(neighborID);
                 if (v == null) continue;
-
                 double alt = u.getDistance() + u.distanceTo(v);
-
                 if (alt < v.getDistance()) {
                     v.setDistance(alt);
                     v.setPredecessor(u.getID());

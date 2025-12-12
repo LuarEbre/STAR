@@ -14,6 +14,7 @@ public class LaneWrap {
     private final String edgeID;
     private final double[] shapeX;
     private final double[] shapeY;
+    private final double width;
 
     public LaneWrap(String laneID,SumoTraciConnection connection, String edgeID) {
         this.laneID = laneID;
@@ -33,6 +34,8 @@ public class LaneWrap {
                 shapeX[i] = point.x;
                 shapeY[i] = point.y;
             }
+
+            width = (double) connection.do_job_get(Lane.getWidth(laneID));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -48,5 +51,9 @@ public class LaneWrap {
 
     public double[] getShapeY(){
         return shapeY;
+    }
+
+    public double getWidth(){
+        return width;
     }
 }

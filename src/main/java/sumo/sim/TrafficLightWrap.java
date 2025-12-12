@@ -4,11 +4,9 @@ import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoPosition2D;
-import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,12 +14,22 @@ import java.util.Set;
 public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private final SumoTraciConnection con;
     private final String id;
-    private Set<Street> controlledStreets;
-    private int phase; // color switch e.g. "GGGrrrrr"
+    private final Set<Street> controlledStreets;
+
+    private String type; // types: static, actuated, delay based, offline, special, rail signal
+    // program :
+    // offset : adjusts start time of phase cycle
+    // program id :
+    // <tlLogic id="J11" type="static" programID="0" offset="0"> ---> can have multiple of this with same TL id diff p id
+    //        <phase duration="42" state="GGrrrGGg"/>
+    //
+    // </tlLogic>
+
+    private int phase; // G = green priority , g , y, r , u = red_yellow , o = off;
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
     private final Point2D.Double position; // position as a junction
-    //private List<List<SumoLink>> controlledLinks; later used for defining incoming/outgoing streets
+    private List<SumoLink> controlledLinks;
 
     public TrafficLightWrap(String id, SumoTraciConnection con) {
         this.id = id;
@@ -33,11 +41,83 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
             this.position.x = pos2D.x;
             this.position.y = pos2D.y;
 
+            this.controlledLinks = (List<SumoLink>) con.do_job_get(Trafficlight.getControlledLinks(id));
+
             update_TL();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+    public String[] getCurrentState() {
+        int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
+        // -> state differs from index to index (index is controlled lanes that have tl)
+        String currentState;
+        try {
+            currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        String [] stateArray = new String[currentState.length()]; // saves state in arr -> to get indices
+        for (int i = 0; i < currentState.length(); i++) {
+            stateArray[i] = currentState.charAt(i) + ""; // every current state e.g = Grrryy (length definded)
+            System.out.print(stateArray[i]); // -> phase duration defined
+        }
+
+        return stateArray;
+    }
+
+    // setter
+
+    public void setPhaseNumber(int index) {
+        //TODO: check if index exists in TL
+        try {
+            con.do_job_set(Trafficlight.setPhase(id,index));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setPhaseName(String tlPhaseName) {
+        try {
+            con.do_job_set(Trafficlight.setPhaseName(id, tlPhaseName));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setPhaseDuration(double phaseDuration) {
+        try {
+            con.do_job_set(Trafficlight.setPhaseDuration(id, phaseDuration));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setProgram(String programID) {
+        //TODO: check for programID
+        try {
+            con.do_job_set(Trafficlight.setProgram(id, programID));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setRedYellowGreenState(String state) {
+        //TODO: string check
+        try {
+            con.do_job_set(Trafficlight.setRedYellowGreenState(id, state));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setControlledStreets(Street s) {
+        this.controlledStreets.add(s);
+        //printControlledStreets();
+    }
+
+    // getter
 
     public int getPhaseNumber() {
         try {
@@ -63,17 +143,37 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
+    public void getControlledJunctions() {
+        try {
+            con.do_job_get(Trafficlight.getControlledJunctions(id));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void getRYGdefinition() {
+        try {
+            System.out.println(con.do_job_get(Trafficlight.getCompleteRedYellowGreenDefinition(id)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        // returns ryg def like = Grrryy -> length -> how many incoming lanes and index =
+    }
+
     public String getId() {
         return id;
     }
-
+    public int get_Phase(){
+        return this.phase;
+    }
     public Point2D.Double getPosition() {
         return position;
     }
-
-    public void setControlledStreets(Street s) {
-        this.controlledStreets.add(s);
+    public Set<Street> getControlledStreets() {
+        return controlledStreets;
     }
+
+    // other
 
     public void printControlledStreets() {
         for (Street s : controlledStreets) {
@@ -90,7 +190,4 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
 
     }
 
-    public int get_Phase(){
-        return this.phase;
-    }
 }

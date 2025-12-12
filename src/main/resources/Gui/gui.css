@@ -213,6 +213,12 @@
     -fx-alignment: center;
 }
 
+#addVehicleButton:pressed {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-text-fill: -fx-color-magenta;
+}
+
 #colorSelector {
     -fx-background-color: -fx-color-grey-light;
     -fx-font-family:"Arial Black";
@@ -409,6 +415,18 @@
 #stepButton:pressed {
     -fx-background-image: url("/Gui/Icons/step_shoe.png");
     -fx-background-size: 56px 56px;
+}
+
+#trafficLightButton {
+    -fx-background-image: url("/Gui/Icons/trafficlights.png");
+    -fx-background-size: 50px 50px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#trafficLightButton:hover {
+    -fx-background-image: url("/Gui/Icons/trafficlights.png");
+    -fx-background-size: 45px 45px;
 }
 
 
