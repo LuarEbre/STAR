@@ -129,6 +129,7 @@ public class WrapperController {
         try {
             connection.do_timestep();
             vl.updateAllVehicles();
+            tl.updateAllCurrentState();
             //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);

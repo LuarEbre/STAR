@@ -3,7 +3,11 @@ package sumo.sim;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.transform.Affine;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Math.abs;
 
@@ -40,7 +44,7 @@ public class SimulationRenderer {
         // -> network: only do the following rendering with objects inside this restricting area;
         gc.setTransform(new Affine()); // transformation matrix
 
-        gc.setFill(Color.GREEN);
+        gc.setFill(Paint.valueOf("#86858E")); // background color
         gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
         transform();
         renderMap();
@@ -153,22 +157,31 @@ public class SimulationRenderer {
         }
     }
 
+    // optimization necessary
+
     private void renderTrafficLight() {
         for (TrafficLightWrap tl : tls.getTrafficlights()) {
-
+            String [] state = tl.getCurrentState(); // [R, edge_R ,y , edge_y , r, edge_r ] format
             Color lightColor = Color.RED; // Default
-            int phase = tl.getPhaseNumber();
-            if (phase == 1) {
-                lightColor = Color.YELLOW;
-            } else if (phase == 2) {
-                lightColor = Color.LIGHTGREEN;
-            }
-            gc.setStroke(lightColor);
-
             gc.setLineWidth(2.0);
 
             for (Street controlledStreet : tl.getControlledStreets()) {
-                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets
+                int i = 0;
+                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets , maybe performance hashmap
+                    if (state==null) continue;
+
+                    for (int j=0; j < state.length/2; j+=2) {
+                        if (state[j+1].equals(l.getLaneID())) { //  maybe performance hashmap
+                            switch (state[j]) { // if state like "g" equals...
+                                case "G", "g" -> lightColor = Color.GREEN;
+                                case "y" -> lightColor = Color.YELLOW;
+                                case "r" -> lightColor = Color.RED;
+                                default -> lightColor = Color.GRAY;
+                            }
+                            gc.setStroke(lightColor);
+                        }
+                    }
+
 
                     double[] rawX = l.getShapeX();
                     double[] rawY = l.getShapeY();
@@ -192,7 +205,7 @@ public class SimulationRenderer {
                     double perpX = -ndy;
                     double perpY = ndx;
 
-                    double halfWidth = 3.5 / 2.0;
+                    double halfWidth = 3.0 / 2.0;
 
                     double lineX1 = endX + (perpX * halfWidth);
                     double lineY1 = endY + (perpY * halfWidth);
@@ -201,6 +214,8 @@ public class SimulationRenderer {
                     double lineY2 = endY - (perpY * halfWidth);
 
                     gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
+
+                    i++;
                 }
             }
 
