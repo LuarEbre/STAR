@@ -21,9 +21,13 @@ public class RouteList {
     }
 
     public String[] getAllRoutesID() {
-        String[] ret = new String[allRoutes.size()];
-
-        ret =  allRoutes.keySet().toArray(ret);
+        String[] ret = new String[allRoutes.size()+1];
+        ret[0] = "CUSTOM";
+        int i = 1;
+        for (String key : allRoutes.keySet()) {
+            ret[i] = key;
+            i++;
+        }
 
         return ret;
     }
