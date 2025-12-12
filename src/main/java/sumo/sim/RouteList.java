@@ -57,22 +57,15 @@ public class RouteList {
         queue.add(startNode);
 
         while (!queue.isEmpty()) {
-
             JunctionWrap u = queue.poll();
-
             if (u.getDistance() > jl.getJunction(u.getID()).getDistance())
                 continue;
-
             if (u == endNode)
                 break;
-
             for (String neighborID : jl.getAdjacentVertexes(u.getID())) {
-
                 JunctionWrap v = jl.getJunction(neighborID);
                 if (v == null) continue;
-
                 double alt = u.getDistance() + u.distanceTo(v);
-
                 if (alt < v.getDistance()) {
                     v.setDistance(alt);
                     v.setPredecessor(u.getID());

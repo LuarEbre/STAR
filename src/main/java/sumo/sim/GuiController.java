@@ -34,7 +34,7 @@ public class GuiController {
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton;
     @FXML
     private Spinner <Integer> delaySelect;
     @FXML
@@ -56,6 +56,7 @@ public class GuiController {
     private final int maxDelay;
     private GraphicsContext gc;
     private SimulationRenderer sr;
+    private AnimationTimer renderLoop;
 
     // panning
     private double mousePressedXOld;
@@ -161,7 +162,9 @@ public class GuiController {
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
 
-        // if no routes exist in .rou files -> cant add vehicles
+        // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
+        startTestButton.setDisable(true);
+        addVehicleButton.setDisable(true);
     }
 
     private void rescale(){
@@ -319,11 +322,6 @@ public class GuiController {
 
     }
 
-    @FXML
-    protected void closeApplication() { // later extra button in file
-        Platform.exit();
-        wrapperController.terminate();
-    }
 
     // functionality
 
@@ -389,13 +387,29 @@ public class GuiController {
     // Render
 
     public void startRenderer() { // maybe with connection as argument? closing connection opened prior
-        AnimationTimer renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
+        renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
             @Override
             public void handle(long timestamp) {
                 renderUpdate();
+
+                // other functions that should update every frame
+                if(wrapperController.isRouteListEmpty() || routeSelector.getValue().equals("CUSTOM")) {
+                    addVehicleButton.setDisable(true);
+                    startTestButton.setDisable(true);
+                } else {
+                    addVehicleButton.setDisable(false);
+                    startTestButton.setDisable(false);
+                }
             }
         };
         renderLoop.start(); // runs 60 frames per second
+    }
+
+    @FXML
+    protected void closeApplication() { // later extra button in file
+        renderLoop.stop();
+        Platform.exit();
+        wrapperController.terminate();
     }
 
     public void initializeRender(){

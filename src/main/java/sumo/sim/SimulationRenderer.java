@@ -128,7 +128,7 @@ public class SimulationRenderer {
         double posY;
 
         for (VehicleWrap v : vl.getVehicles()) {
-            if(!v.exists()) continue;
+            if(!v.exists() && v.getPosition() == null) continue;
             gc.setFill(v.getColor());
             angle = v.getAngle();
             posX = v.getPosition().getX();
