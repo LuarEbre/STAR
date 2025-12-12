@@ -20,7 +20,7 @@ public class XML {
 
     }
 
-    public String get_from_junction(String id){
+    public String getFromJunction(String id){
         try (FileInputStream file = new FileInputStream(path)){
             XMLStreamReader reader = factory.createXMLStreamReader(file);
             while(reader.hasNext()){
@@ -41,7 +41,7 @@ public class XML {
         return null;
     }
 
-    public String get_to_junction(String id) {
+    public String getToJunction(String id) {
         try (FileInputStream file = new FileInputStream(path)){
             XMLStreamReader reader = factory.createXMLStreamReader(file);
             while (reader.hasNext()) {

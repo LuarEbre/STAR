@@ -8,9 +8,10 @@ import javafx.scene.paint.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class VehicleList {
-    private final ArrayList<VehicleWrap> vehicles = new ArrayList<>(); // List of Vehicles
+    private final CopyOnWriteArrayList<VehicleWrap> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     // needs possible routes maybe? for car creation
@@ -59,14 +60,18 @@ public class VehicleList {
 
     public void updateAllVehicles() {
         try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList()); // all current cars
+            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList());
+
             for (VehicleWrap v : vehicles) {
-                if(list.contains(v.getID())) {
+
+                if (list.contains(v.getID())) {
                     v.setExists(true);
                     v.updateVehicle();
+                } else {
+                    v.setExists(false);
                 }
-                else v.setExists(false);
             }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -136,7 +141,7 @@ public class VehicleList {
         return count;
     }
 
-    public ArrayList<VehicleWrap> getVehicles() {
+    public CopyOnWriteArrayList<VehicleWrap> getVehicles() {
         return vehicles;
     }
 }
