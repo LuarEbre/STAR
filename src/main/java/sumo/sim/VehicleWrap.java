@@ -51,7 +51,7 @@ public class VehicleWrap {
         this.color = color;
         this.routeID = route;
         this.speed = 0.0;
-        // this.position = new Point2D.Double(0.0,0.0);
+        this.position = new Point2D.Double(0.0,0.0);
         // this.angle = 0.0;
         this.maxSpeed = 0.0;
         // this.accel = 0.0;
@@ -62,27 +62,6 @@ public class VehicleWrap {
         this.activeTime = 1;
         this.totalLifetime = 0;
         this.activeLastFrame = false;
-
-        // currently trying to figure out how to access subscription values
-        // VariableSubscription has a start and stop time (runs 100,000 ticks now)
-        VariableSubscription sub = new VariableSubscription (
-                SubscribtionVariable.vehicle,
-                0,
-                100000,
-                this.id
-        );
-
-        // Add commands to our subscription of data we want to track
-        sub.addCommand(Constants.VAR_SPEED);
-        sub.addCommand(Constants.VAR_POSITION);
-        sub.addCommand(Constants.VAR_ANGLE);
-
-        // Register the subscription with the connection
-        try {
-            con.do_subscription(sub);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void updateUsingSubscription() {
