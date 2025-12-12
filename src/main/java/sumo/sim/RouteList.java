@@ -5,12 +5,12 @@ import java.util.*;
 public class RouteList {
 
     private final Map<String, List<String>> allRoutes;
+    private  XML xmlReader;
 
     public RouteList(String rouXmlFilePath) throws Exception {
 
         // parssing the xml file
-        XML xmlReader = new XML(rouXmlFilePath);
-
+        xmlReader = new XML(rouXmlFilePath);
         // map of routes(using getRoutes from XML class)
         allRoutes = xmlReader.getRoutes();
 
@@ -32,8 +32,12 @@ public class RouteList {
         return ret;
     }
 
-    public void addRoute(String id, List<String> edges) {
-        allRoutes.put(id, edges);
+    public void printRouteList() {
+        System.out.println("Route list:");
+        for(String key : allRoutes.keySet()) {
+            System.out.println(key + ": " + allRoutes.get(key));
+            System.out.println(allRoutes.get(key));
+        }
     }
 
     public void generateRoute(String start, String end, String routeID, JunctionList jl) {
@@ -74,6 +78,10 @@ public class RouteList {
             }
         }
 
+        System.out.println("Dijkstra finished. End node: " + endNode.getID());
+        System.out.println("Distance to end: " + endNode.getDistance());
+        System.out.println("Predecessor of end: " + endNode.getPredecessor());
+
         LinkedList<String> junctionPath = new LinkedList<>();
 
         for (JunctionWrap step = endNode; step != null; step = jl.getJunction(step.getPredecessor())) {
@@ -90,14 +98,21 @@ public class RouteList {
             String edgeID = jl.findEdgeID(from, to);
 
             if (edgeID == null) {
-                System.err.println("Edge not found between: " + from + " → " + to);
-                return;
+                throw new RuntimeException("Edge not found between: " + from + " → " + to);
             }
 
             edgeList.add(edgeID);
         }
 
-        addRoute(routeID, edgeList);
+        if (edgeList.isEmpty()) {
+            throw new RuntimeException("Route " + routeID + " is empty – cannot write to SUMO!");
+        }
+
+        System.out.println("Junction Path: " + junctionPath); // Ist diese Liste leer?
+        System.out.println("Junction Path Size: " + junctionPath.size());
+
+        allRoutes.put(routeID, edgeList);
+        xmlReader.newRoute(routeID, edgeList);
     }
 
     public List<String> getRouteById(String id) {

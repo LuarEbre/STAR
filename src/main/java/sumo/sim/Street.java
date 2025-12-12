@@ -20,30 +20,26 @@ public class Street {
 
     private XML xml;
 
-    public Street(String id, List<String> data, SumoTraciConnection con) {
+    public Street(String id, String from, String to, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
+        this.fromJunction = from;
+        this.toJunction = to;
+
+        initializeStreet(con);
+    }
+
+    public void initializeStreet(SumoTraciConnection con) {
         try {
-            updateStreet();
-
-            if(data.contains("from")) {
-                this.fromJunction = data.get(data.indexOf("from"));
-            }else if(data.contains("to")) {
-                this.toJunction = data.get(data.indexOf("to"));
-            }else {
-                this.fromJunction = null;
-                this.toJunction = null;
-            }
-
             int laneCount = (Integer) con.do_job_get(Edge.getLaneNumber(id));
             for (int i = 0; i < laneCount; i++) {
-                String currentLaneID = id + "_" + i; // street id_lane
-                lanes.add(new LaneWrap(currentLaneID, con, id));
+                lanes.add(new LaneWrap(id + "_" + i, con, id));
             }
-
+            updateStreet(con);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to initialize Street " + id, e);
         }
+
     }
 
     public Street(String id, SumoTraciConnection con) {
@@ -92,15 +88,14 @@ public class Street {
         }
     }
 
-    public void updateStreet(){
+    public void updateStreet(SumoTraciConnection con) {
         try {
             calcDensity();
-            this.noise = (double)con.do_job_get(Edge.getNoiseEmission(id));
-
-        }catch (Exception e){
-            throw new RuntimeException(e);
+            this.noise = (double) con.do_job_get(Edge.getNoiseEmission(id));
+        } catch (Exception e) {
+            this.density = 0;
+            this.noise = 0;
         }
-
     }
 
 
