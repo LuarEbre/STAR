@@ -167,6 +167,7 @@ public class SimulationRenderer {
             gc.setStroke(lightColor);
 
             gc.setLineWidth(2.0);
+
             for (Street controlledStreet : tl.getControlledStreets()) {
                 for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets
 
@@ -203,6 +204,7 @@ public class SimulationRenderer {
                     gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
                 }
             }
+
         }
     }
 
