@@ -222,6 +222,9 @@ public class GuiController {
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
         if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
+        addMenu.setVisible(false);
+        stressTestMenu.setVisible(false);
+        trafficLightMenu.setVisible(false);
         // still needs fix for small gap between buttons and menus at the top
     }
 
@@ -406,10 +409,10 @@ public class GuiController {
     }
 
     @FXML
-    protected void closeApplication() { // later extra button in file
-        renderLoop.stop();
-        Platform.exit();
-        wrapperController.terminate();
+    protected void closeApplication() {
+        renderLoop.stop(); // terminates Animation Timer
+        Platform.exit(); // terminates JavaFX thread
+        wrapperController.terminate(); // terminates sumo connection and wrapCon thread
     }
 
     public void initializeRender(){

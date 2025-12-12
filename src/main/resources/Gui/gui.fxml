@@ -141,9 +141,9 @@
          </children>
       </AnchorPane>
        <!-- Main Buttons menu -->
-       <AnchorPane fx:id="trafficLightMenu" layoutX="573.0" layoutY="218.0" prefHeight="275.0" prefWidth="229.0" styleClass="mainButtonMenu" visible="false">
+       <AnchorPane fx:id="trafficLightMenu" layoutX="556.0" layoutY="218.0" prefHeight="275.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false">
            <children>
-               <Label styleClass="addMenu-labels" layoutX="19.0" layoutY="9.0" text="Traffic Light Control">
+               <Label layoutX="19.0" layoutY="9.0" styleClass="addMenu-labels" text="Traffic Light Control">
                    <font>
                        <Font name="System Bold" size="20.0" />
                    </font>
@@ -154,8 +154,8 @@
                        <VBox prefHeight="238.0" prefWidth="147.0" spacing="28.0">
                            <children>
                                <Label styleClass="addMenu-labels" text="Select Traffic Light" />
-                               <Label styleClass="addMenu-labels" layoutX="10.0" layoutY="10.0" text="Traffic Light duration " />
-                        <Label styleClass="addMenu-labels" layoutX="15.0" layoutY="76.0" text="Set Program " />
+                               <Label layoutX="10.0" layoutY="10.0" styleClass="addMenu-labels" text="Traffic Light duration " />
+                        <Label layoutX="15.0" layoutY="76.0" styleClass="addMenu-labels" text="Set Program " />
                            </children>
                            <padding>
                                <Insets left="5.0" top="20.0" />
@@ -172,27 +172,59 @@
                            </padding>
                        </VBox>
                    </children>
+               <padding>
+                  <Insets left="5.0" right="5.0" />
+               </padding>
                </HBox>
            </children>
        </AnchorPane>
 
        <AnchorPane fx:id="stressTestMenu" layoutX="364.0" layoutY="164.0" prefHeight="275.0" prefWidth="386.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
-               <HBox layoutX="69.0" layoutY="169.0" prefHeight="91.0" prefWidth="386.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <HBox layoutX="69.0" layoutY="169.0" prefHeight="82.0" prefWidth="386.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <children>
+                  <VBox prefHeight="91.0" prefWidth="184.0" spacing="6.0">
+                     <children>
+                        <CheckBox mnemonicParsing="false" text="Multiple Routes" />
+                        <ChoiceBox prefWidth="150.0" />
+                        <TextField prefHeight="26.0" prefWidth="136.0" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                     </padding>
+                  </VBox>
+                  <Separator orientation="VERTICAL" prefHeight="200.0" />
+                  <VBox prefHeight="91.0" prefWidth="183.0" spacing="6.0">
+                     <children>
+                        <CheckBox mnemonicParsing="false" text="Multiple Types" />
+                        <ChoiceBox prefWidth="150.0" />
+                        <TextField prefHeight="26.0" prefWidth="136.0" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                     </padding>
+                  </VBox>
+               </children></HBox>
                <Separator layoutY="182.0" prefHeight="3.0" prefWidth="386.0" />
-               <Label layoutX="118.0" layoutY="22.0" prefHeight="18.0" prefWidth="94.0" styleClass="addMenu-labels" text="Mode" />
+               <Label layoutX="127.0" layoutY="22.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Mode" />
                <Button fx:id="startTestButton" layoutX="252.0" layoutY="144.0" mnemonicParsing="false" onAction="#startStressTest" prefHeight="26.0" prefWidth="110.0" text="Start Test" />
                <ChoiceBox fx:id="stressTestMode" layoutX="221.0" layoutY="18.0" prefWidth="150.0" />
                <ChoiceBox layoutX="221.0" layoutY="61.0" prefWidth="150.0" />
-               <Label layoutX="118.0" layoutY="65.0" styleClass="addMenu-labels" text="Extras" />
+               <Label layoutX="126.0" layoutY="65.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Result Data" />
                <ChoiceBox layoutX="221.0" layoutY="102.0" prefWidth="150.0" />
-               <Label layoutX="118.0" layoutY="106.0" styleClass="addMenu-labels" text="Vehicle Types" />
-               <Separator layoutX="103.0" orientation="VERTICAL" prefHeight="180.0" prefWidth="6.0" />
-               <VBox layoutX="-4.0" layoutY="-1.0" prefHeight="180.0" prefWidth="110.0" spacing="15.0">
+               <Label layoutX="128.0" layoutY="106.0" prefHeight="18.0" prefWidth="74.0" styleClass="addMenu-labels" text="Vehicle Types" />
+               <Separator layoutX="119.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="180.0" prefWidth="6.0" />
+               <VBox layoutX="-4.0" layoutY="-1.0" prefHeight="180.0" prefWidth="123.0" spacing="15.0">
                    <children>
-                       <CheckBox mnemonicParsing="false" text="feature1" />
-                       <CheckBox layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="feature2" />
-                       <CheckBox layoutX="10.0" layoutY="28.0" mnemonicParsing="false" text="CheckBox" />
+                       <CheckBox mnemonicParsing="false" text="Random TL" />
+                       <CheckBox layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Slow Vehicles" />
+                       <CheckBox layoutX="10.0" layoutY="28.0" mnemonicParsing="false" text="feature" />
                        <CheckBox layoutX="10.0" layoutY="45.0" mnemonicParsing="false" text="CheckBox" />
                        <CheckBox layoutX="10.0" layoutY="63.0" mnemonicParsing="false" text="CheckBox" />
                    </children>
@@ -200,6 +232,7 @@
                        <Insets left="15.0" top="15.0" />
                    </padding>
                </VBox>
+            <Button layoutX="134.0" layoutY="144.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" text="Create Route" />
            </children>
        </AnchorPane>
              <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">

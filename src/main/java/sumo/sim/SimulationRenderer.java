@@ -30,8 +30,7 @@ public class SimulationRenderer {
         this.camY = jl.getCenterPosY() ;
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
-        scale = 1+(scaleX / scaleY);
-        System.out.println("scale: " + scale);
+        scale = 1+(scaleX / scaleY); // should calculate the rough scale of the map
         zoom = scale+1;
         //scale = 1;
     }
