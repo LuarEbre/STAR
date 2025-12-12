@@ -1,7 +1,14 @@
 package sumo.sim;
 
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 import javax.xml.stream.*;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Map;
 import java.util.*;
 
@@ -178,5 +185,33 @@ public class XML {
 
         return result;
     }
+
+    public void newRoute(String id, List<String> edges) {
+        if (edges == null || edges.isEmpty()) {
+            throw new IllegalArgumentException("Route needs at least one edge!");
+        }
+
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            Document doc = builder.build(path);
+            Element root = doc.getRootElement();
+
+            root.getChildren("route").removeIf(r -> id.equals(r.getAttributeValue("id")));
+
+            Element route = new Element("route");
+            route.setAttribute("id", id);
+            route.setAttribute("edges", String.join(" ", edges));
+
+            root.addContent(route);
+
+            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+            out.output(doc, new FileOutputStream(path));
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error writing new route to XML.", e);
+        }
+    }
+
+
 
 }
