@@ -411,6 +411,18 @@
     -fx-background-size: 56px 56px;
 }
 
+#trafficLightButton {
+    -fx-background-image: url("/Gui/Icons/trafficlights.png");
+    -fx-background-size: 50px 50px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#trafficLightButton:hover {
+    -fx-background-image: url("/Gui/Icons/trafficlights.png");
+    -fx-background-size: 45px 45px;
+}
+
 
 #listData .list-cell {
     -fx-padding: 3 3 3 3;
