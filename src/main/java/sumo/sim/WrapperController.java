@@ -103,7 +103,6 @@ public class WrapperController {
             }, 0, delay, TimeUnit.MILLISECONDS); // initialdelay, delay, unit
     }
 
-
     // methods controlling the simulation / also connected with the guiController
 
     public void addVehicle(int amount, String type, String route, Color color) { // int number, String type, Color color ,,int amount, String type, String route
@@ -137,16 +136,37 @@ public class WrapperController {
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);
         } catch (Exception e) {
+            System.err.println(e.getMessage());
             throw new RuntimeException(e);
         }
 
     }
 
+    // fixed Exceptions thrown by Simulation when trying to close during step
+    // closing can still throw exceptions on JavaFX Application Thread caused by trying to render while simulation is closed (java.lang.IllegalStateException: connection is closed)
     public void terminate() {
         paused = false; // else executor would not terminate
-        terminated = true;
-        // needs exception handling , or some way to correctly terminate javafx thread
-        connection.close();
+        terminated = true; // Flag to stop new logic
+
+        if (executor != null) {
+            // no longer allow new tasks to be scheduled
+            executor.shutdown();
+            try {
+                // awaitTermination returns TRUE if termination occurs within delay ms, giving the simulation time to finalize current step
+                // otherwise it returns FALSE, in which case we immediately run shutdownNow(), risking errors
+                if (!executor.awaitTermination(delay, TimeUnit.MILLISECONDS)) {
+                    // force kill if it's stuck
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+            }
+        }
+        try {
+            connection.close();
+        } catch (Exception e) {
+            System.err.println("Error closing connection: " + e.getMessage());
+        }
     }
 
     // getter
