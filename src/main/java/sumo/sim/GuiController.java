@@ -1,5 +1,6 @@
 package sumo.sim;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -33,7 +34,7 @@ public class GuiController {
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton;
     @FXML
     private Spinner <Integer> delaySelect;
     @FXML
@@ -55,6 +56,7 @@ public class GuiController {
     private final int maxDelay;
     private GraphicsContext gc;
     private SimulationRenderer sr;
+    private AnimationTimer renderLoop;
 
     // panning
     private double mousePressedXOld;
@@ -88,25 +90,27 @@ public class GuiController {
             i++;
         }
 
+        // Drop down menus
         String[] modes = { "Light Test" , "Medium Test" , "Heavy Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         stressTestMode.setValue(modes[0]);
 
-
+        String[] routes = wrapperController.getRouteList();
         routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
+        routeSelector.setValue(routes[0]);
+
+        // initializes map pan
         mapPan();
+        // starts renderer loop
+        startRenderer();
     }
 
-    public void closeAllMenus() {
-        if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
-        if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
-        if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
-        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
-        // still needs fix for small gap between buttons and menus at the top
-    }
 
     @FXML
     public void initialize() {
+
+        rescale();
+
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min, max, start
         delaySelect.setValueFactory(valueFactory);
@@ -158,9 +162,9 @@ public class GuiController {
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
 
-        // if no routes exist in .rou files -> cant add vehicles
-
-        rescale();
+        // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
+        startTestButton.setDisable(true);
+        addVehicleButton.setDisable(true);
     }
 
     private void rescale(){
@@ -173,6 +177,25 @@ public class GuiController {
 
        // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
     }
+
+    public void validateInput(TextField editor) {
+        try {
+            int val = Integer.parseInt(editor.getText()); // if it is not an Integer -> exception
+            if (val > maxDelay) {
+                val = maxDelay;
+            }
+            if (val <= 0) {
+                val = 1;
+            }
+            delaySelect.getValueFactory().setValue(val); // setting value
+            editor.setText(String.valueOf(val));
+
+        } catch (NumberFormatException e) { // catches exception
+            delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
+            editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
+        }
+    }
+
 
     private void toggleMenuAtButton(Pane menu, Node button) {
         if (menu.isVisible()) {
@@ -192,6 +215,17 @@ public class GuiController {
         menu.setLayoutX(localPos.getX());
         menu.setLayoutY(localPos.getY());
         //menu.toFront();
+    }
+
+    public void closeAllMenus() {
+        if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
+        if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
+        if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
+        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
+        addMenu.setVisible(false);
+        stressTestMenu.setVisible(false);
+        trafficLightMenu.setVisible(false);
+        // still needs fix for small gap between buttons and menus at the top
     }
 
     @FXML
@@ -233,11 +267,6 @@ public class GuiController {
         } else {
             System.out.println("Stopped");
         }
-    }
-
-    @FXML
-    protected void onStep() {
-        wrapperController.doStepUpdate();
     }
 
     @FXML
@@ -296,11 +325,6 @@ public class GuiController {
 
     }
 
-    @FXML
-    protected void closeApplication() { // later extra button in file
-        Platform.exit();
-        wrapperController.terminate();
-    }
 
     // functionality
 
@@ -357,22 +381,38 @@ public class GuiController {
         }
     }
 
-    public void validateInput(TextField editor) {
-        try {
-            int val = Integer.parseInt(editor.getText()); // if it is not an Integer -> exception
-            if (val > maxDelay) {
-                val = maxDelay;
-            }
-            if (val <= 0) {
-                val = 1;
-            }
-            delaySelect.getValueFactory().setValue(val); // setting value
-            editor.setText(String.valueOf(val));
 
-        } catch (NumberFormatException e) { // catches exception
-            delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
-            editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
-        }
+    @FXML
+    protected void onStep() {
+        wrapperController.doStepUpdate();
+    }
+
+    // Render
+
+    public void startRenderer() { // maybe with connection as argument? closing connection opened prior
+        renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
+            @Override
+            public void handle(long timestamp) {
+                renderUpdate();
+
+                // other functions that should update every frame
+                if(wrapperController.isRouteListEmpty() || routeSelector.getValue().equals("CUSTOM")) {
+                    addVehicleButton.setDisable(true);
+                    startTestButton.setDisable(true);
+                } else {
+                    addVehicleButton.setDisable(false);
+                    startTestButton.setDisable(false);
+                }
+            }
+        };
+        renderLoop.start(); // runs 60 frames per second
+    }
+
+    @FXML
+    protected void closeApplication() {
+        renderLoop.stop(); // terminates Animation Timer
+        Platform.exit(); // terminates JavaFX thread
+        wrapperController.terminate(); // terminates sumo connection and wrapCon thread
     }
 
     public void initializeRender(){
