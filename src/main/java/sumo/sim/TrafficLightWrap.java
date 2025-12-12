@@ -74,7 +74,7 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
             stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
             stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
             //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
-            // [R, edge_R ,y , edge_y , r, edge_r ] format
+            // [G, lane_G ,y , lane_y , r, lane_r ] format
         }
        // System.out.println(id);
 
