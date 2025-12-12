@@ -1,29 +1,27 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class Street_List {
+public class StreetList {
     // List of streets (like TL_List)
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
     private SumoTraciConnection connection;
 
-    public Street_List(SumoTraciConnection con) {
+    public StreetList(SumoTraciConnection con) {
         try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Edge.getIDList()); // returns string array
+            XML xml = new XML(WrapperController.getCurrentNet());
+            Map<String, List<String>> data = xml.getStreetsData();
+
             this.connection = con;
-            for (String id : list) {
-                if(!id.startsWith(":")) {
-                    streets.add(new Street(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
-                    count++;
-                }
+            for(Map.Entry<String, List<String>> entry : data.entrySet()) {
+                streets.add(new Street(entry.getKey(),entry.getValue(), con));
             }
 
         } catch (Exception e) {
@@ -44,7 +42,7 @@ public class Street_List {
         return streets;
     }
 
-    public void test_print() {
+    public void testPrint() {
         for (Street s : streets) {
             System.out.println(s.getFromJunction());
             System.out.println(s.getToJunction());

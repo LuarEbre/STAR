@@ -1,16 +1,11 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.cmd.Lane;
-import de.tudresden.sumo.cmd.Trafficlight;
-import de.tudresden.sumo.objects.SumoGeometry;
-import de.tudresden.sumo.objects.SumoPosition2D;
-import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 public class Street {
     private double maxSpeed; // same attributes as in .net
@@ -25,14 +20,21 @@ public class Street {
 
     private XML xml;
 
-    public Street(String id, SumoTraciConnection con) {
+    public Street(String id, List<String> data, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
         try {
-            xml = new XML(WrapperController.get_current_net());
-            this.fromJunction = xml.get_from_junction(id);
-            this.toJunction = xml.get_to_junction(id);
             updateStreet();
+
+            if(data.contains("from")) {
+                this.fromJunction = data.get(data.indexOf("from"));
+            }else if(data.contains("to")) {
+                this.toJunction = data.get(data.indexOf("to"));
+            }else {
+                this.fromJunction = null;
+                this.toJunction = null;
+            }
+
             int laneCount = (Integer) con.do_job_get(Edge.getLaneNumber(id));
             for (int i = 0; i < laneCount; i++) {
                 String currentLaneID = id + "_" + i; // street id_lane
@@ -42,6 +44,11 @@ public class Street {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Street(String id, SumoTraciConnection con) {
+        this.id = id;
+        this.con = con;
     }
 
     public ArrayList<LaneWrap> getLanes() {

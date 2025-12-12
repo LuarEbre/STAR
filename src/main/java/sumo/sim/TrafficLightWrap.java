@@ -17,19 +17,23 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private final SumoTraciConnection con;
     private final String id;
     private Set<Street> controlledStreets;
-    private String state; // color switch e.g. "GGGrrrrr"
+    private int phase; // color switch e.g. "GGGrrrrr"
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
     private final Point2D.Double position; // position as a junction
     //private List<List<SumoLink>> controlledLinks; later used for defining incoming/outgoing streets
 
-    public TrafficLightWrap(String id, SumoTraciConnection con){
+    public TrafficLightWrap(String id, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
         this.controlledStreets = new HashSet<>();
         try {
             SumoPosition2D pos2D = (SumoPosition2D) con.do_job_get(Junction.getPosition(id)); // position
-            this.position = new Point2D.Double(pos2D.x, pos2D.y);
+            this.position = new Point2D.Double();
+            this.position.x = pos2D.x;
+            this.position.y = pos2D.y;
+
+            update_TL();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -59,14 +63,34 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
-    public String getId() {return id;}
-    public Point2D.Double getPosition() {return position;}
+    public String getId() {
+        return id;
+    }
 
-    public void setControlledStreets(Street s) { this.controlledStreets.add(s); }
+    public Point2D.Double getPosition() {
+        return position;
+    }
+
+    public void setControlledStreets(Street s) {
+        this.controlledStreets.add(s);
+    }
 
     public void printControlledStreets() {
-        for(Street s: controlledStreets) {
+        for (Street s : controlledStreets) {
             System.out.println(this.id + " controls " + s.getId());
         }
+    }
+
+    public void update_TL() {
+        try {
+            this.phase = (int) con.do_job_get(Trafficlight.getPhase(this.id));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public int get_Phase(){
+        return this.phase;
     }
 }

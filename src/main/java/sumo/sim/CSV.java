@@ -8,19 +8,22 @@ public class CSV {
     private final String File;
     private final FileWriter fw;
 
-    public CSV(String csv_file) throws IOException {
-        this.File = csv_file;
+    public CSV(String csvFile) throws IOException {
+        this.File = csvFile;
         fw = new FileWriter(this.File, true);
         fw.write("\n");
     }
 
 
-    public void add_to_CsvFile(String new_data) {
+    public void addToCSV(String[] newData) {
         try {
-            fw.append(new_data + "\n");
+            for(int i = 0; i < newData.length; i++){
+                fw.write(newData[i]);
+                fw.write("\n");
+            }
 
         } catch (IOException i) {
-            i.printStackTrace();
+            System.out.println("Could not write Data to CSV File" + i);
         }
     }
 

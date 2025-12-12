@@ -3,62 +3,112 @@ package sumo.sim;
 import java.util.*;
 
 public class RouteList {
-    // stores all routes: key = route ID(e.g. "r_0.0", value = RouteWrap-object
-    private final Map<String, RouteWrap> routes = new HashMap<>();
 
-    // stores the edge IDs which ar defined as starting points (set for fast checking)
-    private final Set<String> validStartEdgeIDs = new HashSet<>();
+    private final Map<String, List<String>> allRoutes;
 
-    private final XML routesXML; // instance of xml.java
+    public RouteList(String rouXmlFilePath) throws Exception {
 
-    public RouteList(String routesFilePath) throws Exception {
-        this.routesXML = new XML(routesFilePath);
-        loadRoutesFromXML();
+        // parssing the xml file
+        XML xmlReader = new XML(rouXmlFilePath);
+
+        // map of routes(using getRoutes from XML class)
+        allRoutes = xmlReader.getRoutes();
+
     }
 
-    private void loadRoutesFromXML() throws Exception {
-        Map<String, List<String>> loadedRoutes = routesXML.getRoutes();
+    public Map<String, List<String>> getAllRoutes() {
+        return allRoutes;
+    }
 
-        for (Map.Entry<String, List<String>> entry : loadedRoutes.entrySet()) {
-            String id = entry.getKey();
-            List<String> edges = entry.getValue();
+    public String[] getAllRoutesID() {
+        String[] ret = new String[allRoutes.size()];
 
-            if (!edges.isEmpty()) {
-                // 1. store the route
-                RouteWrap routeWrap = new RouteWrap(edges);
-                routes.put(id, routeWrap);
+        ret =  allRoutes.keySet().toArray(ret);
 
-                // 2. Store the first edge of the route as valid starting poibt
-                String startEdgeId = edges.get(0);
-                validStartEdgeIDs.add(startEdgeId);
+        return ret;
+    }
+
+    public void addRoute(String id, List<String> edges) {
+        allRoutes.put(id, edges);
+    }
+
+    public void generateRoute(String start, String end, String routeID, JunctionList jl) {
+
+        for (JunctionWrap jw : jl.getJunctions()) {
+            jw.setDistance(Double.MAX_VALUE);
+            jw.setPredecessor(null);
+        }
+
+        JunctionWrap startNode = jl.getJunction(start);
+        JunctionWrap endNode = jl.getJunction(end);
+
+        if (startNode == null || endNode == null) {
+            throw new RuntimeException("Start or End Junction does not exist!");
+        }
+
+        startNode.setDistance(0.0);
+
+        PriorityQueue<JunctionWrap> queue = new PriorityQueue<>(Comparator.comparingDouble(JunctionWrap::getDistance));
+
+        queue.add(startNode);
+
+        while (!queue.isEmpty()) {
+
+            JunctionWrap u = queue.poll();
+
+            if (u.getDistance() > jl.getJunction(u.getID()).getDistance())
+                continue;
+
+            if (u == endNode)
+                break;
+
+            for (String neighborID : jl.getAdjacentVertexes(u.getID())) {
+
+                JunctionWrap v = jl.getJunction(neighborID);
+                if (v == null) continue;
+
+                double alt = u.getDistance() + u.distanceTo(v);
+
+                if (alt < v.getDistance()) {
+                    v.setDistance(alt);
+                    v.setPredecessor(u.getID());
+                    queue.add(v);
+                }
             }
         }
 
-        System.out.println("RouteList loaded: " + routes.size() + " routes, "
-                + validStartEdgeIDs.size() + " valid starting points found.");
-    }
+        LinkedList<String> junctionPath = new LinkedList<>();
 
-    // public methods for gui implementation
-    public List<String> getAllValidStartEdgeIDs() {
-        return new ArrayList<>(validStartEdgeIDs);
-    }
-
-    public boolean isValidStartEdge(String edgeId) {
-        return validStartEdgeIDs.contains(edgeId);
-    }
-
-
-    public String getRouteStartingWithEdge(String startEdgeId) {
-        // searching the routes and return ID of the first route which starts with this edge
-        for (Map.Entry<String, RouteWrap> entry : routes.entrySet()) {
-            if (entry.getValue().getStartEdgeID().equals(startEdgeId)) {
-                return entry.getKey(); // return the route ID
-            }
+        for (JunctionWrap step = endNode; step != null; step = jl.getJunction(step.getPredecessor())) {
+            junctionPath.addFirst(step.getID());
         }
-        return null; // no route found which starts at this edge
+
+        List<String> edgeList = new ArrayList<>(junctionPath.size() - 1);
+
+        for (int i = 0; i < junctionPath.size() - 1; i++) {
+
+            String from = junctionPath.get(i);
+            String to   = junctionPath.get(i + 1);
+
+            String edgeID = jl.findEdgeID(from, to);
+
+            if (edgeID == null) {
+                System.err.println("Edge not found between: " + from + " → " + to);
+                return;
+            }
+
+            edgeList.add(edgeID);
+        }
+
+        addRoute(routeID, edgeList);
     }
 
-    public Map<String, RouteWrap> getRoutes() {
-        return routes;
+    public List<String> getRouteById(String id) {
+            return allRoutes.get(id);
+        }
+
+    //getter for routecount(use in logic to check if any route is availabl)
+    public boolean isRouteListEmpty() {
+        return allRoutes.isEmpty();
     }
 }

@@ -7,17 +7,16 @@ import de.tudresden.sumo.cmd.Trafficlight;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.LinkedList;
 import java.util.Locale;
 
 
-public class TrafficLights_List {
+public class TrafficLightList {
     private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
-    private final Street_List streetList;
+    private final StreetList streetList;
     private int count;
 
-    public TrafficLights_List(SumoTraciConnection con, Street_List s1) {
+    public TrafficLightList(SumoTraciConnection con, StreetList s1) {
         this.con = con;
         this.streetList = s1;
         try {
@@ -38,6 +37,10 @@ public class TrafficLights_List {
             }
         }
         return null; // if not existent
+    }
+
+    public ArrayList<TrafficLightWrap> getTrafficlights() {
+        return trafficlights;
     }
 
     public int getCount() { return count; }
@@ -101,5 +104,13 @@ public class TrafficLights_List {
         for (TrafficLightWrap tl : trafficlights) {
             tl.printControlledStreets();
         }
+    }
+
+    public void updateTLs(){
+        for(TrafficLightWrap tl : trafficlights ){
+
+
+        }
+
     }
 }
