@@ -76,6 +76,12 @@ public class TrafficLightList {
         }
     }
 
+    public void updateAllCurrentState() {
+        for (TrafficLightWrap tl : trafficlights) {
+            tl.setCurrentState();
+        }
+    }
+
     public String getTrafficLightsData() {
         StringBuilder sb = new StringBuilder();
 

@@ -3,7 +3,10 @@ package sumo.sim;
 import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
+import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoPosition2D;
+import de.tudresden.sumo.objects.SumoTLSPhase;
+import de.tudresden.sumo.objects.SumoTLSProgram;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
@@ -30,8 +33,9 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
     private final Point2D.Double position; // position as a junction
-    private List<SumoLink> controlledLinks;
-    private List<String> incomingLanes;
+    String [] stateArray;
+    private final List<SumoLink> controlledLinks;
+    private final List<String> incomingLanes;
 
     public TrafficLightWrap(String id, Map<String,String> Data, SumoTraciConnection con) {
         this.id = id;
@@ -41,33 +45,42 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
             this.position = new Point2D.Double();
             this.position.x = Double.parseDouble(Data.get("x"));
             this.position.y = Double.parseDouble(Data.get("x"));
-
             String incLanesString = Data.get("incLanes");
             this.incomingLanes = Arrays.asList(incLanesString.split("\\s+"));
 
             this.controlledLinks = (List<SumoLink>) con.do_job_get(Trafficlight.getControlledLinks(id));
-
             update_TL();
+            //getCurrentState();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public String[] getCurrentState() {
+
+
+    public void setCurrentState() {
         int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
         // -> state differs from index to index (index is controlled lanes that have tl)
         String currentState;
+        // links.get(0).from
         try {
             currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        String [] stateArray = new String[currentState.length()]; // saves state in arr -> to get indices
-        for (int i = 0; i < currentState.length(); i++) {
-            stateArray[i] = currentState.charAt(i) + ""; // every current state e.g = Grrryy (length definded)
-            System.out.print(stateArray[i]); // -> phase duration defined
+        stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
+        for (int i = 0; i < currentState.length(); i+=2 ) {
+            int sumoIndex = i/2; // to not skip values
+            stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
+            stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
+            //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
+            // [R, edge_R ,y , edge_y , r, edge_r ] format
         }
+       // System.out.println(id);
 
+    }
+
+    public String[] getCurrentState() {
         return stateArray;
     }
 
@@ -142,6 +155,14 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     public int getDuration() {
         try {
             return (int) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getProgram() {
+        try {
+            return (String) con.do_job_get(Trafficlight.getProgram(id));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
