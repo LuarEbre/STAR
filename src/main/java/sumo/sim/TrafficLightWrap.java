@@ -1,8 +1,8 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Junction;
+import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
-import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoPosition2D;
 import it.polito.appeal.traci.SumoTraciConnection;
 
@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.*;
 
 public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private final SumoTraciConnection con;
@@ -30,16 +31,19 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private int duration; // time
     private final Point2D.Double position; // position as a junction
     private List<SumoLink> controlledLinks;
+    private List<String> incomingLanes;
 
-    public TrafficLightWrap(String id, SumoTraciConnection con) {
+    public TrafficLightWrap(String id, Map<String,String> Data, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
         this.controlledStreets = new HashSet<>();
-        try {
-            SumoPosition2D pos2D = (SumoPosition2D) con.do_job_get(Junction.getPosition(id)); // position
+        try {// position
             this.position = new Point2D.Double();
-            this.position.x = pos2D.x;
-            this.position.y = pos2D.y;
+            this.position.x = Double.parseDouble(Data.get("x"));
+            this.position.y = Double.parseDouble(Data.get("x"));
+
+            String incLanesString = Data.get("incLanes");
+            this.incomingLanes = Arrays.asList(incLanesString.split("\\s+"));
 
             this.controlledLinks = (List<SumoLink>) con.do_job_get(Trafficlight.getControlledLinks(id));
 
@@ -141,23 +145,6 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void getControlledJunctions() {
-        try {
-            con.do_job_get(Trafficlight.getControlledJunctions(id));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void getRYGdefinition() {
-        try {
-            System.out.println(con.do_job_get(Trafficlight.getCompleteRedYellowGreenDefinition(id)));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        // returns ryg def like = Grrryy -> length -> how many incoming lanes and index =
     }
 
     public String getId() {
