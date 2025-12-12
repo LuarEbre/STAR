@@ -6,8 +6,8 @@
 <sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="frankfurt_kfz.net.xml"/>
-        <route-files value="frankfurt_routes_only.xml"/>
+        <net-file value="frankfurt.net.xml"/>
+        <route-files value="frankfurt.rou.xml"/>
     </input>
 
 </sumoConfiguration>
