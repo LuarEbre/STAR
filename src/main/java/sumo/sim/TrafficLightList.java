@@ -52,12 +52,15 @@ public class TrafficLightList {
 
     public int getCount() { return count; }
 
-    public void printIDs() {
+    public String[] getIDs() {
         int counter = 0;
+        String [] ret = new String[trafficlights.size()];
+        int i = 0;
         for (TrafficLightWrap tl : trafficlights) {
-            System.out.println("Traffic lights "+  counter + ": " + tl.getId());
-            counter++;
+            ret[i] = tl.getId();
+            i++;
         }
+        return ret;
     }
 
     public void printALL() { // for the demo

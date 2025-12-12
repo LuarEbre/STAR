@@ -153,8 +153,8 @@
                    <children>
                        <VBox prefHeight="238.0" prefWidth="147.0" spacing="28.0">
                            <children>
-                               <Label styleClass="addMenu-labels" text="Select Traffic Light" />
-                               <Label layoutX="10.0" layoutY="10.0" styleClass="addMenu-labels" text="Traffic Light duration " />
+                               <Label styleClass="addMenu-labels" text="Select" />
+                               <Label layoutX="10.0" layoutY="10.0" styleClass="addMenu-labels" text="Duration" />
                         <Label layoutX="15.0" layoutY="76.0" styleClass="addMenu-labels" text="Set Program " />
                            </children>
                            <padding>
@@ -163,9 +163,10 @@
                        </VBox>
                        <VBox prefHeight="238.0" prefWidth="121.0" spacing="20.0">
                            <children>
-                               <ChoiceBox prefWidth="150.0" />
-                               <Spinner />
+                               <ChoiceBox fx:id="tlSelector" prefWidth="150.0" />
+                               <Spinner fx:id="durationTL" />
                         <ChoiceBox layoutX="10.0" layoutY="25.0" prefWidth="150.0" />
+                        <Button onAction="#applyTLsettings" mnemonicParsing="false" prefHeight="26.0" prefWidth="109.0" text="Apply" />
                            </children>
                            <padding>
                                <Insets top="15.0" />

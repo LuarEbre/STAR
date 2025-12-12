@@ -161,17 +161,18 @@ public class SimulationRenderer {
 
     private void renderTrafficLight() {
         for (TrafficLightWrap tl : tls.getTrafficlights()) {
+            //tl.setCurrentState();
             String [] state = tl.getCurrentState(); // [R, edge_R ,y , edge_y , r, edge_r ] format
-            Color lightColor = Color.RED; // Default
+            if (state == null) continue; // protection
+
+            Color lightColor;
             gc.setLineWidth(2.0);
 
             for (Street controlledStreet : tl.getControlledStreets()) {
-                int i = 0;
                 for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets , maybe performance hashmap
-                    if (state==null) continue;
-
-                    for (int j=0; j < state.length/2; j+=2) {
-                        if (state[j+1].equals(l.getLaneID())) { //  maybe performance hashmap
+                    for (int j = 0; j < state.length; j += 2) {
+                        if (state[j+1] == null) continue;
+                        if (state[j + 1].equals(l.getLaneID())) { //  maybe performance hashmap
                             switch (state[j]) { // if state like "g" equals...
                                 case "G", "g" -> lightColor = Color.GREEN;
                                 case "y" -> lightColor = Color.YELLOW;
@@ -179,9 +180,9 @@ public class SimulationRenderer {
                                 default -> lightColor = Color.GRAY;
                             }
                             gc.setStroke(lightColor);
+                            break; // lane found
                         }
                     }
-
 
                     double[] rawX = l.getShapeX();
                     double[] rawY = l.getShapeY();
@@ -214,8 +215,6 @@ public class SimulationRenderer {
                     double lineY2 = endY - (perpY * halfWidth);
 
                     gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
-
-                    i++;
                 }
             }
 

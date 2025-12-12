@@ -36,7 +36,7 @@ public class GuiController {
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton;
     @FXML
-    private Spinner <Integer> delaySelect;
+    private Spinner <Integer> delaySelect, durationTL;
     @FXML
     private Canvas map;
     @FXML
@@ -46,7 +46,7 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode;
+    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
     @FXML
     private TextField amountField;
     @FXML
@@ -77,6 +77,8 @@ public class GuiController {
         this.wrapperController = wrapperController;
         initializeRender();
 
+        // initializing which is only possible after wrapper con was created
+
         // displays all available types found in xml
         String[] arr = wrapperController.getTypeList();
         typeSelector.setItems(FXCollections.observableArrayList(arr));
@@ -99,6 +101,8 @@ public class GuiController {
         routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         routeSelector.setValue(routes[0]);
 
+        tlSelector.setItems(FXCollections.observableArrayList(wrapperController.getTLids()));
+        tlSelector.setValue(wrapperController.getTLids()[0]);
         // initializes map pan
         mapPan();
         // starts renderer loop
@@ -109,7 +113,7 @@ public class GuiController {
     @FXML
     public void initialize() {
 
-        rescale();
+        rescale(); // rescales menu based on width and height
 
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min, max, start
@@ -161,6 +165,11 @@ public class GuiController {
 
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
+
+        // initializes tl duration spinner
+        SpinnerValueFactory<Integer> duration =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 20); //min, max, start
+        durationTL.setValueFactory(duration);
 
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
@@ -222,9 +231,7 @@ public class GuiController {
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
         if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
-        addMenu.setVisible(false);
-        stressTestMenu.setVisible(false);
-        trafficLightMenu.setVisible(false);
+
         // still needs fix for small gap between buttons and menus at the top
     }
 
@@ -323,6 +330,13 @@ public class GuiController {
     @FXML
     protected void onMiddlePaneHover(){
 
+    }
+
+    @FXML
+    protected void applyTLsettings() {
+        String id = tlSelector.getValue();
+        int duration = durationTL.getValue();
+        wrapperController.setTlSettings(id, duration);
     }
 
 

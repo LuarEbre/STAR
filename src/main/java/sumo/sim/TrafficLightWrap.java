@@ -57,6 +57,7 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
+    // setter
 
     public void setCurrentState() {
         int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
@@ -69,22 +70,16 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
             throw new RuntimeException(e);
         }
         stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
-        for (int i = 0; i < currentState.length(); i+=2 ) {
+        for (int i = 0; i < stateArray.length; i+=2 ) {
             int sumoIndex = i/2; // to not skip values
             stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
             stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
             //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
             // [G, lane_G ,y , lane_y , r, lane_r ] format
         }
-       // System.out.println(id);
+        // System.out.println(id);
 
     }
-
-    public String[] getCurrentState() {
-        return stateArray;
-    }
-
-    // setter
 
     public void setPhaseNumber(int index) {
         //TODO: check if index exists in TL
@@ -104,6 +99,7 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     }
 
     public void setPhaseDuration(double phaseDuration) {
+        //getPhaseNumber(); // -> only applies to phase currently active -> should display phase in gui for reference?
         try {
             con.do_job_set(Trafficlight.setPhaseDuration(id, phaseDuration));
         } catch (Exception e) {
@@ -152,9 +148,9 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
-    public int getDuration() {
+    public double getDuration() {
         try {
-            return (int) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
+            return (double) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -180,6 +176,11 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     public Set<Street> getControlledStreets() {
         return controlledStreets;
     }
+
+    public String[] getCurrentState() {
+        return stateArray;
+    }
+
 
     // other
 
