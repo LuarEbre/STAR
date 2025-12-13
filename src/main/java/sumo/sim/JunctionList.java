@@ -74,22 +74,31 @@ public class JunctionList {
 
     public String findEdgeID(String from, String to) {
         for (Street s : streets.getStreets()) {
-
             String sFrom = s.getFromJunction();
             String sTo = s.getToJunction();
+            String sId = s.getId();
 
-            if (sFrom == null || sTo == null)
-                continue;
+            if (sFrom == null || sTo == null) continue;
+
+            if (sId.startsWith(":")) continue;
 
             if (sFrom.equals(from) && sTo.equals(to)) {
-                return s.getId();
+                return sId;
             }
 
-            if (s.getId().startsWith(":")) continue;
+            String cleanFrom = sFrom.startsWith(":") ? sFrom.substring(sFrom.indexOf("J")) : sFrom;
+            String cleanTo = sTo.startsWith(":") ? sTo.substring(sTo.indexOf("J")) : sTo;
 
+            if (cleanFrom.equals(from) && cleanTo.equals(to)) {
+                return sId;
+            }
         }
+
+        System.err.println("Edge not found from " + from + " to " + to);
         return null;
     }
+
+
 
     public double getMinPosX(){
         double minX = Double.MAX_VALUE; // max value so the first element is always the smallest, still needs check if list is empty

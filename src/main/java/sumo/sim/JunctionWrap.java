@@ -14,6 +14,7 @@ public class JunctionWrap {
     private final String id;
     private final Point2D.Double position;
     private final SumoTraciConnection con;
+    private String type; // dead end , tl
     private double[] shapeX;
     private double[] shapeY;
 

@@ -12,6 +12,7 @@ public class LaneWrap {
     private final String laneID;
     private final SumoTraciConnection connection;
     private final String edgeID;
+    private int index; // which TL state index -> if -1 -> no incoming lane for tl
     private final double[] shapeX;
     private final double[] shapeY;
     private final double width;
@@ -20,6 +21,7 @@ public class LaneWrap {
         this.laneID = laneID;
         this.connection = connection;
         this.edgeID = edgeID;
+        this.index = -1; // if no change -> no index for tl
         //System.out.println("Lane:"+laneID+"edge: "+edgeID);
         SumoGeometry geometry = null;
         try {

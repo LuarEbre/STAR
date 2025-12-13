@@ -3,7 +3,11 @@ package sumo.sim;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.transform.Affine;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Math.abs;
 
@@ -30,8 +34,7 @@ public class SimulationRenderer {
         this.camY = jl.getCenterPosY() ;
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
-        scale = 1+(scaleX / scaleY);
-        System.out.println("scale: " + scale);
+        scale = 1+(scaleX / scaleY); // should calculate the rough scale of the map
         zoom = scale+1;
         //scale = 1;
     }
@@ -41,7 +44,7 @@ public class SimulationRenderer {
         // -> network: only do the following rendering with objects inside this restricting area;
         gc.setTransform(new Affine()); // transformation matrix
 
-        gc.setFill(Color.GREEN);
+        gc.setFill(Paint.valueOf("#86858E")); // background color
         gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
         transform();
         renderMap();
@@ -128,7 +131,7 @@ public class SimulationRenderer {
         double posY;
 
         for (VehicleWrap v : vl.getVehicles()) {
-            if(!v.exists()) continue;
+            if(!v.exists() && v.getPosition() == null) continue;
             gc.setFill(v.getColor());
             angle = v.getAngle();
             posX = v.getPosition().getX();
@@ -154,21 +157,32 @@ public class SimulationRenderer {
         }
     }
 
+    // optimization necessary
+
     private void renderTrafficLight() {
         for (TrafficLightWrap tl : tls.getTrafficlights()) {
+            //tl.setCurrentState();
+            String [] state = tl.getCurrentState(); // [R, edge_R ,y , edge_y , r, edge_r ] format
+            if (state == null) continue; // protection
 
-            Color lightColor = Color.RED; // Default
-            int phase = tl.getPhaseNumber();
-            if (phase == 1) {
-                lightColor = Color.YELLOW;
-            } else if (phase == 2) {
-                lightColor = Color.LIGHTGREEN;
-            }
-            gc.setStroke(lightColor);
-
+            Color lightColor;
             gc.setLineWidth(2.0);
+
             for (Street controlledStreet : tl.getControlledStreets()) {
-                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets
+                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets , maybe performance hashmap
+                    for (int j = 0; j < state.length; j += 2) {
+                        if (state[j+1] == null) continue;
+                        if (state[j + 1].equals(l.getLaneID())) { //  maybe performance hashmap
+                            switch (state[j]) { // if state like "g" equals...
+                                case "G", "g" -> lightColor = Color.GREEN;
+                                case "y" -> lightColor = Color.YELLOW;
+                                case "r" -> lightColor = Color.RED;
+                                default -> lightColor = Color.GRAY;
+                            }
+                            gc.setStroke(lightColor);
+                            break; // lane found
+                        }
+                    }
 
                     double[] rawX = l.getShapeX();
                     double[] rawY = l.getShapeY();
@@ -192,7 +206,7 @@ public class SimulationRenderer {
                     double perpX = -ndy;
                     double perpY = ndx;
 
-                    double halfWidth = 3.5 / 2.0;
+                    double halfWidth = 3.0 / 2.0;
 
                     double lineX1 = endX + (perpX * halfWidth);
                     double lineY1 = endY + (perpY * halfWidth);
@@ -203,6 +217,7 @@ public class SimulationRenderer {
                     gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
                 }
             }
+
         }
     }
 

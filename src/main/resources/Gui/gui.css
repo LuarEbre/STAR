@@ -213,6 +213,12 @@
     -fx-alignment: center;
 }
 
+#addVehicleButton:pressed {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-text-fill: -fx-color-magenta;
+}
+
 #colorSelector {
     -fx-background-color: -fx-color-grey-light;
     -fx-font-family:"Arial Black";

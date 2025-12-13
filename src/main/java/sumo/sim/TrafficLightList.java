@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class TrafficLightList {
@@ -20,11 +21,16 @@ public class TrafficLightList {
         this.con = con;
         this.streetList = s1;
         try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Trafficlight.getIDList()); // returns string array
-            for (String id : list) {
-                trafficlights.add(new TrafficLightWrap(id, con)); // every existing id in .rou is created as TrafficWrap + added in List
-                count++;
+            XML xml = new XML(WrapperController.getCurrentNet());
+            Map<String, Map<String,String>> TLData = xml.getTrafficLightsData();
+
+            for (var entry : TLData.entrySet()) {
+                String id = entry.getKey();
+                Map<String, String> attributes = entry.getValue();
+
+                trafficlights.add(new TrafficLightWrap(id, attributes, con));
             }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -46,12 +52,15 @@ public class TrafficLightList {
 
     public int getCount() { return count; }
 
-    public void printIDs() {
+    public String[] getIDs() {
         int counter = 0;
+        String [] ret = new String[trafficlights.size()];
+        int i = 0;
         for (TrafficLightWrap tl : trafficlights) {
-            System.out.println("Traffic lights "+  counter + ": " + tl.getId());
-            counter++;
+            ret[i] = tl.getId();
+            i++;
         }
+        return ret;
     }
 
     public void printALL() { // for the demo
@@ -67,6 +76,12 @@ public class TrafficLightList {
                     pos.x,
                     pos.y
             );
+        }
+    }
+
+    public void updateAllCurrentState() {
+        for (TrafficLightWrap tl : trafficlights) {
+            tl.setCurrentState();
         }
     }
 

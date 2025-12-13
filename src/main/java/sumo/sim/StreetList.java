@@ -17,11 +17,14 @@ public class StreetList {
     public StreetList(SumoTraciConnection con) {
         try {
             XML xml = new XML(WrapperController.getCurrentNet());
-            Map<String, List<String>> data = xml.getStreetsData();
+            Map<String, String[]> data = xml.readAllEdges();
 
             this.connection = con;
-            for(Map.Entry<String, List<String>> entry : data.entrySet()) {
-                streets.add(new Street(entry.getKey(),entry.getValue(), con));
+            for (Map.Entry<String, String[]> entry : data.entrySet()) {
+                String id = entry.getKey();
+                String from = entry.getValue()[0];
+                String to = entry.getValue()[1];
+                streets.add(new Street(id, from, to, con));
             }
 
         } catch (Exception e) {
@@ -63,7 +66,7 @@ public class StreetList {
 
     public void updateStreets(){
         for (Street s : streets) {
-            s.updateStreet();
+            s.updateStreet(connection);
         }
     }
 }

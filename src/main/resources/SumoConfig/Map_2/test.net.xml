@@ -119,14 +119,14 @@
 
     <tlLogic id="J0" type="static" programID="0" offset="0">
         <phase duration="42" state="Gr"/>
-        <phase duration="3"  state="yr"/>
+        <phase duration="10"  state="yr"/>
         <phase duration="42" state="rG"/>
-        <phase duration="3"  state="ry"/>
+        <phase duration="10"  state="ry"/>
     </tlLogic>
     <tlLogic id="J6" type="static" programID="0" offset="0">
         <phase duration="82" state="GGG" next="2"/>
-        <phase duration="3"  state="yyy"/>
-        <phase duration="5"  state="rrr"/>
+        <phase duration="10"  state="yyy"/>
+        <phase duration="30"  state="rrr"/>
     </tlLogic>
 
     <junction id="J0" type="traffic_light" x="-92.44" y="30.61" incLanes="E6_0 E7_0" intLanes=":J0_0_0 :J0_1_0" shape="-85.40,30.60 -85.40,27.40 -87.59,26.96 -88.36,26.40 -88.92,25.63 -89.27,24.64 -89.41,23.42 -92.61,23.50 -92.99,25.66 -93.52,26.40 -94.27,26.93 -95.24,27.23 -96.43,27.30 -96.51,30.50">
