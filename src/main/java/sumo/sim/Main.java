@@ -6,6 +6,5 @@ public class Main {
     public static void main(String[] args) {
         // Main program to run the entire simulation
         Application.launch(GuiApplication.class);
-
     }
 }

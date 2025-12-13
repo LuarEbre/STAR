@@ -12,9 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 // Main Controller class connecting everything and running the sim.
 public class WrapperController {
-    // Colors for printing , to be removed later
-    public static final String RED = "\u001B[31m";
-    public static final String RESET = "\u001B[0m"; // white
     private final SumoTraciConnection connection;
     private final GuiController guiController;
     private StreetList sl;
@@ -28,7 +25,6 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
-    private XML netXml;
 
     //public static String currentNet = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.net.xml";
     //public static String currentRou = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.rou.xml";
@@ -39,8 +35,11 @@ public class WrapperController {
     //public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt..net.xml";
     //public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.rou.xml";
 
-    public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
-    public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+    //public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
+    //public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+
+    public static String currentNet = "src/main/resources/SumoConfig/RugMap/rugmap.net.xml";
+    public static String currentRou = "src/main/resources/SumoConfig/RugMap/rugmap.rou.xml";
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -52,8 +51,9 @@ public class WrapperController {
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/RugMap/rugmap.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
