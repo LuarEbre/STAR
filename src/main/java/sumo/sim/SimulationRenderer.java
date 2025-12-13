@@ -5,12 +5,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.geometry.VPos;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.lang.Math.abs;
+import javafx.scene.paint.Paint;
 
 public class SimulationRenderer {
     private final GraphicsContext gc;

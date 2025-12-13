@@ -149,12 +149,26 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     }
 
     public double getDuration() {
+        double duration = 0;
         try {
-            return (double) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
+            duration =  (double) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return duration;
     }
+
+    // returns time remaining until tl switches states
+    public double getNextSwitch() {
+        double duration = 0;
+        try {
+            duration =  (double) con.do_job_get(Trafficlight.getNextSwitch(id)); // gets phase of tl = 1, 2, 3
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return duration;
+    }
+
 
     public String getProgram() {
         try {
