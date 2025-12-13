@@ -44,7 +44,7 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         try {// position
             this.position = new Point2D.Double();
             this.position.x = Double.parseDouble(Data.get("x"));
-            this.position.y = Double.parseDouble(Data.get("x"));
+            this.position.y = Double.parseDouble(Data.get("y"));
             String incLanesString = Data.get("incLanes");
             this.incomingLanes = Arrays.asList(incLanesString.split("\\s+"));
 

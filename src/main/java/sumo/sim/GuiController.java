@@ -265,6 +265,7 @@ public class GuiController {
 
     @FXML
     protected void onTrafficLight() {
+        sr.setShowTrafficLightIDs(!sr.getShowTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
     }
 
@@ -483,9 +484,9 @@ public class GuiController {
             mousePressedXNew = e.getX();
             mousePressedYNew = e.getY();
             //System.out.println("NewX"+mousePressedXNew + " NewY " + mousePressedYNew);
-            double panX =-1* (mousePressedXNew - mousePressedXOld) / panSen; // -1 so that panning to the left swipes to the right
+            double panX = -1 * (mousePressedXNew - mousePressedXOld) / panSen; // -1 so that panning to the left swipes to the right
             double panY = (mousePressedYNew - mousePressedYOld) / panSen; // already reversed
-            sr.padMad(panX,panY);
+            sr.padMad(panX, panY);
             mousePressedXOld = e.getX(); // resetting old values
             mousePressedYOld = e.getY();
         });
