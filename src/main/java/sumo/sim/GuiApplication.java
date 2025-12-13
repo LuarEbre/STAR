@@ -25,6 +25,10 @@ public class GuiApplication extends Application {
         //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/Title/title.fxml")); // experimental
 
         Scene scene = new Scene(fxmlLoader.load());
+
+        Image appIcon = new Image(getClass().getResourceAsStream("/Gui/Icons/STAR.png"));
+        stage.getIcons().add(appIcon);
+
         // link to css file
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
         scene.setCursor(new ImageCursor(new Image("/Gui/Icons/cursor.png",  128, 128, true, true))); // changes cursor style
@@ -37,6 +41,7 @@ public class GuiApplication extends Application {
                 stage.setFullScreen(!stage.isFullScreen());
             }
         });
+
         stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
         stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
