@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-12-11T22:34:17.396006+01:00 by Eclipse SUMO netedit v1_24_0+1845-01be9a8093d
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <!-- Routes -->
+    <route id="r_0" edges="E49 E32 E29 E12 E13 E14"/>
+    <route id="r_1" edges="E5 E6 E7 E9"/>
+    <route id="r_10" edges="E49 E50 E53 E54"/>
+    <route id="r_11" edges="E5 E6 E7 E51 E52 -E50 E32 E29 E12 E13 E14"/>
+    <route id="r_12" edges="E28 E15 E16 E17 E18 E44 E8 E9"/>
+    <route id="r_13" edges="E49 E32 E29 E15 E16 E17 E18 E44 E45"/>
+    <route id="r_14" edges="E49 E32 E29 E12 E19 E20 E21 E22"/>
+    <route id="r_15" edges="E49 E32 E29 E12 E13 E23 E24 E25 E26"/>
+    <route id="r_16" edges="E28 E15 E16 E17 E39 E40 E43 E38 E0"/>
+    <route id="r_17" edges="-E26 -E25 -E24 -E23 E27 E35 E36 E37 E38 E0"/>
+    <route id="r_18" edges="-E22 -E21 -E20 -E19 E13 E14"/>
+    <route id="r_19" edges="E34 E32 E29 E15 E16 E17 E18 E44 E46 E47 E48 E16 E17 E18 E44 E45"/>
+    <route id="r_2" edges="E10 E11 E30 E31"/>
+    <route id="r_20" edges="E33 E28 E12 E19 E20 E21 -E39 E18 E44 E45"/>
+    <route id="r_21" edges="E28 E12 E13 E23 E24 E3 -E20 E1 E16 E2 -E20 E1 E16 E2 -E20 E1 E16 E2 -E20 E1 E16 E2 -E20 E1 E16 E2 -E20 E1 E16 E2 -E20 E1"/>
+    <route id="r_22" edges="E34 E32 E29 E15 E16 E2 -E20 E4 E24 E3 -E20 E4 E24 E41 E37 E38 E0"/>
+    <route id="r_23" edges="E28 E12 E13 E27 E35 E36 E37 -E43 -E40 -E39 E18 E44 E45"/>
+    <route id="r_24" edges="E33 E28 E12 E13 E23 E42 E36 E37 E38 E0"/>
+    <route id="r_25" edges="E34 E32 E29 E15 E16 E17 E18 E44 E8 E51 E52 -E50 E32 E29 E12 E19 E1 E16 E17 E18 E44 E46 E47 E48 E16 E2 E21 E40 E43 E38 E30 E31"/>
+    <route id="r_3" edges="E10 E11 E0"/>
+    <route id="r_4" edges="E34 E32 E29 E12 E13 E14"/>
+    <route id="r_5" edges="E33 E28 E12 E13 E14"/>
+    <route id="r_6" edges="E49 E32 E29 E12 E13 E27 E35 E36 E37 E38 E0"/>
+    <route id="r_7" edges="E34 E32 E29 E12 E13 E27 E35 E36 E37 E38 E0"/>
+    <route id="r_8" edges="E28 E12 E13 E27 E35 E36 E37 E38 E0"/>
+    <route id="r_9" edges="E34 E50 E53 E54"/>
+</routes>
