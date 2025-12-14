@@ -317,20 +317,17 @@ public class GuiController {
     @FXML
     protected void startStressTest(){
         String mode = stressTestMode.getValue();
-        // experimental
         if (mode.equals("Light Test")) {
-            wrapperController.StressTest(100, Color.GREEN);
+            wrapperController.StressTest(1000, Color.GREEN, null);
         } else if (mode.equals("Medium Test")) {
-            wrapperController.StressTest(1000, Color.YELLOW);
+            wrapperController.StressTest(2500, Color.YELLOW, null);
         } else if (mode.equals("Heavy Test")) {
-            wrapperController.StressTest(10000, Color.RED);
+            wrapperController.StressTest(5000, Color.RED, null);
         }
     }
 
-
     @FXML
     protected void onMiddlePaneHover(){
-
     }
 
     @FXML
@@ -339,7 +336,6 @@ public class GuiController {
         int duration = durationTL.getValue();
         wrapperController.setTlSettings(id, duration);
     }
-
 
     // functionality
 

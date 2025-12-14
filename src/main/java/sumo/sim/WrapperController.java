@@ -116,7 +116,7 @@ public class WrapperController {
     // methods controlling the simulation / also connected with the guiController
 
     /**
-     * Used by GuiController to add Vehicles
+     * Used by {@link GuiController} to add Vehicles
      * @param amount How many Vehicles will spawn
      * @param type Sets type based on existing types in .rou XML
      * @param route Sets route
@@ -197,18 +197,16 @@ public class WrapperController {
         }
     }
 
-    public int updateCountVehicle() {
-        return vl.getExistingVehCount();
-    }
-
-    public int getAllVehicleCount() {
-        return vl.getCount();
-    }
-
-    public void StressTest(int amount, Color color) {
+    /**
+     * Spread the amount of vehicles determined by the stress test setting evenly across all existing routes
+     * @param amount number of cars (set in Stress Test Menu)
+     * @param color {@link Color}
+     * @param type Type ID (defaults to "DEFAULT_VEHTYPE" if null)
+     */
+    public void StressTest(int amount, Color color, String type) {
         Map<String, List<String>> Routes = rl.getAllRoutes();
         int amount_per = amount/Routes.size();
-
+        type = (type == null) ? "DEFAULT_VEHTYPE" : type;
         for(String key : Routes.keySet()) {
             addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
         }
@@ -216,49 +214,19 @@ public class WrapperController {
 
     // getter
 
-    public static String getCurrentNet(){
-        return currentNet;
-    }
-
-    public double getTime() {
-        return simTime;
-    }
-
-    public int getDelay() {
-        return delay;
-    }
-
-    public JunctionList getJunctions() {
-        return jl;
-    }
-
-    public StreetList getStreets() {
-        return sl;
-    }
-
-    public VehicleList getVehicles() {
-        return vl;
-    }
-
-    public TrafficLightList getTrafficLights() {
-        return tl;
-    }
-
-    public String[] getTypeList() {
-        return typel.getAllTypes();
-    }
-
-    public String[] getRouteList() {
-        return rl.getAllRoutesID();
-    }
-
-    public String[] getTLids() {
-        return tl.getIDs();
-    }
-
-    public boolean isRouteListEmpty() {
-        return rl.isRouteListEmpty();
-    }
+    public static String getCurrentNet(){ return currentNet; }
+    public double getTime() { return simTime; }
+    public int getDelay() { return delay; }
+    public JunctionList getJunctions() { return jl; }
+    public StreetList getStreets() { return sl; }
+    public VehicleList getVehicles() { return vl; }
+    public TrafficLightList getTrafficLights() { return tl; }
+    public String[] getTypeList() { return typel.getAllTypes(); }
+    public String[] getRouteList() { return rl.getAllRoutesID(); }
+    public String[] getTLids() { return tl.getIDs(); }
+    public boolean isRouteListEmpty() { return rl.isRouteListEmpty(); }
+    public int updateCountVehicle() { return vl.getExistingVehCount(); }
+    public int getAllVehicleCount() { return vl.getCount(); }
 
     public String[] getTlStateDuration(String tlID) {
         String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
@@ -277,8 +245,6 @@ public class WrapperController {
 
     public void setTlSettings(String tlid, int duration) {
         tl.getTL(tlid).setPhaseDuration(duration);
-
-        // debug
         double check = tl.getTL(tlid).getDuration();
         System.out.println("Duration: " + check);
 

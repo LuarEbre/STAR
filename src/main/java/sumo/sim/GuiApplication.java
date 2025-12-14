@@ -42,6 +42,12 @@ public class GuiApplication extends Application {
             }
         });
 
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (KeyCode.ENTER.equals(event.getCode()) && event.isAltDown()) {
+                stage.setFullScreen(!stage.isFullScreen());
+            }
+        });
+
         stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
         stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
