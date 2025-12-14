@@ -49,6 +49,11 @@ public class WrapperController {
     //public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
     //public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
 
+    /**
+     * The constructor of the Wrapper controller.
+     *
+     * @param guiController
+     */
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
         String sumoBinary = Util.getOSType().equals("Windows")
@@ -69,6 +74,9 @@ public class WrapperController {
         connectionConfig();
     }
 
+    /**
+     * Initial setup to initiate server connection.
+     */
     public void connectionConfig() {
         connection.addOption("start", "true");
         //connection.addOption("quit-on-end", "true");
@@ -94,6 +102,10 @@ public class WrapperController {
         start();
     }
 
+    /**
+     * Starts/Continues the simulation.
+     * If the connection is closed it will terminate immediate.
+     */
     public void start() { // maybe with connection as argument? closing connection opened prior
         executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly
         executor.scheduleAtFixedRate(() -> {
@@ -140,10 +152,16 @@ public class WrapperController {
         }
     }
 
+    /**
+     * Sets the paused parameter to false, so that the simulation can continue.
+     */
     public void startSim() {
         paused = false;
     }
 
+    /**
+     * Sets the paused parameter to true. The simulation will be halted.
+     */
     public void stopSim() {
         paused = true;
     }
@@ -170,8 +188,9 @@ public class WrapperController {
 
     }
 
-    // fixed Exceptions thrown by Simulation when trying to close during step
-    // closing can still throw exceptions on JavaFX Application Thread caused by trying to render while simulation is closed (java.lang.IllegalStateException: connection is closed)
+    /**
+     * Terminates the simulation.
+     */
     public void terminate() {
         paused = false; // else executor would not terminate
         terminated = true; // Flag to stop new logic
@@ -212,6 +231,37 @@ public class WrapperController {
         }
     }
 
+    /**
+     * Returns the duration of the phase of which the selected traffic light is currently on
+     *
+     * @param tlID
+     * @return e.g.: [g,r,y,80] -> state , last element is duration
+     */
+    public String[] getTlStateDuration(String tlID) {
+        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
+        int j = 0;
+        for (int i=0; i<ret.length-2; i++) {
+            ret[i] = tl.getTL(tlID).getCurrentState()[j];
+            j += 2; // 0,2,4,8
+        }
+        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
+        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
+
+        return ret; // [g,r,y,80] -> state , last element is duration
+    }
+
+    /**
+     * Sets the duration of the phase the traffic light is currently on.
+     * @param tlid
+     * @param duration
+     */
+    public void setTlSettings(String tlid, int duration) {
+        tl.getTL(tlid).setPhaseDuration(duration);
+        double check = tl.getTL(tlid).getDuration();
+        System.out.println("Duration: " + check);
+
+    }
+
     // getter
 
     public static String getCurrentNet(){ return currentNet; }
@@ -227,27 +277,4 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return vl.getExistingVehCount(); }
     public int getAllVehicleCount() { return vl.getCount(); }
-
-    public String[] getTlStateDuration(String tlID) {
-        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
-        int j = 0;
-        for (int i=0; i<ret.length-2; i++) {
-            ret[i] = tl.getTL(tlID).getCurrentState()[j];
-            j += 2; // 0,2,4,8
-        }
-        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
-        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
-
-        return ret; // [g,r,y,80] -> state , last element is duration
-    }
-
-    //setter
-
-    public void setTlSettings(String tlid, int duration) {
-        tl.getTL(tlid).setPhaseDuration(duration);
-        double check = tl.getTL(tlid).getDuration();
-        System.out.println("Duration: " + check);
-
-    }
-
 }
