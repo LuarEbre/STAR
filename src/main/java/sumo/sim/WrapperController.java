@@ -43,7 +43,7 @@ public class WrapperController {
     //public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
     //public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_routes_only.xml";
 
-    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt..net.xml";
+    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.net.xml";
     public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.rou.xml";
 
     //public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
@@ -54,7 +54,7 @@ public class WrapperController {
         String sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
                 ? "src/main/resources/Binaries/sumo.exe"
-                : "src/main/resources/Binaries/sumo";
+                : "/usr/local/bin/sumo";
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.sumocfg";
