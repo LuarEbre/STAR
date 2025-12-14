@@ -437,15 +437,10 @@ public class GuiController {
                 renderUpdate();
 
                 // other functions that should update every frame
-                if(wrapperController.isRouteListEmpty()){
-                    if(routeSelector.getValue().equals("CUSTOM")) {
-                        addVehicleButton.setDisable(true);
-                    }
+                if(wrapperController.isRouteListEmpty()) {
+                    addVehicleButton.setDisable(true);
                     startTestButton.setDisable(true);
                 } else {
-                    if(routeSelector.getValue().equals("CUSTOM")) {
-                        addVehicleButton.setDisable(true);
-                    }
                     addVehicleButton.setDisable(false);
                     startTestButton.setDisable(false);
                 }
