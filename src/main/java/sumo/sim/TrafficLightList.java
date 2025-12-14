@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Class for all managing all TrafficLights
+ * Class for managing all TrafficLights
  * @author simonr
  */
 public class TrafficLightList {
