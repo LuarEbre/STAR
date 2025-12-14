@@ -66,8 +66,6 @@ public class GuiController {
     @FXML
     private HBox mainButtonBox;
 
-    private final int defaultDelay;
-    private final int maxDelay;
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
@@ -93,8 +91,8 @@ public class GuiController {
      * @author Leandro Liuzzo
      */
     public GuiController() {
-        defaultDelay = 50;
-        maxDelay = 999;
+        this.defaultDelay = 50;
+        this.maxDelay = 999;
         panSen = 2;
     }
 
