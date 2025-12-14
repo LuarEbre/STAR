@@ -10,6 +10,12 @@ import java.util.LinkedList;
 
 import static java.lang.Math.abs;
 
+/**
+ * Class for the Junctions
+ *
+ * @author simonr
+ * @author LeleZss
+ */
 public class JunctionWrap {
     private final String id;
     private final Point2D.Double position;
@@ -21,6 +27,12 @@ public class JunctionWrap {
     private double distance = Integer.MAX_VALUE; //Used for Dijkstra Initialization
     private String predecessor = null; //Used for Dijkstra
 
+    /**
+     * Constructor for JunctionWrap.
+     * Initializes all parameters
+     * @param id
+     * @param con
+     */
     public JunctionWrap(String id, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
@@ -44,38 +56,79 @@ public class JunctionWrap {
         }
     }
 
+    /**
+     * Get the ID of a Junction
+     * @return id
+     */
     public String getID() {
         return id;
     }
 
+    /**
+     * Set the Distance of one Junction.
+     * Only used for Route generation
+     * @param distance
+     */
     public void setDistance(double distance) {
         this.distance = distance;
     }
 
+    /**
+     * Get the Distance of one Junction
+     * Only used for Route generation
+     * @return distance
+     */
     public double getDistance() {
         return distance;
     }
 
+    /**
+     * Set the Predecessor of one Junction
+     * Only used for Route generation
+     * @param predecessor
+     */
     public void setPredecessor(String predecessor) {
         this.predecessor = predecessor;
     }
 
+    /**
+     * Get the Predecessor of one Junction
+     * Only used for Route generation
+     * @return predecessor
+     */
     public String getPredecessor() {
         return predecessor;
     }
 
+    /**
+     * Calculate and returns the distance of this junction to Junction u
+     * @param u
+     * @return distance to Junction u
+     */
     public double distanceTo(JunctionWrap u) {
         return abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
     }
 
+    /**
+     * Get the Position of one Junction
+     * @return position
+     */
     public Point2D.Double getPosition() {
         return position;
     }
 
+    /**
+     * Get the X shape for one Junction
+     * @return shapeX
+     */
     public double[] getShapeX() {
         return shapeX;
     }
 
+    /**
+     * Get the Y shape for one Junction
+     * @return shapeY
+     */
     public double[] getShapeY() {
         return shapeY;
     }

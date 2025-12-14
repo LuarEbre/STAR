@@ -10,13 +10,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
+/**
+ * Class for all managing all TrafficLights
+ * @author simonr
+ */
 public class TrafficLightList {
     private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final StreetList streetList;
     private int count;
 
+    /**
+     * Constructor for TrafficLightList
+     * creates all TrafficLights as Objects in an ArrayList
+     *
+     * @param con SumoTraciConnection
+     * @param s1 StreetList
+     */
     public TrafficLightList(SumoTraciConnection con, StreetList s1) {
         this.con = con;
         this.streetList = s1;
@@ -37,6 +47,11 @@ public class TrafficLightList {
         setAllControlledStreets();
     }
 
+    /**
+     * Get an TrafficLight by ID
+     * @param id ID of TrafficLight
+     * @return TrafficLightWrap
+     */
     public TrafficLightWrap getTL(String id) {
         for (TrafficLightWrap tl : trafficlights) {
             if (tl.getId().equals(id)) { // searching for TrafficLight object
@@ -46,12 +61,24 @@ public class TrafficLightList {
         return null; // if not existent
     }
 
+    /**
+     * Get all TrafficLights as an ArrayList
+     * @return allTrafficLight
+     */
     public ArrayList<TrafficLightWrap> getTrafficlights() {
         return trafficlights;
     }
 
+    /**
+     * Get amount of TrafficLights in TrafficLightList
+     * @return amount of TrafficLights
+     */
     public int getCount() { return count; }
 
+    /**
+     * Get all IDs of TrafficLights in TrafficLightList
+     * @return String[] IDs
+     */
     public String[] getIDs() {
         int counter = 0;
         String [] ret = new String[trafficlights.size()];
@@ -63,6 +90,9 @@ public class TrafficLightList {
         return ret;
     }
 
+    /**
+     * Prints all TrafficLights in TrafficLightList
+     */
     public void printALL() { // for the demo
         System.out.println("");
         for (TrafficLightWrap tl : trafficlights) {
@@ -79,12 +109,19 @@ public class TrafficLightList {
         }
     }
 
+    /**
+     * Updates the State for all TrafficLights
+     */
     public void updateAllCurrentState() {
         for (TrafficLightWrap tl : trafficlights) {
             tl.setCurrentState();
         }
     }
 
+    /**
+     * Appends all TrafficLights Attributes in a String and returns it
+     * @return String of Data
+     */
     public String getTrafficLightsData() {
         StringBuilder sb = new StringBuilder();
 
@@ -102,6 +139,9 @@ public class TrafficLightList {
         return sb.toString();
     }
 
+    /**
+     * Set the Controlled Street for every TrafficLight
+     */
     public void setAllControlledStreets() {
         try {
             for (TrafficLightWrap tl : trafficlights) {
@@ -116,12 +156,19 @@ public class TrafficLightList {
         }
     }
 
+    /**
+     * Print all currently Controlled Streets of every TrafficLight
+     */
     public void printAllControlledStreets() {
         for (TrafficLightWrap tl : trafficlights) {
             tl.printControlledStreets();
         }
     }
 
+    /**
+     * Does the update_TL method for every TrafficLight in TrafficLightList
+     * This updates their attributes to current Simulation data
+     */
     public void updateTLs(){
         for(TrafficLightWrap tl : trafficlights ){
             tl.update_TL();
