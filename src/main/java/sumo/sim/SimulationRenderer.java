@@ -2,45 +2,90 @@ package sumo.sim;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
+import javafx.geometry.VPos;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.paint.Paint;
 
-import static java.lang.Math.abs;
-
+/**
+ * Handles the graphical rendering of the SUMO simulation onto a JavaFX {@link Canvas}.
+ * <p>
+ * This class manages the 2D camera transformation (panning, zooming, coordinate flipping),
+ * and draws the static network (streets, junctions) as well as dynamic objects
+ * (vehicles, traffic lights) frame by frame.
+ * </p>
+ */
 public class SimulationRenderer {
     private final GraphicsContext gc;
     private final Canvas map;
+    boolean showTrafficLightIDs;
     private double zoom;
     private double camX;
     private double camY;
     private double scale; // should depend on how big the map is -> difference between max and min?
+    private double rotation;
     private final JunctionList jl;
     private final StreetList sl;
     private final VehicleList vl;
     private final TrafficLightList tls;
+    private final Font tlFont;
 
+    /**
+     * Constructs a new SimulationRenderer called by {@link GuiController}
+     * <p>
+     * Initializes the camera position to the center of the network and calculates
+     * an initial scale factor to fit the network bounds within the canvas.
+     * </p>
+     *
+     * Arguments passed on by {@link GuiController}: <br>
+     *
+     * @param canvas The JavaFX Canvas to draw on
+     * @param gc     The GraphicsContext associated with the canvas. Which controls its content
+     * @param jl     The list of junctions to render.
+     * @param sl     The list of streets to render -> to get its associated lanes
+     * @param vl     The list of vehicles to render.
+     * @param tls    The list of traffic lights to render.
+     * <br>
+     * <p>
+     *      Initializes scale, zoom and rotation as well as CamX/Y which is centered by {@link JunctionList#getCenterPosX()}
+     *
+     * </p>
+     */
     public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls) {
+        this.showTrafficLightIDs = false;
+        this.tlFont = new Font("Arial", 7);
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
         this.sl = sl;
         this.jl = jl;
         this.vl = vl;
         this.tls = tls;
-        this.camX = jl.getCenterPosX() ; // center Position is max + min / 2
-        this.camY = jl.getCenterPosY() ;
+        this.camX = jl.getCenterPosX(); // center Position is max + min / 2
+        this.camY = jl.getCenterPosY();
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
-        scale = 1+(scaleX / scaleY); // should calculate the rough scale of the map
-        zoom = scale+1;
+        this.scale = 1 + (scaleX / scaleY); // should calculate the rough scale of the map
+        this.zoom = scale + 1;
+        this.rotation = 0;
         //scale = 1;
     }
 
-    public void initRender(){
+    /**
+     * Main rendering method. Clears the canvas, applies transformations with {@link #transform()}, and triggers
+     * the drawing of map layers {@link #renderTrafficLight()} {@link #renderMap()} {@link #renderVehicle()}  }
+     * <p>
+     * This method is called by {@link GuiController#renderUpdate()} method ~60 times per second
+     * </p>
+     */
+    public void initRender() {
         // area the size of canvas : frame -> canvas cords.
         // -> network: only do the following rendering with objects inside this restricting area;
         gc.setTransform(new Affine()); // transformation matrix
 
-        gc.setFill(Color.GREEN);
+        gc.setFill(Paint.valueOf("#86858E")); // background color
         gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
         transform();
         renderMap();
@@ -51,14 +96,31 @@ public class SimulationRenderer {
     // [  0  ,  0  ,  1 ]
     // m matrix , t translate, first letter: target; second letter: source ( which to mult)
 
-    private void transform(){
+    /**
+     * <p>
+     *     Applies a JavaFX transformation matrix (Affine) to the GraphicsContext via setTransform.
+     *  <li> Translation: Moves by x and y value (only possible with homogenous matrix) </li>
+     *  <li> Rotation: Rotates with sin and cos </li>
+     *  <li> Scale: Scales bigger or smaller </li>
+     * </p>
+     * <br>
+     * <p>
+     * Steps:
+     * <li> Translate to center of canvas based on map (width,height) / 2 .</li>
+     * <li>Apply rotation based on value (unused). </li>
+     * <li>Apply zoom/scale (Note: Y-axis is flipped with {@code -zoom} because SUMO
+     * and JavaFX y-coordinates are reversed. </li>
+     * <li> Translate back by camera position (camX, camY). </li>
+     * </p>
+     */
+    private void transform() {
         Affine transform = new Affine();
-        transform.appendTranslation(map.getWidth()/2, map.getHeight()/2); // moves 0,0 to map middle : add/sub
+        transform.appendTranslation(map.getWidth() / 2, map.getHeight() / 2); // moves 0,0 to map middle : add/sub
         // [ 1 , 0 , width ]        [ x + w ] <-- this is our point x -> + is to the right on x
         // [ 0 , 1 , height ]  *    [ y+h ]  <-- this is our point y
         // [ 0 , 0 , 1 ]            [ 1 ] <-- homogeneuos (added 1 row )
-
-        transform.appendScale(zoom,-zoom); // - y because sumo y coords are reversed : mul / div
+        transform.appendRotation(rotation);
+        transform.appendScale(zoom, -zoom); // - y because sumo y coords are reversed : mul / div
         // [ xSc , 0 , 0 ]        [ x * xSc ]  Scales our point with xSc and ySc
         // [ 0 , ySC , 0 ]  *    [ y * ySc ]
         // [ 0 , 0 , 1 ]            [ 1 ]
@@ -67,8 +129,15 @@ public class SimulationRenderer {
 
     }
 
-
-    private void renderMap(){
+    /**
+     * Renders the static map elements (streets and junctions) and triggers rendering
+     * of dynamic elements (Vehicle / TL)
+     *
+     * <p>
+     *     Performs rendering by parsing raw shapes of objects onto gc via the given lists
+     * </p>
+     */
+    private void renderMap() {
 
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
@@ -94,7 +163,7 @@ public class SimulationRenderer {
             }
         }
 
-        for(JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
+        for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
             gc.setFill(Color.BLACK);
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(scale);
@@ -108,39 +177,83 @@ public class SimulationRenderer {
             // [54.7, 38.75] 2 -> line
             // > 3 elements in array : polygon
             if (rawX.length >= 3) {
-                gc.fillPolygon(rawX, rawY, rawX.length ); // fills polygon
+                gc.fillPolygon(rawX, rawY, rawX.length); // fills polygon
                 //gc.strokePolygon(rawX, rawY, rawX.length); // border
             } else if (rawX.length == 2) {
                 //gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]);
             } else {
-               gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
+                gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
             }
 
         }
         renderVehicle();
         renderTrafficLight();
+        if (showTrafficLightIDs) displayTrafficLights();
     }
 
-    private void renderVehicle(){
-        double angle = 0;
-        double posX;
-        double posY;
+    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) {
+        this.showTrafficLightIDs = showTrafficLightIDs;
+    }
 
-        for (VehicleWrap v : vl.getVehicles()) {
-            if(!v.exists() && v.getPosition() == null) continue;
-            gc.setFill(v.getColor());
-            angle = v.getAngle();
-            posX = v.getPosition().getX();
-            posY = v.getPosition().getY();
-            // no need to translate coordinates since translation is already applied to graphics context
-            //gc.fillOval(posX-2, posY-2, 4, 4); // for now drawing an oval, could be either a svg or other polygon in the future
-            // drawTriangleCar is still experimental as the angles are not accurate when taking turns etc.
-            this.drawTriangleCar(v,1.5, 3); // set length / widht in vehicle class -> internal
+    protected boolean getShowTrafficLightIDs() {
+        return showTrafficLightIDs;
+    }
+
+    /**
+     * Renders text labels for Traffic Light IDs at their respective positions.
+     * <p>
+     * This method handles the coordinate flip locally to ensure text renders
+     * "right-side up" despite the global flip in {@link #transform()}.
+     * </p>
+     */
+    protected void displayTrafficLights() {
+        // text adjustments (color, alignment, font)
+        gc.setFill(Color.rgb(241, 241, 241));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setFont(tlFont);
+
+        for (TrafficLightWrap tl : tls.getTrafficlights()) {
+            // save and restore context, as each traffic light gets a unique translation
+            gc.save();
+
+            // using TL position as "offset" so we can later render at translated (0 | 0)
+            double newX = tl.getPosition().getX();
+            double newY = tl.getPosition().getY();
+            String id = tl.getId();
+
+            // translate using position
+            gc.translate(newX, newY);
+            // flip Y-axis so text renders right side up
+            gc.scale(1, -1);
+
+            gc.fillText(id, 0, 0);
+            // restore previously saved GraphicsContext
+            gc.restore();
         }
     }
 
+    /**
+     * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(VehicleWrap, double, double)} for every vehicle (still on the map)
+     */
+    private void renderVehicle() {
+        for (VehicleWrap v : vl.getVehicles()) {
+            if (!v.exists() && v.getPosition() == null) continue;
+            // no need to translate coordinates since translation is already applied to graphics context
+            this.drawTriangleCar(v, 1.5, 3); // ? set length / width in vehicle class -> internal
+        }
+    }
+
+    /**
+     * Helper method to draw a single vehicle as a triangle.
+     * Saves gc state and applies new state for rendering vehicle, restores gc state after wards
+     *
+     * @param v      The vehicle wrapper object.
+     * @param width  Half-width of the vehicle base.
+     * @param length Distance from center to front/back.
+     */
     private void drawTriangleCar(VehicleWrap v, double width, double length) {
-        if(v.exists()) {
+        if (v.exists()) {
             gc.save(); // saves previous gc state
             gc.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
             gc.rotate(-v.getAngle() + 180); // mirror along x -> rotate 180 degree
@@ -153,21 +266,40 @@ public class SimulationRenderer {
         }
     }
 
+    // optimization necessary
+
+    /**
+     * Renders the status of traffic lights by drawing colored lines at the end of controlled lanes.
+     * <p>
+     * It matches the current light state string (e.g., "GrGr") to the controlled lanes
+     * by checking if the controlled lanes are equivalent to {@link LaneWrap} ids. If they are, rendering is performed
+     * and a line is drawn at the end of the lane with the corresponding color using {@link TrafficLightWrap#getCurrentState()}
+     * </p>
+     */
     private void renderTrafficLight() {
         for (TrafficLightWrap tl : tls.getTrafficlights()) {
+            //tl.setCurrentState();
+            String[] state = tl.getCurrentState(); // [R, lane_R ,y , lane_y , r, lane_r ] format
+            if (state == null) continue; // protection
 
-            Color lightColor = Color.RED; // Default
-            int phase = tl.getPhaseNumber();
-            if (phase == 1) {
-                lightColor = Color.YELLOW;
-            } else if (phase == 2) {
-                lightColor = Color.LIGHTGREEN;
-            }
-            gc.setStroke(lightColor);
-
+            Color lightColor;
             gc.setLineWidth(2.0);
+
             for (Street controlledStreet : tl.getControlledStreets()) {
-                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets
+                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets , maybe performance hashmap
+                    for (int j = 0; j < state.length; j += 2) {
+                        if (state[j + 1] == null) continue;
+                        if (state[j + 1].equals(l.getLaneID())) { //  maybe performance hashmap
+                            switch (state[j]) { // if state like "g" equals...
+                                case "G", "g" -> lightColor = Color.GREEN;
+                                case "y" -> lightColor = Color.YELLOW;
+                                case "r" -> lightColor = Color.RED;
+                                default -> lightColor = Color.GRAY;
+                            }
+                            gc.setStroke(lightColor);
+                            break; // lane found
+                        }
+                    }
 
                     double[] rawX = l.getShapeX();
                     double[] rawY = l.getShapeY();
@@ -191,7 +323,7 @@ public class SimulationRenderer {
                     double perpX = -ndy;
                     double perpY = ndx;
 
-                    double halfWidth = 3.5 / 2.0;
+                    double halfWidth = 3.0 / 2.0;
 
                     double lineX1 = endX + (perpX * halfWidth);
                     double lineY1 = endY + (perpY * halfWidth);
@@ -202,20 +334,27 @@ public class SimulationRenderer {
                     gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
                 }
             }
+
         }
     }
 
+    /**
+     * Is called by {@link GuiController#mapPan()}
+     * @param x
+     * @param y
+     */
     public void padMad(double x, double y) {
-        camX += x/(zoom/2); // zoom / 2 -> if zoomed out -> x gets bigger
-        camY += y/(zoom/2);
+        camX += x / (zoom / 2); // zoom / 2 -> if zoomed out -> x gets bigger
+        camY += y / (zoom / 2);
     }
 
+    /**
+     * Is called by {@link GuiController#zoomMap(ScrollEvent)}
+     * @param z
+     */
     public void zoomMap(double z) {
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
-
-
-
 }
 
 

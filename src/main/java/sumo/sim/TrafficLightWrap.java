@@ -1,17 +1,31 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Junction;
+import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoPosition2D;
+import de.tudresden.sumo.objects.SumoTLSPhase;
+import de.tudresden.sumo.objects.SumoTLSProgram;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.*;
 
-public class TrafficLightWrap { // extends JunctionWrap later maybe?
+/**
+ * A wrapper class representing a single Traffic Light, gets created by {@link TrafficLightList}
+ * <p>
+ * This class communicates with TraaS Trafficlight to control traffic light phases,
+ * programs, and states. It also stores information such as position,
+ * controlled lanes (links), and incoming streets.
+ * </p>
+ *
+ */
+public class TrafficLightWrap {
+
     private final SumoTraciConnection con;
     private final String id;
     private final Set<Street> controlledStreets;
@@ -29,46 +43,85 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
     private final Point2D.Double position; // position as a junction
-    private List<SumoLink> controlledLinks;
+    String [] stateArray;
+    private final List<SumoLink> controlledLinks;
+    private final List<String> incomingLanes;
+    private XML xml;
 
-    public TrafficLightWrap(String id, SumoTraciConnection con) {
+    /**
+     * Constructor is called by {@link TrafficLightList#TrafficLightList(SumoTraciConnection, StreetList)} constructor
+     * <p>
+     * Instantiates all attributes based on the data provided from the parsed {@code .net.xml} file
+     * </p>
+     *
+     * @param id   The unique ID of the traffic light, used to call do_job methods.
+     * @param Data A map containing attributes parsed from the network XML (e.g., x, y, incLanes).
+     * @param con  The active SumoTraciConnection object created in {@link WrapperController}.
+     * @throws RuntimeException if there is an error parsing data or communicating with TraCI.
+     */
+    public TrafficLightWrap(String id, Map<String,String> Data, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
         this.controlledStreets = new HashSet<>();
         try {
-            SumoPosition2D pos2D = (SumoPosition2D) con.do_job_get(Junction.getPosition(id)); // position
+            xml = new XML(WrapperController.getCurrentNet());
             this.position = new Point2D.Double();
-            this.position.x = pos2D.x;
-            this.position.y = pos2D.y;
+            this.position.x = Double.parseDouble(Data.get("x"));
+            this.position.y = Double.parseDouble(Data.get("y"));
+            String incLanesString = Data.get("incLanes");
+            this.incomingLanes = Arrays.asList(incLanesString.split("\\s+"));
 
             this.controlledLinks = (List<SumoLink>) con.do_job_get(Trafficlight.getControlledLinks(id));
-
             update_TL();
+            //getCurrentState();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public String[] getCurrentState() {
+
+    // setter
+
+    /**
+     * Constructs an array in this format:
+     *
+     * <p>
+     *     Array: [index0, lane controlled by index0...]
+     *     State e.g. of "Grr" state index 0 is "G" and its controlled lane {@link LaneWrap} is stored after wards by its id.
+     * </p>
+     *
+     *<p>
+     *     This is to ensure {@link SimulationRenderer} renders Traffic lights correctly.
+     *</p>
+     */
+    public void setCurrentState() {
         int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
         // -> state differs from index to index (index is controlled lanes that have tl)
         String currentState;
+        // links.get(0).from
         try {
             currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        String [] stateArray = new String[currentState.length()]; // saves state in arr -> to get indices
-        for (int i = 0; i < currentState.length(); i++) {
-            stateArray[i] = currentState.charAt(i) + ""; // every current state e.g = Grrryy (length definded)
-            System.out.print(stateArray[i]); // -> phase duration defined
+        stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
+        for (int i = 0; i < stateArray.length; i+=2 ) {
+            int sumoIndex = i/2; // to not skip values
+            stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
+            stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
+            //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
+            // [G, lane_G ,y , lane_y , r, lane_r ] format
         }
+        // System.out.println(id);
 
-        return stateArray;
     }
 
-    // setter
-
+    /**
+     * Sets the active phase of the traffic light to the specified index.
+     *
+     * @param index The index of the phase to switch to.
+     * @throws RuntimeException if the TraCI command fails.
+     */
     public void setPhaseNumber(int index) {
         //TODO: check if index exists in TL
         try {
@@ -78,6 +131,12 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
+    /**
+     * Assigns a custom name to the current phase of the traffic light (not used)
+     *
+     * @param tlPhaseName name given
+     * @throws RuntimeException if the TraCI command fails.
+     */
     public void setPhaseName(String tlPhaseName) {
         try {
             con.do_job_set(Trafficlight.setPhaseName(id, tlPhaseName));
@@ -86,9 +145,52 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
+    /**
+     * Sets the remaining duration for the current phase (overwrites current remaining duration)
+     *
+     * @param phaseDuration The duration in seconds.
+     * @throws RuntimeException if the TraCI command fails.
+     */
     public void setPhaseDuration(double phaseDuration) {
+        //getPhaseNumber(); // -> only applies to phase currently active -> should display phase in gui for reference?
         try {
             con.do_job_set(Trafficlight.setPhaseDuration(id, phaseDuration));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Sets phase duration with {@link XML} class (unused)
+     * <p>
+     * This calls {@link #update_TL()} after setting the value.
+     * </p>
+     *
+     * @param phaseIndex    The index of the phase to modify.
+     * @param phaseDuration The new duration for the phase.
+     * @throws RuntimeException if the TraCI command or XML operation fails.
+     */
+    public void setSpecificPhaseDuration(int phaseIndex, double phaseDuration) {
+        try {
+            String ProgramID = (String) con.do_job_get(Trafficlight.getProgram(id));
+            xml.setPhaseDuration(id, ProgramID, phaseIndex, phaseDuration);
+            update_TL();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Modifies the duration of a phase identified by its state string (e.g., "GGrr").
+     *
+     * @param state         The state string identifying the phase.
+     * @param phaseDuration The new duration for the phase.
+     * @throws RuntimeException if the TraCI command or XML operation fails.
+     */
+    public void setPhaseDurationByState(String state, double phaseDuration) {
+        try {
+            String ProgramID = (String) con.do_job_get(Trafficlight.getProgram(id));
+            xml.setPhaseDurationByState(id, ProgramID, state, phaseDuration);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -112,6 +214,11 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
+    /**
+     * Adds a {@link Street} object to the set of streets controlled by this traffic light.
+     *
+     * @param s The Street object to add.
+     */
     public void setControlledStreets(Street s) {
         this.controlledStreets.add(s);
         //printControlledStreets();
@@ -135,29 +242,34 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         }
     }
 
-    public int getDuration() {
+    public double getDuration() {
+        double duration = 0;
         try {
-            return (int) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
+            duration =  (double) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return duration;
     }
 
-    public void getControlledJunctions() {
+    // returns time remaining until tl switches states
+    public double getNextSwitch() {
+        double duration = 0;
         try {
-            con.do_job_get(Trafficlight.getControlledJunctions(id));
+            duration =  (double) con.do_job_get(Trafficlight.getNextSwitch(id)); // gets phase of tl = 1, 2, 3
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return duration;
     }
 
-    public void getRYGdefinition() {
+
+    public String getProgram() {
         try {
-            System.out.println(con.do_job_get(Trafficlight.getCompleteRedYellowGreenDefinition(id)));
+            return (String) con.do_job_get(Trafficlight.getProgram(id));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        // returns ryg def like = Grrryy -> length -> how many incoming lanes and index =
     }
 
     public String getId() {
@@ -173,14 +285,25 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         return controlledStreets;
     }
 
+    public String[] getCurrentState() {
+        return stateArray;
+    }
+
+
     // other
 
+    /**
+     * Prints controlledStreets for debugging
+     */
     public void printControlledStreets() {
         for (Street s : controlledStreets) {
             System.out.println(this.id + " controls " + s.getId());
         }
     }
 
+    /**
+     * Updates TL phase
+     */
     public void update_TL() {
         try {
             this.phase = (int) con.do_job_get(Trafficlight.getPhase(this.id));

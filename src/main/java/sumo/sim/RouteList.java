@@ -2,28 +2,46 @@ package sumo.sim;
 
 import java.util.*;
 
+/**
+ * The Class for all Routes of the Simulation
+ * Different to other Objects, there is no RouteWrap, instead every RouteOperation is handled here
+ * @author simonr
+ */
 public class RouteList {
 
     private final Map<String, List<String>> allRoutes;
+    private  XML xmlReader;
 
+    /**
+     * Constructor for RouteList
+     * uses the rou.xml to read all Routes
+     * @param rouXmlFilePath
+     * @throws Exception
+     */
     public RouteList(String rouXmlFilePath) throws Exception {
 
         // parssing the xml file
-        XML xmlReader = new XML(rouXmlFilePath);
-
+        xmlReader = new XML(rouXmlFilePath);
         // map of routes(using getRoutes from XML class)
         allRoutes = xmlReader.getRoutes();
 
     }
 
+    /**
+     * Returns all Routes as a Hashmap of their Ids and their Path
+     * @return Map<String,List<String> allRoutes
+     */
     public Map<String, List<String>> getAllRoutes() {
         return allRoutes;
     }
 
+    /**
+     * Returns the ID of every Route
+     * @return allRouteIds
+     */
     public String[] getAllRoutesID() {
         String[] ret = new String[allRoutes.size()+1];
-        ret[0] = "CUSTOM";
-        int i = 1;
+        int i = 0;
         for (String key : allRoutes.keySet()) {
             ret[i] = key;
             i++;
@@ -32,10 +50,27 @@ public class RouteList {
         return ret;
     }
 
-    public void addRoute(String id, List<String> edges) {
-        allRoutes.put(id, edges);
+    /**
+     * Prints every Route
+     * used for debugging
+     */
+    public void printRouteList() {
+        System.out.println("Route list:");
+        for(String key : allRoutes.keySet()) {
+            System.out.println(key + ": " + allRoutes.get(key));
+            System.out.println(allRoutes.get(key));
+        }
     }
 
+    /**
+     * Generates a new Route based on a Start and End Junction
+     * New Route has optimal path of Start to End
+     * adds new Route to RouteList and to rou.xml
+     * @param start ID of startJunction
+     * @param end ID of endJunction
+     * @param routeID ID of new Route
+     * @param jl the JunctionList
+     */
     public void generateRoute(String start, String end, String routeID, JunctionList jl) {
 
         for (JunctionWrap jw : jl.getJunctions()) {
@@ -74,6 +109,10 @@ public class RouteList {
             }
         }
 
+        System.out.println("Dijkstra finished. End node: " + endNode.getID());
+        System.out.println("Distance to end: " + endNode.getDistance());
+        System.out.println("Predecessor of end: " + endNode.getPredecessor());
+
         LinkedList<String> junctionPath = new LinkedList<>();
 
         for (JunctionWrap step = endNode; step != null; step = jl.getJunction(step.getPredecessor())) {
@@ -90,20 +129,36 @@ public class RouteList {
             String edgeID = jl.findEdgeID(from, to);
 
             if (edgeID == null) {
-                System.err.println("Edge not found between: " + from + " → " + to);
-                return;
+                throw new RuntimeException("Edge not found between: " + from + " → " + to);
             }
 
             edgeList.add(edgeID);
         }
 
-        addRoute(routeID, edgeList);
+        if (edgeList.isEmpty()) {
+            throw new RuntimeException("Route " + routeID + " is empty – cannot write to SUMO!");
+        }
+
+        System.out.println("Junction Path: " + junctionPath); // Ist diese Liste leer?
+        System.out.println("Junction Path Size: " + junctionPath.size());
+
+        allRoutes.put(routeID, edgeList);
+        xmlReader.newRoute(routeID, edgeList);
     }
 
+    /**
+     * Get a specific Route by its ID
+     * @param id
+     * @return Route
+     */
     public List<String> getRouteById(String id) {
             return allRoutes.get(id);
         }
 
+    /**
+     * Checks if RouteList is empty
+     * @return boolean
+     */
     //getter for routecount(use in logic to check if any route is availabl)
     public boolean isRouteListEmpty() {
         return allRoutes.isEmpty();

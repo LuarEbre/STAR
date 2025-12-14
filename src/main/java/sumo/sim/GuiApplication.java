@@ -14,10 +14,28 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Class for loading FXML and CSS files. Extends JavaFX Application and therefor must override {@link #start(Stage)}
+ *
+ * <p>
+ *
+ * </p>
+ */
 //GUI application
 public class GuiApplication extends Application {
     private static GuiController guiController; // static because you dont instance guiCon -> javafx instances the controller
 
+    /**
+     * Loads FXML file and CSS file and sets the stage
+     *
+     * <p>
+     *     When loading and setting the FXML file. {@link GuiController} is created by JavaFX
+     *     and {@link WrapperController#WrapperController(GuiController)} constructor is called to enable the connection
+     *     between GUI and Simulation
+     * </p>
+     * @param stage , visible JavaFX frame acting as root element and containing all FXML (GUI) objects
+     * @throws IOException
+     */
     @Override
     public void start(Stage stage) throws IOException {
         // link to gui.fxml (more than one possible)
@@ -25,6 +43,10 @@ public class GuiApplication extends Application {
         //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/Title/title.fxml")); // experimental
 
         Scene scene = new Scene(fxmlLoader.load());
+
+        Image appIcon = new Image(getClass().getResourceAsStream("/Gui/Icons/STAR.png"));
+        stage.getIcons().add(appIcon);
+
         // link to css file
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
         scene.setCursor(new ImageCursor(new Image("/Gui/Icons/cursor.png",  128, 128, true, true))); // changes cursor style
@@ -37,6 +59,7 @@ public class GuiApplication extends Application {
                 stage.setFullScreen(!stage.isFullScreen());
             }
         });
+
         stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
         stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);

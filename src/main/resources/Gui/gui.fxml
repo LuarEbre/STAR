@@ -149,23 +149,24 @@
                    </font>
                </Label>
                <Separator layoutY="38.0" prefHeight="3.0" prefWidth="230.0" />
-               <HBox layoutY="38.0" prefHeight="238.0" prefWidth="230.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <HBox layoutY="38.0" prefHeight="187.0" prefWidth="250.0" AnchorPane.bottomAnchor="51.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                    <children>
                        <VBox prefHeight="238.0" prefWidth="147.0" spacing="28.0">
                            <children>
-                               <Label styleClass="addMenu-labels" text="Select Traffic Light" />
-                               <Label layoutX="10.0" layoutY="10.0" styleClass="addMenu-labels" text="Traffic Light duration " />
+                               <Label styleClass="addMenu-labels" text="Select" />
+                               <Label layoutX="10.0" layoutY="10.0" styleClass="addMenu-labels" text="Duration" />
                         <Label layoutX="15.0" layoutY="76.0" styleClass="addMenu-labels" text="Set Program " />
                            </children>
                            <padding>
                                <Insets left="5.0" top="20.0" />
                            </padding>
                        </VBox>
-                       <VBox prefHeight="238.0" prefWidth="121.0" spacing="20.0">
+                       <VBox prefHeight="238.0" prefWidth="110.0" spacing="20.0">
                            <children>
-                               <ChoiceBox prefWidth="150.0" />
-                               <Spinner />
+                               <ChoiceBox fx:id="tlSelector" prefWidth="150.0" />
+                               <Spinner fx:id="durationTL" />
                         <ChoiceBox layoutX="10.0" layoutY="25.0" prefWidth="150.0" />
+                        <Button mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="26.0" prefWidth="109.0" text="Apply" />
                            </children>
                            <padding>
                                <Insets top="15.0" />
@@ -176,6 +177,8 @@
                   <Insets left="5.0" right="5.0" />
                </padding>
                </HBox>
+            <TextField fx:id="stateText" editable="false" layoutX="7.0" layoutY="236.0" prefHeight="26.0" prefWidth="238.0" />
+            <Label layoutX="14.0" layoutY="215.0" styleClass="addMenu-labels" text="Current Phase" />
            </children>
        </AnchorPane>
 
@@ -297,9 +300,14 @@
        </AnchorPane>
 
        <!-- Buttons top right menu -->
-      <HBox fx:id="topMenuBox" layoutX="701.0" layoutY="-5.0" prefHeight="27.0" prefWidth="280.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox fx:id="topMenuBox" layoutX="701.0" layoutY="-5.0" prefHeight="27.0" prefWidth="386.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Pane fx:id="exitTopMenu" onMouseEntered="#closeAllMenus" prefHeight="30.0" prefWidth="14.0" />
+            <Label fx:id="vehicleCount" alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="85.0" styleClass="whiteLabel" text="0">
+               <HBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+            <Pane fx:id="exitTopMenu" onMouseEntered="#closeAllMenus" prefHeight="30.0" prefWidth="30.0" />
             <Button mnemonicParsing="false" onMouseEntered="#onMapsHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
             <Button mnemonicParsing="false" onMouseEntered="#onFiltersHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
             <Button mnemonicParsing="false" onMouseEntered="#onViewHover" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
