@@ -20,13 +20,27 @@ import java.util.function.UnaryOperator;
 
 import javafx.scene.paint.Color;
 
+/**
+ * Main JavaFX controller for the simulation GUI and gui.fxml.
+ *
+ * <p>
+ * This class handles all GUI elements such as buttons, panes and labels,
+ * as well as all user interactions and communication with the
+ * {@link WrapperController}.
+ * </p>
+ *
+ * <p>
+ * The controller runs on the JavaFX Application Thread.
+ * Rendering is performed by the {@link SimulationRenderer} and
+ * initialized via {@link #initializeRender()}.
+ * </p>
+ *
+ * @author Leandro Liuzzo
+ */
 public class GuiController {
-
+    // all FXML objects
     @FXML
     private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu;
-
-    // performance update -> addMenu and StressTestMenu in separate fxml files
-
     @FXML
     private ColorPicker colorSelector;
     @FXML
@@ -52,8 +66,7 @@ public class GuiController {
     @FXML
     private HBox mainButtonBox;
 
-    private final int defaultDelay;
-    private final int maxDelay;
+    // rendering
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
@@ -65,14 +78,44 @@ public class GuiController {
     private double mousePressedYNew;
     private double panSen; // sensitivity
 
+    // sim
     private WrapperController wrapperController;
+    private final int defaultDelay;
+    private final int maxDelay;
 
+    /**
+     * <p>
+     * Is created by FXML loader in {@link GuiApplication}
+     * after launching Application in {@link Main} class
+     *
+     * </p>
+     * @author Leandro Liuzzo
+     */
     public GuiController() {
         defaultDelay = 50;
         maxDelay = 999;
         panSen = 2;
     }
 
+    /**
+     * Initializes the GUI controller using the given {@link WrapperController}.
+     *
+     * <p>
+     * This method establishes the connection to the simulation backend and
+     * performs all initialization steps that require an active
+     * {@link WrapperController}, including:
+     * </p>
+     *
+     * <ul>
+     *   <li>Populating UI components (types, routes, traffic lights)</li>
+     *   <li>Initializing the renderer {@link #initializeRender()} </li>
+     *   <li>Enabling map interaction {@link #mapPan()} </li>
+     *   <li>Starting the render loop {@link #startRenderer()} </li>
+     *   <li>Initializes all drop down GUI menus (e.g. StressTestMode, routeSelector)</li>
+     * </ul>
+     *
+     * @param wrapperController the simulation wrapper used for backend communication with the simulation
+     */
     public void initializeCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
         initializeRender();
@@ -109,7 +152,23 @@ public class GuiController {
         startRenderer();
     }
 
-
+    /**
+     * Is called automatically after FXML loader has created {@link GuiController}.
+     *
+     * <p>
+     *  This method initializes everything that does not require a connection to {@link WrapperController}.
+     *
+     * </p>
+     *
+     * <p>
+     *     Methods called:
+     *  <ul>
+     *      <li> {@link #rescale()} rescales GUI elements based on height and width of the frame. </li>
+     *      <li> {@link #updateDataList()} updates data Listview object displayed on the left Pane. </li>
+     *      <li> {@link #validateInput(TextField)} checks weather the given input is correct or not. </li>
+     *  </ul>
+     * </p>
+     */
     @FXML
     public void initialize() {
 
@@ -176,9 +235,20 @@ public class GuiController {
         addVehicleButton.setDisable(true);
     }
 
+    /**
+     * This method scales GUI elements based on height and width:
+     *
+     * <p>
+     *    <ul>
+     *           <li> dataPane , displays data  </li>
+     *            <li> map , where map is rendered </li>
+     *           <li> mainButtonBox, adjusts width of main buttons </li>
+     *      </ul>
+     * </p>
+     */
     private void rescale(){
         // scales data field
-        dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20));
+        dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20)); // 20 percent of the width
         // scales map based on pane width and height
         map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
         map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
@@ -187,6 +257,24 @@ public class GuiController {
        // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
     }
 
+    /**
+     * Validates the input of a {@link TextField} associated with the delay spinner.
+     *
+     * <p>
+     * This method ensures that the value entered by the user is a valid integer
+     * within the allowed range (1 to {@link #maxDelay}). If the value is higher
+     * than {@link #maxDelay}, it is set to {@link #maxDelay}. If it is zero or negative,
+     * it is set to 1. In case the input cannot be parsed as an integer,
+     * the value is reset to the default delay ({@link #defaultDelay}).
+     * </p>
+     *
+     * <p>
+     * After validation, both the spinner's value and the text field are updated
+     * to reflect the corrected value.
+     * </p>
+     *
+     * @param editor the {@link TextField} to validate
+     */
     public void validateInput(TextField editor) {
         try {
             int val = Integer.parseInt(editor.getText()); // if it is not an Integer -> exception
@@ -205,15 +293,23 @@ public class GuiController {
         }
     }
 
-
+    /**
+     * Toggles the visibility of the given menu and positions it relative to the given button.
+     *
+     * <p>
+     * If the menu is already visible, it will be hidden. Otherwise, it is shown and
+     * positioned above the button with a small vertical offset.
+     * </p>
+     *
+     * @param menu   the menu pane to show or hide
+     * @param button the button relative to which the menu is positioned
+     */
     private void toggleMenuAtButton(Pane menu, Node button) {
         if (menu.isVisible()) {
             menu.setVisible(false);
             return;
         }
         menu.setVisible(true);
-        //menu.applyCss();
-        //menu.layout();
 
         Bounds buttonBounds = button.localToScene(button.getBoundsInLocal()); // position of buttons bound to screen
         double buttonCenterX = buttonBounds.getMinX() + (buttonBounds.getWidth() / 2); // middle position of button
@@ -223,18 +319,24 @@ public class GuiController {
 
         menu.setLayoutX(localPos.getX());
         menu.setLayoutY(localPos.getY());
-        //menu.toFront();
     }
 
+    /**
+     * This method closes all menus (invisible).
+     */
     public void closeAllMenus() {
         if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
         if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
-
-        // still needs fix for small gap between buttons and menus at the top
     }
 
+    /**
+     * <p>
+     *     Is triggered when pressing "-" on amountButton
+     *     <li> Reads and decrements value inside amount text field </li>
+     * </p>
+     */
     @FXML
     protected void amountMinus() {
         String oldVal = amountField.getText();
@@ -242,6 +344,9 @@ public class GuiController {
         amountField.setText(String.valueOf(newVal));
     }
 
+    /**
+     * Equivalent to {@link #amountMinus()}.
+     */
     @FXML
     protected void amountPlus() {
         String oldVal = amountField.getText();
@@ -249,6 +354,16 @@ public class GuiController {
         amountField.setText(String.valueOf(newVal));
     }
 
+    // main buttons pressed
+
+    /**
+     * <p>
+     *     Called when "play button" is pressed:
+     *     <li> disables "step button." </li>
+     *     <li> calls {@link WrapperController} methode {@link WrapperController#startSim()} to start
+     *     and {@link WrapperController#stopSim()} to stop the simulation.</li>
+     * </p>
+     */
     @FXML
     protected void onPlayStart() {
         stepButton.setDisable(true);
@@ -263,13 +378,23 @@ public class GuiController {
         }
     }
 
+    /**
+     * <p>
+     *     Called when "traffic light button" is pressed.
+     *     <li> Calls {@link SimulationRenderer#setShowTrafficLightIDs(boolean)}.</li>
+     *     <li> Displays TL menu via {@link #toggleMenuAtButton(Pane, Node)}.</li>
+     * </p>
+     *
+     */
     @FXML
     protected void onTrafficLight() {
         sr.setShowTrafficLightIDs(!sr.getShowTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
-
     }
 
+    /**
+     * Called when "select button" is pressed.
+     */
     @FXML
     protected void onSelect(){
         if (selectButton.isSelected()) { // toggled
@@ -278,41 +403,87 @@ public class GuiController {
         }
     }
 
+    /**
+     * Called when "add button" is pressed
+     * and displays add menu.
+     */
     @FXML
     protected void onAdd(){
         toggleMenuAtButton(addMenu, addButton);
     }
 
+    /**
+     * Called when "stress test button" is pressed
+     * and displays stress test menu.
+     */
     @FXML
-    protected void onFiltersHover(MouseEvent event){
+    protected void onStressTest(){
+        toggleMenuAtButton(stressTestMenu, stressTestButton);
+    }
+
+    /**
+     * <p>
+     *     Called when "step button" is pressed.
+     *     <li> Runs {@link WrapperController#doStepUpdate()} method with every click.</li>
+     * </p>
+     */
+    @FXML
+    protected void onStep() {
+        wrapperController.doStepUpdate();
+    }
+
+    // top right menu buttons hovered
+
+    /**
+     * Is triggered when user hovers over "filter" button
+     *
+     * <p>
+     *     Calls {@link #closeAllMenus()} method to ensure that no menus are stacked on top of each other and
+     *     sets menu to "visible"
+     * </p>
+     */
+    @FXML
+    protected void onFiltersHover(){
         closeAllMenus();
         filtersMenuSelect.setVisible(true);
     }
 
+    /**
+     * Equivalent to {@link #onFiltersHover()}
+     */
     @FXML
-    protected void onMapsHover(MouseEvent event){
+    protected void onMapsHover(){
         // deactivate all menus
         closeAllMenus();
         // activate Map menu
         mapMenuSelect.setVisible(true);
     }
 
+    /**
+     * Equivalent to {@link #onFiltersHover()}
+     */
     @FXML
-    protected void onViewHover(MouseEvent event){
+    protected void onViewHover(){
         closeAllMenus();
         viewMenuSelect.setVisible(true);
     }
 
     @FXML
-    protected void onFileHover(MouseEvent event){
+    protected void onMiddlePaneHover(){
+
+    }
+
+
+    /**
+     * Equivalent to {@link #onFiltersHover()}
+     */
+    @FXML
+    protected void onFileHover(){
         closeAllMenus();
         fileMenuSelect.setVisible(true);
     }
 
-    @FXML
-    protected void onStressTest(){
-        toggleMenuAtButton(stressTestMenu, stressTestButton);
-    }
+    // main buttons menu methods
 
     @FXML
     protected void startStressTest(){
@@ -329,11 +500,6 @@ public class GuiController {
 
 
     @FXML
-    protected void onMiddlePaneHover(){
-
-    }
-
-    @FXML
     protected void applyTLsettings() {
         String id = tlSelector.getValue();
         int duration = durationTL.getValue();
@@ -343,22 +509,16 @@ public class GuiController {
 
     // functionality
 
-    public void disableAllButtons(){
-        selectButton.setDisable(true);
-        playButton.setDisable(true);
-        addButton.setDisable(true);
-        stressTestButton.setDisable(true);
-        stepButton.setDisable(true);
-    }
-
-    public void enableAllButtons(){
-        selectButton.setDisable(false);
-        playButton.setDisable(false);
-        addButton.setDisable(false);
-        stressTestButton.setDisable(false);
-        stepButton.setDisable(false);
-    }
-
+    /**
+     * Called by {@link WrapperController} thread repeatedly to update GUI elements connected to the simulation
+     *
+     * <p>
+     *     <li> {@link #updateTime()} updates time based on sim time. </li>
+     *     <li> {@link #updateDelay()} updates delay. </li>
+     *     <li> {@link #updateCountVeh()} updates how many cars are spawned. </li>
+     *     <li> {@link #updateTLPhaseText()} updates TL menu phase text. </li>
+     * </p>
+     */
     public void doSimStep() {
         // updates UI elements
         updateTime();
@@ -367,12 +527,19 @@ public class GuiController {
         updateTLPhaseText();
     }
 
+    /**
+     * Updates selected value, if changed, and calls {@link WrapperController#changeDelay(int)} method to set value.
+     */
     public void updateDelay() {
         if (delaySelect.getValue() != wrapperController.getDelay()) {
             wrapperController.changeDelay(delaySelect.getValue());
         }
     }
 
+    /**
+     * Calculates time provided by {@link WrapperController#getTime()}
+     * formats it to: "HH:MM:SS"  and displays it in GUI
+     */
     public void updateTime() {
         int time = (int) wrapperController.getTime();
         StringBuilder b1 = new StringBuilder();
@@ -383,6 +550,9 @@ public class GuiController {
         timeLabel.setText(b1.toString());
     }
 
+    /**
+     * Refreshes the data list view (currently placeholder structure).
+     */
     public void updateDataList() {
         // list of data should be returned from vehicle/tl lists -> entry for every object, maybe list in listdata.getItems().addAll
         listData.getItems().clear();
@@ -397,17 +567,28 @@ public class GuiController {
     }
 
 
-    @FXML
-    protected void onStep() {
-        wrapperController.doStepUpdate();
-    }
-
+    /**
+     * Updates the vehicle count label.
+     * <p>
+     * Displays "TotalVehicles / CurrentVehicles".
+     * </p>
+     */
     private void updateCountVeh() {
         int c = wrapperController.updateCountVehicle(); // updates count everytime a new veh is added
         int all = wrapperController.getAllVehicleCount();
         vehicleCount.setText(all+"/"+c);
     }
 
+    /**
+     * Updates the text display in the Traffic Light menu.
+     * <p>
+     * Shows the current phase string and the remaining time until the next switch
+     * for the selected Traffic Light in this format: <br>
+     * "Grr, dur: 67/82" <br>
+     * State, remaining dur and absolute duration of this state
+     *
+     * </p>
+     */
     private void updateTLPhaseText() {
         if (trafficLightMenu.isVisible()) {
             String[] stateDur = wrapperController.getTlStateDuration(tlSelector.getValue());
@@ -429,7 +610,13 @@ public class GuiController {
 
 
     // Render
-
+    /**
+     * Starts the animation loop called by {@link #initializeCon(WrapperController)}
+     * <p>
+     * Creates an {@link AnimationTimer} that calls {@link #renderUpdate()} roughly 60 times per second.
+     * It also checks every frame if the route list is empty to enable/disable vehicle addition buttons if so.
+     * </p>
+     */
     public void startRenderer() { // maybe with connection as argument? closing connection opened prior
         renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
             @Override
@@ -449,6 +636,10 @@ public class GuiController {
         renderLoop.start(); // runs 60 frames per second
     }
 
+    /**
+     * Correctly terminates JavaFX thread and {@link AnimationTimer}
+     * and runs {@link WrapperController#terminate()}
+     */
     @FXML
     protected void closeApplication() {
         renderLoop.stop(); // terminates Animation Timer
@@ -456,6 +647,13 @@ public class GuiController {
         wrapperController.terminate(); // terminates sumo connection and wrapCon thread
     }
 
+    /**
+     * Initializes the {@link SimulationRenderer}.
+     * <p>
+     * Obtains the 2D GraphicsContext from the canvas and injects the (necessary) simulation object lists
+     * (Junctions, Streets, Vehicles, TLs) into the renderer.
+     * </p>
+     */
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
         sr = new SimulationRenderer(map,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
@@ -463,10 +661,17 @@ public class GuiController {
         renderUpdate();
     }
 
+    /**
+     * Called by {@link #startRenderer()} to update {@link SimulationRenderer#initRender()} ~60 times per frame
+     */
     public void renderUpdate(){
         sr.initRender();
     }
 
+    /**
+     * Collects data from the "Add Vehicle" menu inputs and calls
+     * {@link WrapperController#addVehicle(int, String, String, Color)}
+     */
     @FXML
     public void addVehicle(){
         // parameters from addMenu components
@@ -475,18 +680,15 @@ public class GuiController {
         Color color = colorSelector.getValue();
         String type = typeSelector.getValue();
         String route = routeSelector.getValue();
-        if(route == null) {
-            route = "r0"; // if route count == 0 -> disable add button, disable stress test start
-        }
-
         wrapperController.addVehicle(amount, type, route, color);
     }
 
-    @FXML
-    protected void mapClick(){
-
-    }
-
+    /**
+     * Handles scrolling events on the map to zoom in or out and calls
+     * {@link SimulationRenderer#zoomMap(double)}
+     *
+     * @param event the scroll event generated by the mouse wheel.
+     */
     @FXML
     protected void zoomMap(ScrollEvent event){
 
@@ -499,6 +701,13 @@ public class GuiController {
         }
     }
 
+    /**
+     * Sets up mouse listeners for panning the map.
+     * <p>
+     * Calculates the difference between mouse press and drag coordinates
+     * and sends the offset to the renderer via {@link SimulationRenderer#padMad(double, double)}.
+     * </p>
+     */
     public void mapPan() {
         map.setOnMousePressed(event -> {
             mousePressedXOld = event.getX(); // old

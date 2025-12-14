@@ -14,10 +14,28 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Class for loading FXML and CSS files. Extends JavaFX Application and therefor must override {@link #start(Stage)}
+ *
+ * <p>
+ *
+ * </p>
+ */
 //GUI application
 public class GuiApplication extends Application {
     private static GuiController guiController; // static because you dont instance guiCon -> javafx instances the controller
 
+    /**
+     * Loads FXML file and CSS file and sets the stage
+     *
+     * <p>
+     *     When loading and setting the FXML file. {@link GuiController} is created by JavaFX
+     *     and {@link WrapperController#WrapperController(GuiController)} constructor is called to enable the connection
+     *     between GUI and Simulation
+     * </p>
+     * @param stage , visible JavaFX frame acting as root element and containing all FXML (GUI) objects
+     * @throws IOException
+     */
     @Override
     public void start(Stage stage) throws IOException {
         // link to gui.fxml (more than one possible)
