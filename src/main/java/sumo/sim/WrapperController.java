@@ -30,12 +30,17 @@ public class WrapperController {
     private double simTime;
     private XML netXml;
 
-    public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
-    public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
+    //public static String currentNet = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.net.xml";
+    //public static String currentRou = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.rou.xml";
 
     //public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
     //public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_routes_only.xml";
 
+    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt..net.xml";
+    public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.rou.xml";
+
+    //public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
+    //public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
 
     public WrapperController(GuiController guiController) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
@@ -46,9 +51,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/Map_1/test5.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Map_3/test6.sumocfg";
-        //String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.sumocfg";
+        //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
@@ -76,6 +81,8 @@ public class WrapperController {
             rl = new RouteList(currentRou);
             typel = new TypeList(connection);
 
+            tl.updateAllCurrentState(); // important for rendering
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -92,10 +99,7 @@ public class WrapperController {
                 }
                 try {
                     double timeSeconds = (double) connection.do_job_get(Simulation.getTime());
-                    //System.out.println(RED + "Time: " + timeSeconds + RESET);
-                    //System.out.println("Delay:" + delay);
                     doStepUpdate();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -132,6 +136,7 @@ public class WrapperController {
         try {
             connection.do_timestep();
             vl.updateAllVehicles();
+            tl.updateAllCurrentState();
             //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime());
             Platform.runLater(guiController::doSimStep);
@@ -167,6 +172,14 @@ public class WrapperController {
         } catch (Exception e) {
             System.err.println("Error closing connection: " + e.getMessage());
         }
+    }
+
+    public int updateCountVehicle() {
+        return vl.getExistingVehCount();
+    }
+
+    public int getAllVehicleCount() {
+        return vl.getCount();
     }
 
     // getter
@@ -207,13 +220,35 @@ public class WrapperController {
         return rl.getAllRoutesID();
     }
 
+    public String[] getTLids() {
+        return tl.getIDs();
+    }
+
     public boolean isRouteListEmpty() {
         return rl.isRouteListEmpty();
     }
 
+    public String[] getTlStateDuration(String tlID) {
+        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
+        int j = 0;
+        for (int i=0; i<ret.length-2; i++) {
+            ret[i] = tl.getTL(tlID).getCurrentState()[j];
+            j += 2; // 0,2,4,8
+        }
+        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
+        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
+
+        return ret; // [g,r,y,80] -> state , last element is duration
+    }
+
     //setter
 
-    public String[] setTypeList() {
-        return typel.getAllTypes();
+    public void setTlSettings(String tlid, int duration) {
+        tl.getTL(tlid).setPhaseDuration(duration);
+
+        // debug
+        double check = tl.getTL(tlid).getDuration();
+        System.out.println("Duration: " + check);
+
     }
 }

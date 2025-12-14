@@ -102,6 +102,17 @@
     -fx-font-family:"Arial Black";
 }
 
+#exitTopMenu {
+    -fx-background-image: url("/Gui/Icons/countCar.png");
+    -fx-background-size: 20px 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
+#vehicleCount:hover {
+    -fx-text-fill: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+}
+
 .mapSelect:hover {
     -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
     -fx-border-width: 3, 3;
@@ -211,6 +222,12 @@
     -fx-text-fill: -fx-color-white;
     -fx-font-family:"Arial Black";
     -fx-alignment: center;
+}
+
+#addVehicleButton:pressed {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-text-fill: -fx-color-magenta;
 }
 
 #colorSelector {
