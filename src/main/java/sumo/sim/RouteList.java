@@ -41,8 +41,7 @@ public class RouteList {
      */
     public String[] getAllRoutesID() {
         String[] ret = new String[allRoutes.size()+1];
-        ret[0] = "CUSTOM";
-        int i = 1;
+        int i = 0;
         for (String key : allRoutes.keySet()) {
             ret[i] = key;
             i++;
