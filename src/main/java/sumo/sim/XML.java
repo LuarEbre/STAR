@@ -12,14 +12,24 @@ import java.io.FileOutputStream;
 import java.util.Map;
 import java.util.*;
 
+/**
+ * XML is used for writing and reading the xml files of the sumo conifg.
+ * @author simonr
+ */
+
 public class XML {
 // XML file read/write class
+
     private FileInputStream file;
-    //private static SAXBuilder saxBuilder;
-    //private static Document document;
     private static XMLInputFactory factory = null;
     private String path;
 
+    /**
+     * The Constructor of XML
+     * Simply creates an XMLInputFactory Instance and a FileInputStream with the given Path
+     * @param path
+     * @throws Exception
+     */
     public XML(String path) throws Exception{
         this.path = path;
         file = new FileInputStream(path);
@@ -27,6 +37,40 @@ public class XML {
 
     }
 
+    /**
+     * Sets the Duration of a specific Traffic Light of a Junction
+     * This then overwrites the <phase><duration></duration></phase> segment of the .net.xml
+     * @param id
+     * @param phaseIndex
+     * @param newDuration
+     */
+    public void setPhaseDuration(String id, int phaseIndex, int newDuration){
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            Document doc = builder.build(path);
+            Element root = doc.getRootElement();
+
+            for(Element tlLogic : root.getChildren("tlLlogic")) {
+                if(!(tlLogic.getAttributeValue("id").equals(id))) {
+                    continue;
+                }
+
+                List<Element> phases = tlLogic.getChildren("phase");
+                phases.get(phaseIndex).setAttribute("duration", String.valueOf(newDuration));
+            }
+
+            new XMLOutputter(Format.getPrettyFormat()).output(doc, new FileOutputStream(path));
+
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    /**
+     * Reads a Streets FromJunction and returns it
+     * @param id
+     * @return fromJunction
+     */
     public String getFromJunction(String id){
         try (FileInputStream file = new FileInputStream(path)){
             XMLStreamReader reader = factory.createXMLStreamReader(file);
@@ -48,6 +92,11 @@ public class XML {
         return null;
     }
 
+    /**
+     * Reads a Streets ToJunction and returns it
+     * @param id
+     * @return toJunction
+     */
     public String getToJunction(String id) {
         try (FileInputStream file = new FileInputStream(path)){
             XMLStreamReader reader = factory.createXMLStreamReader(file);
@@ -70,7 +119,10 @@ public class XML {
         return null;
     }
 
-    //Same as get_from_junction and get_to_junction, but instead returns a map of all edges and their from and to junction
+    /**
+     * Reads all Streets, and their from and toJucntions. Then returns them as a HashMap
+     * @return Map<String, String[]> Map of all Edges from and to Jucntions
+     */
     public Map<String, String[]> readAllEdges() {
         Map<String, String[]> map = new HashMap<>();
 
@@ -99,6 +151,10 @@ public class XML {
         return map;
     }
 
+    /**
+     * Reads every Route in the rou.xml and returns them as a Hashmap
+     * @return Map<String, List<String> allRoutes
+     */
     public Map<String, List<String>> getRoutes(){
         Map<String, List<String>> map = new HashMap<>();
         try(FileInputStream file = new FileInputStream(path)){
@@ -125,6 +181,10 @@ public class XML {
         return map;
     }
 
+    /**
+     * Reads all Streets Data from .net.xml. Returns the Data as a Hashmap with Index to Attributes.
+     * @return Map<String, List<String> AllStreets and their Attributes
+     */
     public Map<String, List<String>> getStreetsData(){
         Map<String, List<String>> map = new HashMap<>();
         try(FileInputStream file = new FileInputStream(path)){
@@ -151,7 +211,10 @@ public class XML {
         }
         return map;
     }
-
+    /**
+     * Reads all TrafficLight Data from .net.xml. Returns the Data as a Hashmap with Index to a Hashmap with Phases and their Attributes.
+     * @return Map<String, Map<String,String> AllTrafficLights and their Attributes
+     */
     public Map<String, Map<String, String>> getTrafficLightsData() {
 
         Map<String, Map<String, String>> result = new HashMap<>();
@@ -186,6 +249,11 @@ public class XML {
         return result;
     }
 
+    /**
+     * Creates a new Route in the rou.xml.
+     * @param id
+     * @param edges
+     */
     public void newRoute(String id, List<String> edges) {
         if (edges == null || edges.isEmpty()) {
             throw new IllegalArgumentException("Route needs at least one edge!");
