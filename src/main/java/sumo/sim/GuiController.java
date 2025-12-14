@@ -66,7 +66,6 @@ public class GuiController {
     @FXML
     private HBox mainButtonBox;
 
-    // rendering
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
@@ -92,8 +91,8 @@ public class GuiController {
      * @author Leandro Liuzzo
      */
     public GuiController() {
-        defaultDelay = 50;
-        maxDelay = 999;
+        this.defaultDelay = 50;
+        this.maxDelay = 999;
         panSen = 2;
     }
 
@@ -329,6 +328,8 @@ public class GuiController {
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
         if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
+
+        // still needs fix for small gap between buttons and menus at the top
     }
 
     /**
@@ -488,13 +489,12 @@ public class GuiController {
     @FXML
     protected void startStressTest(){
         String mode = stressTestMode.getValue();
-        // experimental
         if (mode.equals("Light Test")) {
-            wrapperController.StressTest(100, Color.GREEN);
+            wrapperController.StressTest(1000, Color.GREEN, null);
         } else if (mode.equals("Medium Test")) {
-            wrapperController.StressTest(1000, Color.YELLOW);
+            wrapperController.StressTest(2500, Color.YELLOW, null);
         } else if (mode.equals("Heavy Test")) {
-            wrapperController.StressTest(10000, Color.RED);
+            wrapperController.StressTest(5000, Color.RED, null);
         }
     }
 
@@ -680,6 +680,10 @@ public class GuiController {
         Color color = colorSelector.getValue();
         String type = typeSelector.getValue();
         String route = routeSelector.getValue();
+        if(route == null) {
+            route = "r0"; // if route count == 0 -> disable add button, disable stress test start
+        }
+
         wrapperController.addVehicle(amount, type, route, color);
     }
 

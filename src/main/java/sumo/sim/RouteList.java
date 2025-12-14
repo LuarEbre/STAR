@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * The Class for all Routes of the Simulation
  * Different to other Objects, there is no RouteWrap, instead every RouteOperation is handled here
- * @author simonr
+ * @author simon kevin
  */
 public class RouteList {
 
@@ -139,7 +139,7 @@ public class RouteList {
             throw new RuntimeException("Route " + routeID + " is empty – cannot write to SUMO!");
         }
 
-        System.out.println("Junction Path: " + junctionPath); // Ist diese Liste leer?
+        System.out.println("Junction Path: " + junctionPath); // empty list?
         System.out.println("Junction Path Size: " + junctionPath.size());
 
         allRoutes.put(routeID, edgeList);
