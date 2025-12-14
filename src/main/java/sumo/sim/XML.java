@@ -43,15 +43,16 @@ public class XML {
      * @param id
      * @param phaseIndex
      * @param newDuration
+     * @param programID
      */
-    public void setPhaseDuration(String id, int phaseIndex, double newDuration){
+    public void setPhaseDuration(String id, String programID, int phaseIndex, double newDuration){
         try {
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(path);
             Element root = doc.getRootElement();
 
             for(Element tlLogic : root.getChildren("tlLlogic")) {
-                if(!(tlLogic.getAttributeValue("id").equals(id))) {
+                if(!(tlLogic.getAttributeValue("id").equals(id)&&tlLogic.getAttributeValue("programID").equals(programID))) {
                     continue;
                 }
 
@@ -61,6 +62,35 @@ public class XML {
 
             new XMLOutputter(Format.getPrettyFormat()).output(doc, new FileOutputStream(path));
 
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    /**
+     * Sets the Phase Duration of one Specific TrafficLight by its Phase state
+     * @param id ID of Junction that has the TrafficLights
+     * @param programID ProgrammID, needed for identification in xml
+     * @param state State of the Phase you want to change
+     * @param newDuration New Duration wanted for the phase
+     */
+    public void setPhaseDurationByState(String id, String programID, String state, double newDuration){
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            Document doc = builder.build(path);
+            Element root = doc.getRootElement();
+
+            for(Element tlLogic : root.getChildren("tlLlogic")) {
+                if(!(tlLogic.getAttributeValue("id").equals(id)&&tlLogic.getAttributeValue("programID").equals(programID))) {
+                    continue;
+                }
+                List<Element> phases = tlLogic.getChildren("phase");
+                for(Element phase : phases) {
+                    if(phase.getAttributeValue("state").equals(state)){
+                        phase.setAttribute("duration", String.valueOf(newDuration));
+                    }
+                }
+            }
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
