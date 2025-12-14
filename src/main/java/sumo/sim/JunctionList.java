@@ -7,6 +7,10 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.ArrayList;
 import java.util.*;
 
+/**
+ * Holds every JunctionWrap Object
+ * @author simonr
+ */
 public class JunctionList {
     //private final Set<JunctionWrap> junctions = new HashSet<>();
     private final ArrayList<JunctionWrap> junctions = new ArrayList<>(); // List of TrafficLights
@@ -14,7 +18,11 @@ public class JunctionList {
     private Map<String, Set<String>> adjacency = new HashMap<>();
     private final StreetList streets;
 
-
+    /**
+     *
+     * @param con
+     * @param streets
+     */
     public JunctionList(SumoTraciConnection con, StreetList streets) {
         this.streets = streets;
         try {
@@ -30,6 +38,9 @@ public class JunctionList {
         }
     }
 
+    /**
+     * Updates the Adjacence Matrix used for Route Generation
+     */
     public void updateAdjacency(){
 
         adjacency.clear();
@@ -51,14 +62,20 @@ public class JunctionList {
         }
     }
 
-
+    /**
+     * Prints the Adjacency Matrix
+     */
     public void printAdjacency() {
         for (String j : adjacency.keySet()) {
             System.out.println(j + " → " + adjacency.get(j));
         }
     }
 
-
+    /**
+     * Get one specific Junction from the Junction List
+     * @param id
+     * @return Junction
+     */
     public JunctionWrap getJunction(String id) {
         for (JunctionWrap jw : junctions) {
             if (jw.getID().equals(id)) {
@@ -68,10 +85,21 @@ public class JunctionList {
         return null;
     }
 
+    /**
+     * Get the corresponding adjacent junctions of one junction
+     * @param junctionID
+     * @return Set<String> Vertexes adjacent to one junction
+     */
     public Set<String> getAdjacentVertexes(String junctionID) {
         return adjacency.getOrDefault(junctionID, Collections.emptySet()) ;
     }
 
+    /**
+     * returns Street based on its from and to Junction
+     * @param from
+     * @param to
+     * @return Street
+     */
     public String findEdgeID(String from, String to) {
         for (Street s : streets.getStreets()) {
             String sFrom = s.getFromJunction();
@@ -97,7 +125,6 @@ public class JunctionList {
         System.err.println("Edge not found from " + from + " to " + to);
         return null;
     }
-
 
 
     public double getMinPosX(){
@@ -163,6 +190,10 @@ public class JunctionList {
         return (minY + maxY) / 2;
     }
 
+    /**
+     * get all Junctions as an ArrayList
+     * @return junctions
+     */
     public ArrayList<JunctionWrap> getJunctions() {
         return junctions;
     }
