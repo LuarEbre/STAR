@@ -67,6 +67,13 @@ public class XML {
         }
     }
 
+    /**
+     * Sets the Phase Duration of one Specific TrafficLight by its Phase state
+     * @param id ID of Junction that has the TrafficLights
+     * @param programID ProgrammID, needed for identification in xml
+     * @param state State of the Phase you want to change
+     * @param newDuration New Duration wanted for the phase
+     */
     public void setPhaseDurationByState(String id, String programID, String state, double newDuration){
         try {
             SAXBuilder builder = new SAXBuilder();
