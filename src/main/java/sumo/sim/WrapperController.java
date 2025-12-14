@@ -5,6 +5,8 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -250,5 +252,14 @@ public class WrapperController {
         double check = tl.getTL(tlid).getDuration();
         System.out.println("Duration: " + check);
 
+    }
+
+    public void StressTest(int amount, Color color) {
+        Map<String, List<String>> Routes = rl.getAllRoutes();
+        int amount_per = amount/Routes.size();
+
+        for(String key : Routes.keySet()) {
+            addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
+        }
     }
 }

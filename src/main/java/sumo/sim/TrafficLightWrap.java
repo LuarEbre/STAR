@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.*;
 
+/**
+ * Class for single TrafficLight Objects
+ * @author simonr
+ */
 public class TrafficLightWrap { // extends JunctionWrap later maybe?
     private final SumoTraciConnection con;
     private final String id;
@@ -36,12 +40,21 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
     String [] stateArray;
     private final List<SumoLink> controlledLinks;
     private final List<String> incomingLanes;
+    private XML xml;
 
+    /**
+     * Constructor for TrafficLightWrap
+     * Instances all Attributes based on the Data given from the .net.xml
+     * @param id
+     * @param Data
+     * @param con
+     */
     public TrafficLightWrap(String id, Map<String,String> Data, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
         this.controlledStreets = new HashSet<>();
         try {// position
+            xml = new XML(WrapperController.getCurrentNet());
             this.position = new Point2D.Double();
             this.position.x = Double.parseDouble(Data.get("x"));
             this.position.y = Double.parseDouble(Data.get("y"));
@@ -102,6 +115,25 @@ public class TrafficLightWrap { // extends JunctionWrap later maybe?
         //getPhaseNumber(); // -> only applies to phase currently active -> should display phase in gui for reference?
         try {
             con.do_job_set(Trafficlight.setPhaseDuration(id, phaseDuration));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setSpecificPhaseDuration(int phaseIndex, double phaseDuration) {
+        try {
+            String ProgramID = (String) con.do_job_get(Trafficlight.getProgram(id));
+            xml.setPhaseDuration(id, ProgramID, phaseIndex, phaseDuration);
+            update_TL();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setPhaseDurationByState(String state, double phaseDuration) {
+        try {
+            String ProgramID = (String) con.do_job_get(Trafficlight.getProgram(id));
+            xml.setPhaseDurationByState(id, ProgramID, state, phaseDuration);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
