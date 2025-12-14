@@ -136,6 +136,14 @@ public class VehicleList {
         return vehiclesData;
     }
 
+    public int getExistingVehCount() {
+        int r = 0;
+        for (VehicleWrap v : vehicles) {
+            if (v.exists()) r++;
+        }
+        return r;
+    }
+
 
     public int getCount() {
         return count;

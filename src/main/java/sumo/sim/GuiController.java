@@ -40,7 +40,7 @@ public class GuiController {
     @FXML
     private Canvas map;
     @FXML
-    private Label timeLabel;
+    private Label timeLabel, vehicleCount;
     @FXML
     private Slider playSlider;
     @FXML
@@ -48,7 +48,7 @@ public class GuiController {
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
     @FXML
-    private TextField amountField;
+    private TextField amountField, stateText;
     @FXML
     private HBox mainButtonBox;
 
@@ -267,6 +267,7 @@ public class GuiController {
     protected void onTrafficLight() {
         sr.setShowTrafficLightIDs(!sr.getShowTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
+
     }
 
     @FXML
@@ -360,11 +361,11 @@ public class GuiController {
     }
 
     public void doSimStep() {
+        // updates UI elements
         updateTime();
         updateDelay();
-        //renderUpdate();
-        // rendering?
-        // connection time_step?
+        updateCountVeh();
+        updateTLPhaseText();
     }
 
     public void updateDelay() {
@@ -401,6 +402,32 @@ public class GuiController {
     protected void onStep() {
         wrapperController.doStepUpdate();
     }
+
+    private void updateCountVeh() {
+        int c = wrapperController.updateCountVehicle(); // updates count everytime a new veh is added
+        int all = wrapperController.getAllVehicleCount();
+        vehicleCount.setText(all+"/"+c);
+    }
+
+    private void updateTLPhaseText() {
+        if (trafficLightMenu.isVisible()) {
+            String[] stateDur = wrapperController.getTlStateDuration(tlSelector.getValue());
+            String text ="";
+            double nextSwitchAbsolute = Double.parseDouble(stateDur[stateDur.length-1]); // returns time when tl is switched
+            double currentTime = wrapperController.getTime(); // current time of sim
+            double remaining = nextSwitchAbsolute - currentTime; // remaining time
+            for (int i=0; i<stateDur.length-2; i++) {
+                text = text + stateDur[i];
+            }
+            text = text + ", dur: "+ remaining +"/"+ stateDur[stateDur.length-2];
+            stateText.setText(text);
+        } else {
+            stateText.setText("");
+        }
+
+        // later: forcing with xml writing and do job get
+    }
+
 
     // Render
 
