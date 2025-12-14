@@ -44,7 +44,7 @@ public class XML {
      * @param phaseIndex
      * @param newDuration
      */
-    public void setPhaseDuration(String id, int phaseIndex, int newDuration){
+    public void setPhaseDuration(String id, int phaseIndex, double newDuration){
         try {
             SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(path);
