@@ -443,6 +443,9 @@ public class GuiController {
                     }
                     startTestButton.setDisable(true);
                 } else {
+                    if(routeSelector.getValue().equals("CUSTOM")) {
+                        addVehicleButton.setDisable(true);
+                    }
                     addVehicleButton.setDisable(false);
                     startTestButton.setDisable(false);
                 }
