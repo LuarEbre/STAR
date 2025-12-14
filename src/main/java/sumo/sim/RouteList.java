@@ -2,11 +2,22 @@ package sumo.sim;
 
 import java.util.*;
 
+/**
+ * The Class for all Routes of the Simulation
+ * Different to other Objects, there is no RouteWrap, instead every RouteOperation is handled here
+ * @author simonr
+ */
 public class RouteList {
 
     private final Map<String, List<String>> allRoutes;
     private  XML xmlReader;
 
+    /**
+     * Constructor for RouteList
+     * uses the rou.xml to read all Routes
+     * @param rouXmlFilePath
+     * @throws Exception
+     */
     public RouteList(String rouXmlFilePath) throws Exception {
 
         // parssing the xml file
@@ -16,10 +27,18 @@ public class RouteList {
 
     }
 
+    /**
+     * Returns all Routes as a Hashmap of their Ids and their Path
+     * @return Map<String,List<String> allRoutes
+     */
     public Map<String, List<String>> getAllRoutes() {
         return allRoutes;
     }
 
+    /**
+     * Returns the ID of every Route
+     * @return allRouteIds
+     */
     public String[] getAllRoutesID() {
         String[] ret = new String[allRoutes.size()+1];
         ret[0] = "CUSTOM";
@@ -32,6 +51,10 @@ public class RouteList {
         return ret;
     }
 
+    /**
+     * Prints every Route
+     * used for debugging
+     */
     public void printRouteList() {
         System.out.println("Route list:");
         for(String key : allRoutes.keySet()) {
@@ -40,6 +63,15 @@ public class RouteList {
         }
     }
 
+    /**
+     * Generates a new Route based on a Start and End Junction
+     * New Route has optimal path of Start to End
+     * adds new Route to RouteList and to rou.xml
+     * @param start ID of startJunction
+     * @param end ID of endJunction
+     * @param routeID ID of new Route
+     * @param jl the JunctionList
+     */
     public void generateRoute(String start, String end, String routeID, JunctionList jl) {
 
         for (JunctionWrap jw : jl.getJunctions()) {
@@ -115,10 +147,19 @@ public class RouteList {
         xmlReader.newRoute(routeID, edgeList);
     }
 
+    /**
+     * Get a specific Route by its ID
+     * @param id
+     * @return Route
+     */
     public List<String> getRouteById(String id) {
             return allRoutes.get(id);
         }
 
+    /**
+     * Checks if RouteList is empty
+     * @return boolean
+     */
     //getter for routecount(use in logic to check if any route is availabl)
     public boolean isRouteListEmpty() {
         return allRoutes.isEmpty();
