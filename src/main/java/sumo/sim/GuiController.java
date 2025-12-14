@@ -319,11 +319,11 @@ public class GuiController {
         String mode = stressTestMode.getValue();
         // experimental
         if (mode.equals("Light Test")) {
-            wrapperController.StressTest(10, Color.GREEN);
+            wrapperController.StressTest(100, Color.GREEN);
         } else if (mode.equals("Medium Test")) {
-            wrapperController.StressTest(100, Color.YELLOW);
+            wrapperController.StressTest(1000, Color.YELLOW);
         } else if (mode.equals("Heavy Test")) {
-            wrapperController.StressTest(1000, Color.RED);
+            wrapperController.StressTest(10000, Color.RED);
         }
     }
 
@@ -437,8 +437,10 @@ public class GuiController {
                 renderUpdate();
 
                 // other functions that should update every frame
-                if(wrapperController.isRouteListEmpty() || routeSelector.getValue().equals("CUSTOM")) {
-                    addVehicleButton.setDisable(true);
+                if(wrapperController.isRouteListEmpty()){
+                    if(routeSelector.getValue().equals("CUSTOM")) {
+                        addVehicleButton.setDisable(true);
+                    }
                     startTestButton.setDisable(true);
                 } else {
                     addVehicleButton.setDisable(false);
