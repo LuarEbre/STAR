@@ -277,4 +277,5 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return vl.getExistingVehCount(); }
     public int getAllVehicleCount() { return vl.getCount(); }
+    public RouteList getRoutes()  { return rl; }
 }

@@ -10,6 +10,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
 
+import java.util.List;
+
 /**
  * Handles the graphical rendering of the SUMO simulation onto a JavaFX {@link Canvas}.
  * <p>
@@ -22,6 +24,7 @@ public class SimulationRenderer {
     private final GraphicsContext gc;
     private final Canvas map;
     boolean showTrafficLightIDs;
+    boolean pickedARoute;
     private double zoom;
     private double camX;
     private double camY;
@@ -32,6 +35,8 @@ public class SimulationRenderer {
     private final VehicleList vl;
     private final TrafficLightList tls;
     private final Font tlFont;
+    private final RouteList rl;
+    private String RouteID;
 
     /**
      * Constructs a new SimulationRenderer called by {@link GuiController}
@@ -54,7 +59,7 @@ public class SimulationRenderer {
      *
      * </p>
      */
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls, RouteList rl) {
         this.showTrafficLightIDs = false;
         this.tlFont = new Font("Arial", 7);
         this.map = canvas;
@@ -63,6 +68,7 @@ public class SimulationRenderer {
         this.jl = jl;
         this.vl = vl;
         this.tls = tls;
+        this.rl = rl;
         this.camX = jl.getCenterPosX(); // center Position is max + min / 2
         this.camY = jl.getCenterPosY();
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
@@ -143,7 +149,35 @@ public class SimulationRenderer {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(scale);
 
-        for (Street s : sl.getStreets()) { // streets
+        List<String> currentRoute = (pickedARoute && RouteID != null) ? rl.getAllRoutes().get(RouteID) : null;
+
+        for (Street s : sl.getStreets()) {
+            String streetId = s.getId();
+
+            if (currentRoute != null && !currentRoute.isEmpty()) {
+
+                String startId = currentRoute.getFirst();
+
+                if (streetId.equals(startId)) {
+                    gc.setStroke(Color.GREEN);
+                    gc.setFill(Color.GREEN);
+                    gc.setLineWidth(8);
+                }
+                else if (currentRoute.contains(streetId)) {
+                    gc.setStroke(Color.RED);
+                    gc.setFill(Color.RED);
+                    gc.setLineWidth(5);
+                }
+                else {
+                    gc.setStroke(Color.BLACK);
+                    gc.setFill(Color.BLACK);
+                    gc.setLineWidth(scale);
+                }
+            } else {
+                gc.setStroke(Color.BLACK);
+                gc.setFill(Color.BLACK);
+                gc.setLineWidth(scale);
+            }
             // stroke Polyline for lanes
             for (LaneWrap l : s.getLanes()) { // lanes of streets
 
@@ -197,6 +231,18 @@ public class SimulationRenderer {
 
     protected boolean getShowTrafficLightIDs() {
         return showTrafficLightIDs;
+    }
+
+    protected void setPickedARoute(boolean pickedARoute) {
+        this.pickedARoute = pickedARoute;
+    }
+
+    protected void setPickedRouteID(String routeID) {
+        this.RouteID = routeID;
+    }
+
+    protected boolean getPickedARoute() {
+        return pickedARoute;
     }
 
     /**
