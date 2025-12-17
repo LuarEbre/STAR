@@ -173,23 +173,15 @@ public class SimulationRenderer {
 
                 if (streetId.equals(startId)) {
                     gc.setStroke(Color.GREEN);
-                    gc.setFill(Color.GREEN);
-                    gc.setLineWidth(8);
                 }
                 else if (currentRoute.contains(streetId)) {
                     gc.setStroke(Color.RED);
-                    gc.setFill(Color.RED);
-                    gc.setLineWidth(5);
                 }
                 else {
                     gc.setStroke(Color.BLACK);
-                    gc.setFill(Color.BLACK);
-                    gc.setLineWidth(scale);
                 }
             } else {
                 gc.setStroke(Color.BLACK);
-                gc.setFill(Color.BLACK);
-                gc.setLineWidth(scale);
             }
             // stroke Polyline for lanes
             if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
@@ -224,7 +216,6 @@ public class SimulationRenderer {
                 if (rawX.length >= 2) {
                     // if there are at least 2 values in pointCount -> it's a line e.g. : [54.7, 38.75]
                     gc.setFill(Color.BLACK);
-                    gc.setStroke(Color.BLACK);
                     gc.setLineWidth(5); // should be adjustable
                     gc.setLineDashes(null);
                     gc.strokePolyline(rawX, rawY, rawX.length);

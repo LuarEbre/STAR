@@ -668,9 +668,6 @@ public class GuiController {
         gc = staticMap.getGraphicsContext2D();
 
         sr = new SimulationRenderer(staticMap,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
-                wrapperController.getVehicles(), wrapperController.getTrafficLights());
-        gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
                 wrapperController.getVehicles(), wrapperController.getTrafficLights(), wrapperController.getRoutes());
         renderUpdate();
     }

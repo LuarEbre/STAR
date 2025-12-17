@@ -43,8 +43,11 @@ public class WrapperController {
     //public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_kfz.net.xml";
     //public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt_routes_only.xml";
 
-    public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.net.xml";
-    public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.rou.xml";
+    // public static String currentNet = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.net.xml";
+    // public static String currentRou = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.rou.xml";
+
+    public static String currentNet = "src/main/resources/SumoConfig/rugmap/RugMap.net.xml";
+    public static String currentRou = "src/main/resources/SumoConfig/rugmap/RugMap.rou.xml";
 
     //public static String currentNet = "src/main/resources/SumoConfig/Map_2/test.net.xml";
     //public static String currentRou = "src/main/resources/SumoConfig/Map_2/test.rou.xml";
@@ -64,7 +67,8 @@ public class WrapperController {
         // config knows both .rou and .net XMLs
         //String configFile = "src/main/resources/SumoConfig/RedLightDistrict/redlightdistrict.sumocfg";
         //String configFile = "src/main/resources/SumoConfig/Map_2/test.sumocfg";
-        String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
+        String configFile = "src/main/resources/SumoConfig/rugmap/rugmap.sumocfg";
+        // String configFile = "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg";
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
