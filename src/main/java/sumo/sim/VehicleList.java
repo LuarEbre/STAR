@@ -6,6 +6,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,6 +39,7 @@ public class VehicleList {
      * @param route desired route
      */
     public void addVehicle(int n, String type, String route, Color color) { // more arguments later? maybe overloaded methods with different args.
+        ArrayList<VehicleWrap> newVehicles = new ArrayList<>(n);
         try {
             for (int i=0; i<n; i++) {
                 con.do_job_set(Vehicle.addFull("v" + count, route, type, // ids -> latest car id
@@ -45,12 +47,14 @@ public class VehicleList {
                         "current", "max", "current", "",
                         "", "", 0, 0)
                 );
-                vehicles.add(new VehicleWrap("v" + count, con, type, route, color)); // adds new vehicle
+                //vehicles.add(new VehicleWrap("v" + count, con, type, route, color)); // adds new vehicle
+                newVehicles.add(new VehicleWrap("v"+count, con, type, route, color));
                 count++; // increment to prevent identical car ids
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        vehicles.addAll(newVehicles); // thread save list is really slow
     }
 
     /**
@@ -73,11 +77,15 @@ public class VehicleList {
     public void updateAllVehicles() {
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList());
+            HashSet<String> activeIDs = new HashSet<>(list); // much faster
             for (VehicleWrap v : vehicles) {
-
-                if (list.contains(v.getID())) {
-                    v.setExists(true);
-                    v.updateVehicle();
+                if (activeIDs.contains(v.getID())) {
+                    try {
+                        v.updateVehicle();
+                        v.setExists(true);
+                    } catch (Exception e) {
+                        v.setExists(false); // if vehicle despawns
+                    }
                 } else {
                     v.setExists(false);
                 }
@@ -93,7 +101,9 @@ public class VehicleList {
     public ArrayList<Point2D.Double> getAllPositions() {
         ArrayList<Point2D.Double> positions = new ArrayList<>();
         for (VehicleWrap v : vehicles) {
-            positions.add(v.getPosition());
+            if (v.exists() && v.getPosition() != null) {
+                positions.add(v.getPosition());
+            }
         }
         return positions;
     }
