@@ -410,7 +410,10 @@ public class GuiController {
      */
     @FXML
     protected void onAdd(){
+        sr.setPickedARoute(!sr.getPickedARoute());
         toggleMenuAtButton(addMenu, addButton);
+        String Route = routeSelector.getValue();
+        sr.setPickedRouteID(Route);
     }
 
     /**
@@ -631,6 +634,11 @@ public class GuiController {
                     addVehicleButton.setDisable(false);
                     startTestButton.setDisable(false);
                 }
+
+                if(addMenu.isVisible() && !(routeSelector.getValue().isEmpty())){
+                    String Route = routeSelector.getValue();
+                    sr.setPickedRouteID(Route);
+                }
             }
         };
         renderLoop.start(); // runs 60 frames per second
@@ -657,7 +665,7 @@ public class GuiController {
     public void initializeRender(){
         gc = map.getGraphicsContext2D();
         sr = new SimulationRenderer(map,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
-                wrapperController.getVehicles(), wrapperController.getTrafficLights());
+                wrapperController.getVehicles(), wrapperController.getTrafficLights(), wrapperController.getRoutes());
         renderUpdate();
     }
 
@@ -680,10 +688,10 @@ public class GuiController {
         Color color = colorSelector.getValue();
         String type = typeSelector.getValue();
         String route = routeSelector.getValue();
+
         if(route == null) {
             route = "r0"; // if route count == 0 -> disable add button, disable stress test start
         }
-
         wrapperController.addVehicle(amount, type, route, color);
     }
 
