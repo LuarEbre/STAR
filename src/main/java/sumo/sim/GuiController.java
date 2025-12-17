@@ -52,7 +52,7 @@ public class GuiController {
     @FXML
     private Spinner <Integer> delaySelect, durationTL;
     @FXML
-    private Canvas map;
+    private Canvas staticMap, dynamicMap;
     @FXML
     private Label timeLabel, vehicleCount;
     @FXML
@@ -249,8 +249,10 @@ public class GuiController {
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20)); // 20 percent of the width
         // scales map based on pane width and height
-        map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
-        map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+        staticMap.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
+        staticMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+       // dynamicMap.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
+       // dynamicMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
         mainButtonBox.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.8));
 
        // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
@@ -663,6 +665,10 @@ public class GuiController {
      * </p>
      */
     public void initializeRender(){
+        gc = staticMap.getGraphicsContext2D();
+
+        sr = new SimulationRenderer(staticMap,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
+                wrapperController.getVehicles(), wrapperController.getTrafficLights());
         gc = map.getGraphicsContext2D();
         sr = new SimulationRenderer(map,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
                 wrapperController.getVehicles(), wrapperController.getTrafficLights(), wrapperController.getRoutes());
@@ -692,6 +698,7 @@ public class GuiController {
         if(route == null) {
             route = "r0"; // if route count == 0 -> disable add button, disable stress test start
         }
+
         wrapperController.addVehicle(amount, type, route, color);
     }
 
@@ -721,13 +728,13 @@ public class GuiController {
      * </p>
      */
     public void mapPan() {
-        map.setOnMousePressed(event -> {
+        staticMap.setOnMousePressed(event -> {
             mousePressedXOld = event.getX(); // old
             mousePressedYOld = event.getY();
             //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
         });
         // drag start with pressed -> then this follows
-        map.setOnMouseDragged(e->{
+        staticMap.setOnMouseDragged(e->{
             mousePressedXNew = e.getX();
             mousePressedYNew = e.getY();
             //System.out.println("NewX"+mousePressedXNew + " NewY " + mousePressedYNew);
