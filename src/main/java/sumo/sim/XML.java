@@ -162,7 +162,7 @@ public class XML {
                 int event = reader.next();
 
                 if (event == XMLStreamConstants.START_ELEMENT &&
-                        reader.getLocalName().equals("edge")) {
+                        reader.getLocalName().equals("edge")){
 
                     String id = reader.getAttributeValue(null, "id");
                     String from = reader.getAttributeValue(null, "from");
@@ -309,7 +309,5 @@ public class XML {
             throw new RuntimeException("Error writing new route to XML.", e);
         }
     }
-
-
 
 }
