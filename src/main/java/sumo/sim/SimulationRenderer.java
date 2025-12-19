@@ -1,6 +1,5 @@
 package sumo.sim;
 
-import de.tudresden.sumo.cmd.Junction;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ScrollEvent;
@@ -10,7 +9,7 @@ import javafx.geometry.VPos;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
-
+import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
@@ -22,9 +21,14 @@ import java.util.List;
  * </p>
  */
 public class SimulationRenderer {
+
+    boolean showTrafficLightIDs;
+    boolean showDensityAnchor;
+    boolean showRouteHighlighting;
+    boolean seeTrafficLightIDs;
+
     private final GraphicsContext gc;
     private final Canvas map;
-    boolean showTrafficLightIDs;
     boolean pickedARoute;
     private double zoom;
     private double camX;
@@ -66,7 +70,13 @@ public class SimulationRenderer {
      * </p>
      */
     public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls, RouteList rl) {
-        this.showTrafficLightIDs = false;
+
+        this.showTrafficLightIDs = true;
+        this.showRouteHighlighting = true;
+        this.showDensityAnchor = true;
+
+        this.seeTrafficLightIDs = false;
+
         this.tlFont = new Font("Arial", 7);
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
@@ -167,7 +177,7 @@ public class SimulationRenderer {
         for (Street s : sl.getStreets()) {
             String streetId = s.getId();
 
-            if (currentRoute != null && !currentRoute.isEmpty()) {
+            if (currentRoute != null && !currentRoute.isEmpty() && showRouteHighlighting) {
 
                 String startId = currentRoute.getFirst();
 
@@ -216,7 +226,7 @@ public class SimulationRenderer {
                 if (rawX.length >= 2) {
                     // if there are at least 2 values in pointCount -> it's a line e.g. : [54.7, 38.75]
                     gc.setFill(Color.BLACK);
-                    gc.setLineWidth(5); // should be adjustable
+                    gc.setLineWidth(3.3); // should be adjustable
                     gc.setLineDashes(null);
                     gc.strokePolyline(rawX, rawY, rawX.length);
                 }
@@ -273,7 +283,8 @@ public class SimulationRenderer {
         }
         renderVehicle();
         renderTrafficLight();
-        if (showTrafficLightIDs) displayTrafficLights();
+        if (showDensityAnchor) renderDensityAnchor();
+        if (showTrafficLightIDs && seeTrafficLightIDs) displayTrafficLights();
     }
 
     private void updateViewportBounds() {
@@ -284,26 +295,6 @@ public class SimulationRenderer {
         this.viewMaxX = camX + (viewWidthWorld / 2);
         this.viewMinY = camY - (viewHeightWorld / 2);
         this.viewMaxY = camY + (viewHeightWorld / 2);
-    }
-
-    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) {
-        this.showTrafficLightIDs = showTrafficLightIDs;
-    }
-
-    protected boolean getShowTrafficLightIDs() {
-        return showTrafficLightIDs;
-    }
-
-    protected void setPickedARoute(boolean pickedARoute) {
-        this.pickedARoute = pickedARoute;
-    }
-
-    protected void setPickedRouteID(String routeID) {
-        this.RouteID = routeID;
-    }
-
-    protected boolean getPickedARoute() {
-        return pickedARoute;
     }
 
     /**
@@ -372,6 +363,22 @@ public class SimulationRenderer {
             gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
 
             gc.restore(); // restores previous
+        }
+    }
+
+    /**
+     * draws a "density anchor" on the road network, this shows the average car position, which is helpful for visualizing congestion
+     */
+    private void renderDensityAnchor() {
+        Point2D.Double meanPos = vl.getMeanPosition();
+        if (meanPos != null) {
+            double width = 5;
+            // subtracting half the width to account for oval center
+            gc.setFill(Color.rgb(220, 35, 15, 0.8));
+            gc.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
+            width += 2;
+            gc.setFill(Color.rgb(220, 35, 15, 0.2));
+            gc.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
         }
     }
 
@@ -465,6 +472,18 @@ public class SimulationRenderer {
     public void zoomMap(double z) {
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
+
+    protected void setSeeTrafficLightIDs(boolean seeTrafficLightIDs) { this.seeTrafficLightIDs = seeTrafficLightIDs; }
+    protected boolean getSeeTrafficLightIDs() { return seeTrafficLightIDs; }
+    protected void setShowDensityAnchor(boolean showDensityAnchor) { this.showDensityAnchor = showDensityAnchor; }
+    protected boolean getShowDensityAnchor() { return this.showDensityAnchor; }
+    protected void setShowRouteHighlighting(boolean showRouteHighlighting) { this.showRouteHighlighting = showRouteHighlighting; }
+    protected boolean getShowRouteHighlighting() { return this.showRouteHighlighting; }
+    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) { this.showTrafficLightIDs = showTrafficLightIDs; }
+    protected boolean getShowTrafficLightIDs() { return this.showTrafficLightIDs; }
+    protected void setPickedARoute(boolean pickedARoute) { this.pickedARoute = pickedARoute; }
+    protected void setPickedRouteID(String routeID) { this.RouteID = routeID; }
+    protected boolean getPickedARoute() { return pickedARoute; }
 }
 
 
