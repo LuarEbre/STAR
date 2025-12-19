@@ -47,6 +47,9 @@ public class GuiController {
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton;
+
+    private ButtonBase[] allButtons;
+
     @FXML
     private Spinner <Integer> delaySelect, durationTL;
     @FXML
@@ -134,7 +137,15 @@ public class GuiController {
             i++;
         }
 
-        // Drop down menus
+        allButtons = new ButtonBase[]{
+                playButton,
+                selectButton,
+                addButton,
+                stressTestButton,
+                trafficLightButton,
+                stepButton
+        };
+
         String[] modes = { "Light Test" , "Medium Test" , "Heavy Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         stressTestMode.setValue(modes[0]);
@@ -472,6 +483,17 @@ public class GuiController {
     protected void onViewHover(){
         closeAllMenus();
         viewMenuSelect.setVisible(true);
+    }
+
+    @FXML void onDataOutputToggle() {
+
+    }
+
+    @FXML void onButtonToggle() {
+        for(ButtonBase button: allButtons) {
+            button.setDisable(!showButtons.isSelected());
+            button.setVisible(showButtons.isSelected());
+        }
     }
 
     @FXML
