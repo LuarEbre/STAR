@@ -119,7 +119,6 @@ public class WrapperController {
                 terminate(); // if connection is closed terminate instantly
                 return;
             }
-
             try {
                 doStepUpdate(); // sim step
             } catch (IllegalStateException e) {
