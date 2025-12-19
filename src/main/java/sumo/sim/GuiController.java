@@ -10,14 +10,12 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import java.util.function.UnaryOperator;
-
 import javafx.scene.paint.Color;
 
 /**
@@ -65,6 +63,8 @@ public class GuiController {
     private TextField amountField, stateText;
     @FXML
     private HBox mainButtonBox;
+    @FXML
+    private CheckBox showDensityAnchor, showDataOutput, showButtons, showRouteHighlighting, showTrafficLightIDs;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
@@ -384,14 +384,14 @@ public class GuiController {
     /**
      * <p>
      *     Called when "traffic light button" is pressed.
-     *     <li> Calls {@link SimulationRenderer#setShowTrafficLightIDs(boolean)}.</li>
+     *     <li> Calls {@link SimulationRenderer#setSeeTrafficLightIDs(boolean)}.</li>
      *     <li> Displays TL menu via {@link #toggleMenuAtButton(Pane, Node)}.</li>
      * </p>
      *
      */
     @FXML
     protected void onTrafficLight() {
-        sr.setShowTrafficLightIDs(!sr.getShowTrafficLightIDs());
+        sr.setSeeTrafficLightIDs(!sr.getSeeTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
     }
 
@@ -472,6 +472,21 @@ public class GuiController {
     protected void onViewHover(){
         closeAllMenus();
         viewMenuSelect.setVisible(true);
+    }
+
+    @FXML
+    protected void onDensityAnchorToggle() {
+        sr.setShowDensityAnchor(showDensityAnchor.isSelected());
+    }
+
+    @FXML
+    protected void onRouteHighlightingToggle() {
+        sr.setShowRouteHighlighting(showRouteHighlighting.isSelected());
+    }
+
+    @FXML
+    protected void onTrafficLightIDToggle() {
+        sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected());
     }
 
     @FXML

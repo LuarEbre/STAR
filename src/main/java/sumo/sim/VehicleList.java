@@ -21,6 +21,7 @@ public class VehicleList {
     private final CopyOnWriteArrayList<VehicleWrap> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
+    private int activeCount; // vehicles currently on the road network
     // needs possible routes maybe? for car creation
 
     /**
@@ -78,6 +79,7 @@ public class VehicleList {
         try {
             SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList());
             HashSet<String> activeIDs = new HashSet<>(list); // much faster
+            this.activeCount = activeIDs.size();
             for (VehicleWrap v : vehicles) {
                 if (activeIDs.contains(v.getID())) {
                     try {
@@ -176,6 +178,20 @@ public class VehicleList {
             if (v.exists()) r++;
         }
         return r;
+    }
+
+    public Point2D.Double getMeanPosition() {
+        double meanX = 0;
+        double meanY = 0;
+        for (VehicleWrap v : this.vehicles) {
+            if(v.exists()) {
+                meanX += v.getPosition().x;
+                meanY += v.getPosition().y;
+            }
+        }
+        meanX /= this.activeCount;
+        meanY /= this.activeCount;
+        return new Point2D.Double(meanX, meanY);
     }
 
     /**
