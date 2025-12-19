@@ -102,8 +102,8 @@
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <CheckBox selected="true" styleClass="viewLabel" text="Data Output" fx:id="showDataOutput"/>
-                        <CheckBox selected="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false"  styleClass="viewLabel" text="Buttons" fx:id="showButtons"/>
+                        <CheckBox selected="true" styleClass="viewLabel" text="Data Output" fx:id="showDataOutput" onAction="#onDataOutputToggle"/>
+                        <CheckBox selected="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false"  styleClass="viewLabel" text="Buttons" fx:id="showButtons" onAction="#onButtonToggle"/>
                         <CheckBox selected="true" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" styleClass="viewLabel" text="Density Anchor" fx:id="showDensityAnchor" onAction="#onDensityAnchorToggle"/>
                         <CheckBox selected="true" layoutX="10.0" layoutY="45.0" mnemonicParsing="false" styleClass="viewLabel" text="Route Highlighting" wrapText="true" fx:id="showRouteHighlighting" onAction="#onRouteHighlightingToggle"/>
                         <CheckBox selected="true" layoutX="10.0" layoutY="60.0" mnemonicParsing="false" styleClass="viewLabel" text="Traffic Light IDs" fx:id="showTrafficLightIDs" onAction="#onTrafficLightIDToggle"/>
