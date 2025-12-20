@@ -17,6 +17,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -47,6 +48,9 @@ public class GuiController {
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton;
+
+    private ButtonBase[] allButtons;
+
     @FXML
     private Spinner <Integer> delaySelect, durationTL;
     @FXML
@@ -69,6 +73,9 @@ public class GuiController {
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
+
+    // dragging window
+    private double xOffset, yOffset;
 
     // panning
     private double mousePressedXOld;
@@ -134,7 +141,15 @@ public class GuiController {
             i++;
         }
 
-        // Drop down menus
+        allButtons = new ButtonBase[]{
+                playButton,
+                selectButton,
+                addButton,
+                stressTestButton,
+                trafficLightButton,
+                stepButton
+        };
+
         String[] modes = { "Light Test" , "Medium Test" , "Heavy Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         stressTestMode.setValue(modes[0]);
@@ -232,6 +247,20 @@ public class GuiController {
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
         addVehicleButton.setDisable(true);
+    }
+
+    @FXML
+    private void mouseClicked(MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
+
+    @FXML
+    private void dragWindow(MouseEvent event) {
+        Stage stage = (Stage) root.getScene().getWindow();
+        if (stage.isFullScreen()) return;
+        stage.setX(event.getScreenX() - xOffset);
+        stage.setY(event.getScreenY() - yOffset);
     }
 
     /**
@@ -472,6 +501,32 @@ public class GuiController {
     protected void onViewHover(){
         closeAllMenus();
         viewMenuSelect.setVisible(true);
+    }
+
+    @FXML void onDataOutputToggle() {
+
+    }
+
+    @FXML void onButtonToggle() {
+        for(ButtonBase button: allButtons) {
+            button.setDisable(!showButtons.isSelected());
+            button.setVisible(showButtons.isSelected());
+        }
+    }
+
+    @FXML
+    protected void onDensityAnchorToggle() {
+        sr.setShowDensityAnchor(showDensityAnchor.isSelected());
+    }
+
+    @FXML
+    protected void onRouteHighlightingToggle() {
+        sr.setShowRouteHighlighting(showRouteHighlighting.isSelected());
+    }
+
+    @FXML
+    protected void onTrafficLightIDToggle() {
+        sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected());
     }
 
     @FXML
