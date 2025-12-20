@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -17,6 +18,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -72,6 +74,9 @@ public class GuiController {
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
+
+    // dragging window
+    private double xOffset, yOffset;
 
     // panning
     private double mousePressedXOld;
@@ -243,6 +248,20 @@ public class GuiController {
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
         addVehicleButton.setDisable(true);
+    }
+
+    @FXML
+    private void mouseClicked(MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
+
+    @FXML
+    private void dragWindow(MouseEvent event) {
+        Stage stage = (Stage) root.getScene().getWindow();
+        if (stage.isFullScreen()) return;
+        stage.setX(event.getScreenX() - xOffset);
+        stage.setY(event.getScreenY() - yOffset);
     }
 
     /**
