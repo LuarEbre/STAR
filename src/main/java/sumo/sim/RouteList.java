@@ -40,7 +40,7 @@ public class RouteList {
      * @return allRouteIds
      */
     public String[] getAllRoutesID() {
-        String[] ret = new String[allRoutes.size()+1];
+        String[] ret = new String[allRoutes.size()];
         int i = 0;
         for (String key : allRoutes.keySet()) {
             ret[i] = key;

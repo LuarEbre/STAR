@@ -426,6 +426,7 @@ public class SimulationRenderer {
      * @param z
      */
     public void zoomMap(double z) {
+        // should have a zoom min and max cap based on map scale
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
 }
