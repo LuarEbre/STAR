@@ -21,6 +21,8 @@ public class JunctionWrap {
     private final Point2D.Double position;
     private final SumoTraciConnection con;
     private String type; // dead end , tl
+    private boolean spawnable; // true -> to display start points
+
     private double[] shapeX;
     private double[] shapeY;
     private double minX, maxX, minY, maxY;
@@ -37,6 +39,7 @@ public class JunctionWrap {
     public JunctionWrap(String id, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
+        this.spawnable = false;
         try {
             SumoPosition2D pos2D = (SumoPosition2D) this.con.do_job_get(Junction.getPosition(id)); // position
             this.position = new Point2D.Double(pos2D.x, pos2D.y);
@@ -58,29 +61,12 @@ public class JunctionWrap {
     }
 
     /**
-     * Get the ID of a Junction
-     * @return id
-     */
-    public String getID() {
-        return id;
-    }
-
-    /**
      * Set the Distance of one Junction.
      * Only used for Route generation
      * @param distance
      */
     public void setDistance(double distance) {
         this.distance = distance;
-    }
-
-    /**
-     * Get the Distance of one Junction
-     * Only used for Route generation
-     * @return distance
-     */
-    public double getDistance() {
-        return distance;
     }
 
     /**
@@ -93,15 +79,6 @@ public class JunctionWrap {
     }
 
     /**
-     * Get the Predecessor of one Junction
-     * Only used for Route generation
-     * @return predecessor
-     */
-    public String getPredecessor() {
-        return predecessor;
-    }
-
-    /**
      * Calculate and returns the distance of this junction to Junction u
      * @param u
      * @return distance to Junction u
@@ -110,29 +87,6 @@ public class JunctionWrap {
         return abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
     }
 
-    /**
-     * Get the Position of one Junction
-     * @return position
-     */
-    public Point2D.Double getPosition() {
-        return position;
-    }
-
-    /**
-     * Get the X shape for one Junction
-     * @return shapeX
-     */
-    public double[] getShapeX() {
-        return shapeX;
-    }
-
-    /**
-     * Get the Y shape for one Junction
-     * @return shapeY
-     */
-    public double[] getShapeY() {
-        return shapeY;
-    }
 
     public void calculateBounds() {
         minX = Double.MAX_VALUE;
@@ -151,9 +105,32 @@ public class JunctionWrap {
 
     }
 
+    // getter
+
     public double getMinX() { return minX; }
     public double getMaxX() { return maxX; }
     public double getMinY() { return minY; }
     public double getMaxY() { return maxY; }
+
+
+    public Point2D.Double getPosition() {
+        return position;
+    }
+    public String getID() {
+        return id;
+    }
+    public double getDistance() {
+        return distance;
+    }
+    public String getPredecessor() {
+        return predecessor;
+    }
+    public double[] getShapeX() {
+        return shapeX;
+    }
+    public double[] getShapeY() {
+        return shapeY;
+    }
+    public boolean isSpawnable() { return spawnable; }
 }
 

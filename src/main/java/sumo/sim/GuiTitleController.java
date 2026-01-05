@@ -27,8 +27,8 @@ public class GuiTitleController {
             Scene scene = new Scene(root);
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
             stage.setScene(scene);
-            WrapperController wrapper = new WrapperController(guiController);
-            guiController.initializeCon(wrapper);
+            //WrapperController wrapper = new WrapperController(guiController);
+            //guiController.initializeCon(wrapper);
 
             stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
             //stage.initStyle(StageStyle.UNDECORATED); // removes frame and title

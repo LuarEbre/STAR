@@ -37,8 +37,13 @@ public class TrafficLightList {
             for (var entry : TLData.entrySet()) {
                 String id = entry.getKey();
                 Map<String, String> attributes = entry.getValue();
+                try {
+                    TrafficLightWrap tl = new TrafficLightWrap(id, attributes, con);
+                    trafficlights.add(tl);
 
-                trafficlights.add(new TrafficLightWrap(id, attributes, con));
+                } catch (Exception e) {
+                    System.out.println(e.getMessage()); // fails if not known in Sumo and skips tl
+                }
             }
 
         } catch (Exception e) {

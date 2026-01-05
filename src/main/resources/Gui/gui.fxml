@@ -79,9 +79,9 @@
 
             <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" onMouseExited="#closeAllMenus" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button layoutX="373.0" layoutY="241.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="34.0" />
+                  <Button fx:id="map1select" onAction="#changeToMap1" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
+                  <Button fx:id="map2select" onAction="#changeToMap2" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
+                  <Button text="Import" layoutX="313.0" layoutY="241.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" />
                   <Label layoutX="14.0" layoutY="241.0" styleClass="topMenuLabel" text="Real-Time Traffic Simulation with Java v1.0" textFill="VIOLET">
                      <font>
                         <Font size="9.0" />
@@ -102,7 +102,7 @@
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <CheckBox fx:id="showDataOutput" onAction="#onDataOutputToggle" selected="true" styleClass="viewLabel" text="Data Output" />
+                        <CheckBox fx:id="dataView" selected="true" styleClass="viewLabel" text="Data" />
                         <CheckBox fx:id="showButtons" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onButtonToggle" selected="true" styleClass="viewLabel" text="Buttons" />
                         <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="true" styleClass="viewLabel" text="Density Anchor" />
                         <CheckBox fx:id="showRouteHighlighting" layoutX="10.0" layoutY="45.0" mnemonicParsing="false" onAction="#onRouteHighlightingToggle" selected="true" styleClass="viewLabel" text="Route Highlighting" wrapText="true" />

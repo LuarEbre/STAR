@@ -14,7 +14,7 @@ public class StreetList {
     // List of streets (like TL_List)
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
-    private SumoTraciConnection connection;
+    private final SumoTraciConnection connection;
 
     /**
      * Initializes the {@link Street} objects inside the List via {@link XML#readAllEdges()}
@@ -30,7 +30,13 @@ public class StreetList {
                 String id = entry.getKey();
                 String from = entry.getValue()[0];
                 String to = entry.getValue()[1];
-                streets.add(new Street(id, from, to, con));
+                try {
+                    // if id is not known -> error , needs to be checked in other lists too
+                    Street s = new Street(id, from, to, con);
+                    streets.add(s);
+                } catch (RuntimeException e) {
+                    // System.out.println("Info: Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
