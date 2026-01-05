@@ -111,7 +111,6 @@ public class WrapperController {
                 terminate(); // if connection is closed terminate instantly
                 return;
             }
-
             try {
                 doStepUpdate(); // sim step
             } catch (IllegalStateException e) {
@@ -327,6 +326,7 @@ public class WrapperController {
     public StreetList getStreets() { return sl; }
     public VehicleList getVehicles() { return vl; }
     public TrafficLightList getTrafficLights() { return tl; }
+    public RouteList getRoutes()  { return rl; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -335,4 +335,5 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
+    
 }
