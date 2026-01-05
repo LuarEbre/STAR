@@ -24,13 +24,14 @@ import java.util.Objects;
 //GUI application
 public class GuiApplication extends Application {
     private static GuiController guiController; // static because you dont instance guiCon -> javafx instances the controller
+    private WrapperController wrapper;
 
     /**
      * Loads FXML file and CSS file and sets the stage
      *
      * <p>
      *     When loading and setting the FXML file. {@link GuiController} is created by JavaFX
-     *     and {@link WrapperController#WrapperController(GuiController)} constructor is called to enable the connection
+     *     and WrapperController constructor is called to enable the connection
      *     between GUI and Simulation
      * </p>
      * @param stage , visible JavaFX frame acting as root element and containing all FXML (GUI) objects
@@ -72,8 +73,20 @@ public class GuiApplication extends Application {
         stage.show(); // display gui
 
         // Establishing connection between WrappCon and GuiCon
-        WrapperController wrapper = new WrapperController(guiController);
-        guiController.initializeCon(wrapper);
 
+        SumoMapManager mapManager = new SumoMapManager(); // initializes Maps
+        wrapper = new WrapperController(guiController, mapManager);
+        guiController.initializeCon(wrapper);
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if (this.wrapper != null) {
+            this.wrapper.terminate();
+        }
+        // JavaFx stop
+        super.stop();
+        // Forces termination of all threads
+        System.exit(0);
     }
 }
