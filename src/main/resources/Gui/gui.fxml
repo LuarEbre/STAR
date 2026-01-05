@@ -102,8 +102,8 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="146.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <CheckBox selected="true" styleClass="viewLabel" text="Data" />
-                        <CheckBox layoutX="10.0" layoutY="10.0" mnemonicParsing="false" selected="true" styleClass="viewLabel" text="Buttons" />
+                        <CheckBox fx:id="dataView" selected="true" styleClass="viewLabel" text="Data" />
+                        <CheckBox fx:id="buttonView" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" selected="true" styleClass="viewLabel" text="Buttons" />
                         <CheckBox layoutX="10.0" layoutY="28.0" mnemonicParsing="false" styleClass="viewLabel" text="Extra " />
                         <CheckBox layoutX="10.0" layoutY="45.0" mnemonicParsing="false" styleClass="viewLabel" text="Pro" />
                      </children>

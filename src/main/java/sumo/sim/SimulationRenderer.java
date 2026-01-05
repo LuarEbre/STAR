@@ -23,6 +23,7 @@ public class SimulationRenderer {
     private final GraphicsContext gc;
     private final Canvas map;
     boolean showTrafficLightIDs;
+    boolean showSelectablePoints;
     private double zoom;
     private double camX;
     private double camY;
@@ -269,6 +270,14 @@ public class SimulationRenderer {
         return showTrafficLightIDs;
     }
 
+    protected void setSelectablePoints(boolean p) {
+        this.showSelectablePoints = p;
+    }
+
+    protected boolean getSelectablePoints() {
+        return showSelectablePoints;
+    }
+
     /**
      * Renders text labels for Traffic Light IDs at their respective positions.
      * <p>
@@ -301,6 +310,10 @@ public class SimulationRenderer {
             // restore previously saved GraphicsContext
             gc.restore();
         }
+    }
+
+    private void displaySelectablePoints() {
+
     }
 
     /**

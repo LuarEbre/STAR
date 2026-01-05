@@ -62,6 +62,8 @@ public class GuiController {
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
     @FXML
+    private CheckBox buttonView, dataView;
+    @FXML
     private TextField amountField, stateText;
     @FXML
     private HBox mainButtonBox;
@@ -417,9 +419,10 @@ public class GuiController {
      */
     @FXML
     protected void onSelect(){
-        if (selectButton.isSelected()) { // toggled
+        if (selectButton.isSelected()) {
+
         } else {
-            System.out.println("Stopped");
+
         }
     }
 
@@ -641,18 +644,31 @@ public class GuiController {
             @Override
             public void handle(long timestamp) {
                 renderUpdate();
-
-                // other functions that should update every frame
-                if(wrapperController.isRouteListEmpty()) {
-                    addVehicleButton.setDisable(true);
-                    startTestButton.setDisable(true);
-                } else {
-                    addVehicleButton.setDisable(false);
-                    startTestButton.setDisable(false);
-                }
+                checkPerFrame();
             }
         };
         renderLoop.start(); // runs 60 frames per second
+    }
+
+    private void checkPerFrame(){
+        // Only allow injection if there are routes
+        if(wrapperController.isRouteListEmpty()) {
+            addVehicleButton.setDisable(true);
+            startTestButton.setDisable(true);
+        } else {
+            addVehicleButton.setDisable(false);
+            startTestButton.setDisable(false);
+        }
+
+        if (!dataView.isSelected()) {
+            staticMap.widthProperty().bind(middlePane.widthProperty());
+            staticMap.heightProperty().bind(middlePane.heightProperty());
+            dataPane.setVisible(false);
+        } else {
+            dataPane.setVisible(true);
+            rescale();
+        }
+
     }
 
     private void stopRenderer() {

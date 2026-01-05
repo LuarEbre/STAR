@@ -101,7 +101,7 @@ public class WrapperController {
      */
     public void start() { // maybe with connection as argument? closing connection opened prior
         if (executor != null && !executor.isShutdown()) {
-            terminate();
+            return;
         }
         executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly
         executor.scheduleAtFixedRate(() -> {
@@ -161,9 +161,11 @@ public class WrapperController {
     public void changeDelay(int delay) {
         this.delay = delay;
         if (!executor.isShutdown() && executor!= null) {
-            executor.shutdown();
-            start();
+            executor.shutdownNow();
         }
+        terminated = false;
+        paused = false;
+        start();
     }
 
     /**
