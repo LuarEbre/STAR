@@ -17,8 +17,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import java.util.function.UnaryOperator;
-
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -48,11 +48,14 @@ public class GuiController {
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;;
+
+    private ButtonBase[] allButtons;
+
     @FXML
     private Spinner <Integer> delaySelect, durationTL;
     @FXML
-    private Canvas map;
+    private Canvas staticMap, dynamicMap;
     @FXML
     private Label timeLabel, vehicleCount;
     @FXML
@@ -62,14 +65,20 @@ public class GuiController {
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
     @FXML
+    private CheckBox buttonView, dataView;
+    @FXML
     private TextField amountField, stateText;
     @FXML
     private HBox mainButtonBox;
+    @FXML
+    private CheckBox showDensityAnchor, showDataOutput, showButtons, showRouteHighlighting, showTrafficLightIDs;
 
-    // rendering
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
+
+    // dragging window
+    private double xOffset, yOffset;
 
     // panning
     private double mousePressedXOld;
@@ -92,8 +101,8 @@ public class GuiController {
      * @author Leandro Liuzzo
      */
     public GuiController() {
-        defaultDelay = 50;
-        maxDelay = 999;
+        this.defaultDelay = 50;
+        this.maxDelay = 999;
         panSen = 2;
     }
 
@@ -118,9 +127,27 @@ public class GuiController {
      */
     public void initializeCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
-        initializeRender();
+
+        // allows map switching
+        map1select.setDisable(false);
+        map2select.setDisable(false);
 
         // initializing which is only possible after wrapper con was created
+        initializeDropDowns();
+
+        // rendering
+        stopRenderer(); // stops animation timer if already active
+        initializeRender();
+
+        // initializes map pan
+        mapPan();
+
+        // starts renderer loop
+        startRenderer();
+    }
+
+    private void initializeDropDowns() {
+        if (wrapperController==null) return;
 
         // displays all available types found in xml
         String[] arr = wrapperController.getTypeList();
@@ -135,7 +162,15 @@ public class GuiController {
             i++;
         }
 
-        // Drop down menus
+        allButtons = new ButtonBase[]{
+                playButton,
+                selectButton,
+                addButton,
+                stressTestButton,
+                trafficLightButton,
+                stepButton
+        };
+
         String[] modes = { "Light Test" , "Medium Test" , "Heavy Test" };
         stressTestMode.setItems(FXCollections.observableArrayList(modes));
         stressTestMode.setValue(modes[0]);
@@ -146,10 +181,7 @@ public class GuiController {
 
         tlSelector.setItems(FXCollections.observableArrayList(wrapperController.getTLids()));
         tlSelector.setValue(wrapperController.getTLids()[0]);
-        // initializes map pan
-        mapPan();
-        // starts renderer loop
-        startRenderer();
+
     }
 
     /**
@@ -171,15 +203,22 @@ public class GuiController {
      */
     @FXML
     public void initialize() {
-
         rescale(); // rescales menu based on width and height
+        updateDataList();
+        setUpInputs(); // Spinner factory etc. initializing
+        // set initial colorSelector color to magenta to match our UI
+        colorSelector.setValue(Color.MAGENTA);
 
+        // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
+        startTestButton.setDisable(true);
+        addVehicleButton.setDisable(true);
+    }
+
+    private void setUpInputs() {
         SpinnerValueFactory<Integer> valueFactory = // manages spinner
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, defaultDelay); //min, max, start
         delaySelect.setValueFactory(valueFactory);
         delaySelect.setEditable(true); // no longer read only
-
-        updateDataList();
 
         TextField delayTextField = delaySelect.getEditor(); // split spinner into its components -> text field
         delayTextField.setOnAction(e -> validateInput(delayTextField)); // action = enter, check input after "enter"
@@ -222,17 +261,26 @@ public class GuiController {
             }
         });
 
-        // set initial colorSelector color to magenta to match our UI
-        colorSelector.setValue(Color.MAGENTA);
+
 
         // initializes tl duration spinner
         SpinnerValueFactory<Integer> duration =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 20); //min, max, start
         durationTL.setValueFactory(duration);
+    }
 
-        // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
-        startTestButton.setDisable(true);
-        addVehicleButton.setDisable(true);
+    @FXML
+    private void mouseClicked(MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
+
+    @FXML
+    private void dragWindow(MouseEvent event) {
+        Stage stage = (Stage) root.getScene().getWindow();
+        if (stage.isFullScreen()) return;
+        stage.setX(event.getScreenX() - xOffset);
+        stage.setY(event.getScreenY() - yOffset);
     }
 
     /**
@@ -250,8 +298,10 @@ public class GuiController {
         // scales data field
         dataPane.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.20)); // 20 percent of the width
         // scales map based on pane width and height
-        map.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
-        map.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+        staticMap.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
+        staticMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+       // dynamicMap.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
+       // dynamicMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
         mainButtonBox.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.8));
 
        // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
@@ -329,6 +379,8 @@ public class GuiController {
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
         if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
+
+        // still needs fix for small gap between buttons and menus at the top
     }
 
     /**
@@ -381,14 +433,14 @@ public class GuiController {
     /**
      * <p>
      *     Called when "traffic light button" is pressed.
-     *     <li> Calls {@link SimulationRenderer#setShowTrafficLightIDs(boolean)}.</li>
+     *     <li> Calls {@link SimulationRenderer#setSeeTrafficLightIDs(boolean)}.</li>
      *     <li> Displays TL menu via {@link #toggleMenuAtButton(Pane, Node)}.</li>
      * </p>
      *
      */
     @FXML
     protected void onTrafficLight() {
-        sr.setShowTrafficLightIDs(!sr.getShowTrafficLightIDs());
+        sr.setSeeTrafficLightIDs(!sr.getSeeTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
     }
 
@@ -397,9 +449,10 @@ public class GuiController {
      */
     @FXML
     protected void onSelect(){
-        if (selectButton.isSelected()) { // toggled
+        if (selectButton.isSelected()) {
+
         } else {
-            System.out.println("Stopped");
+
         }
     }
 
@@ -409,7 +462,10 @@ public class GuiController {
      */
     @FXML
     protected void onAdd(){
+        sr.setPickedARoute(!sr.getPickedARoute());
         toggleMenuAtButton(addMenu, addButton);
+        String Route = routeSelector.getValue();
+        sr.setPickedRouteID(Route);
     }
 
     /**
@@ -468,6 +524,28 @@ public class GuiController {
         viewMenuSelect.setVisible(true);
     }
 
+    @FXML void onDataOutputToggle() {
+
+    }
+
+    @FXML void onButtonToggle() {
+        for(ButtonBase button: allButtons) {
+            button.setDisable(!showButtons.isSelected());
+            button.setVisible(showButtons.isSelected());
+        }
+    }
+
+    @FXML
+    protected void onDensityAnchorToggle() {
+        sr.setShowDensityAnchor(showDensityAnchor.isSelected());
+    }
+
+    @FXML
+    protected void onRouteHighlightingToggle() { sr.setShowRouteHighlighting(showRouteHighlighting.isSelected()); }
+
+    @FXML
+    protected void onTrafficLightIDToggle() { sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected()); }
+
     @FXML
     protected void onMiddlePaneHover(){
 
@@ -488,13 +566,12 @@ public class GuiController {
     @FXML
     protected void startStressTest(){
         String mode = stressTestMode.getValue();
-        // experimental
         if (mode.equals("Light Test")) {
-            wrapperController.StressTest(100, Color.GREEN);
+            wrapperController.StressTest(1000, Color.GREEN, null);
         } else if (mode.equals("Medium Test")) {
-            wrapperController.StressTest(1000, Color.YELLOW);
+            wrapperController.StressTest(2500, Color.YELLOW, null);
         } else if (mode.equals("Heavy Test")) {
-            wrapperController.StressTest(10000, Color.RED);
+            wrapperController.StressTest(5000, Color.RED, null);
         }
     }
 
@@ -622,18 +699,43 @@ public class GuiController {
             @Override
             public void handle(long timestamp) {
                 renderUpdate();
-
-                // other functions that should update every frame
-                if(wrapperController.isRouteListEmpty()) {
-                    addVehicleButton.setDisable(true);
-                    startTestButton.setDisable(true);
-                } else {
-                    addVehicleButton.setDisable(false);
-                    startTestButton.setDisable(false);
-                }
+                checkPerFrame();
             }
         };
         renderLoop.start(); // runs 60 frames per second
+    }
+
+    private void checkPerFrame(){
+        // Only allow injection if there are routes
+        if(wrapperController.isRouteListEmpty()) {
+            addVehicleButton.setDisable(true);
+            startTestButton.setDisable(true);
+        } else {
+            addVehicleButton.setDisable(false);
+            startTestButton.setDisable(false);
+        }
+        
+        if(addMenu.isVisible() && !(routeSelector.getValue().isEmpty())){
+                    String Route = routeSelector.getValue();
+                    sr.setPickedRouteID(Route);
+        }
+        
+        if (!dataView.isSelected()) {
+            staticMap.widthProperty().bind(middlePane.widthProperty());
+            staticMap.heightProperty().bind(middlePane.heightProperty());
+            dataPane.setVisible(false);
+        } else {
+            dataPane.setVisible(true);
+            rescale();
+        }
+
+    }
+
+    private void stopRenderer() {
+        if (renderLoop != null) {
+            renderLoop.stop();
+            renderLoop = null;
+        }
     }
 
     /**
@@ -643,8 +745,8 @@ public class GuiController {
     @FXML
     protected void closeApplication() {
         renderLoop.stop(); // terminates Animation Timer
-        Platform.exit(); // terminates JavaFX thread
-        wrapperController.terminate(); // terminates sumo connection and wrapCon thread
+        Platform.exit(); // terminates JavaFX thread, runs "stop" method in GuiAppl
+        //wrapperController.terminate(); // terminates sumo connection and wrapCon thread
     }
 
     /**
@@ -655,9 +757,10 @@ public class GuiController {
      * </p>
      */
     public void initializeRender(){
-        gc = map.getGraphicsContext2D();
-        sr = new SimulationRenderer(map,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
-                wrapperController.getVehicles(), wrapperController.getTrafficLights());
+        gc = staticMap.getGraphicsContext2D();
+
+        sr = new SimulationRenderer(staticMap,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
+                wrapperController.getVehicles(), wrapperController.getTrafficLights(), wrapperController.getRoutes());
         renderUpdate();
     }
 
@@ -680,6 +783,11 @@ public class GuiController {
         Color color = colorSelector.getValue();
         String type = typeSelector.getValue();
         String route = routeSelector.getValue();
+
+        if(route == null) {
+            route = "r0"; // if route count == 0 -> disable add button, disable stress test start
+        }
+
         wrapperController.addVehicle(amount, type, route, color);
     }
 
@@ -693,11 +801,11 @@ public class GuiController {
     protected void zoomMap(ScrollEvent event){
 
         if (event.getDeltaY() > 0) { // delta y vertical
-            sr.zoomMap(1.2);
+            sr.zoomMap(1.25);
             //System.out.println("zoom");
         } else  {
             //System.out.println("zoomout");
-            sr.zoomMap(0.8);
+            sr.zoomMap(0.75);
         }
     }
 
@@ -709,13 +817,13 @@ public class GuiController {
      * </p>
      */
     public void mapPan() {
-        map.setOnMousePressed(event -> {
+        staticMap.setOnMousePressed(event -> {
             mousePressedXOld = event.getX(); // old
             mousePressedYOld = event.getY();
             //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
         });
         // drag start with pressed -> then this follows
-        map.setOnMouseDragged(e->{
+        staticMap.setOnMouseDragged(e->{
             mousePressedXNew = e.getX();
             mousePressedYNew = e.getY();
             //System.out.println("NewX"+mousePressedXNew + " NewY " + mousePressedYNew);
@@ -729,6 +837,27 @@ public class GuiController {
 
     public void setPanSens(double s) {
         panSen = s;
+    }
+
+    @FXML
+    protected void changeToMap1() {
+        changeMap("Frankfurt");
+    }
+
+    @FXML
+    protected void changeToMap2() {
+        changeMap("TestMap");
+    }
+
+    private void changeMap(String mapName) {
+        // disable buttons -> prevents spamming of switches
+        map1select.setDisable(true);
+        map2select.setDisable(true);
+        wrapperController.mapSwitch(mapName);
+    }
+
+    private void importMap() {
+
     }
 
 }
