@@ -29,6 +29,8 @@ public class SimulationRenderer {
 
     private final GraphicsContext gc;
     private final Canvas map;
+    boolean showTrafficLightIDs;
+    boolean showSelectablePoints;
     boolean pickedARoute;
     private double zoom;
     private double camX;
@@ -297,6 +299,22 @@ public class SimulationRenderer {
         this.viewMaxY = camY + (viewHeightWorld / 2);
     }
 
+    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) {
+        this.showTrafficLightIDs = showTrafficLightIDs;
+    }
+
+    protected boolean getShowTrafficLightIDs() {
+        return showTrafficLightIDs;
+    }
+
+    protected void setSelectablePoints(boolean p) {
+        this.showSelectablePoints = p;
+    }
+
+    protected boolean getSelectablePoints() {
+        return showSelectablePoints;
+    }
+
     /**
      * Renders text labels for Traffic Light IDs at their respective positions.
      * <p>
@@ -329,6 +347,10 @@ public class SimulationRenderer {
             // restore previously saved GraphicsContext
             gc.restore();
         }
+    }
+
+    private void displaySelectablePoints() {
+
     }
 
     /**
@@ -470,6 +492,7 @@ public class SimulationRenderer {
      * @param z
      */
     public void zoomMap(double z) {
+        // should have a zoom min and max cap based on map scale
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
 
