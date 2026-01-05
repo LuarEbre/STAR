@@ -19,6 +19,7 @@ public class LaneWrap {
     private final double[] shapeX;
     private final double[] shapeY;
     private final double width;
+    private final double length;
 
     /**
      * Initializes this lane's shape via {@link SumoTraciConnection#do_job_get(SumoCommand)}
@@ -39,6 +40,7 @@ public class LaneWrap {
             int numPoints = coords.size();
             shapeX = new double[numPoints];
             shapeY = new double[numPoints];
+            length = (double) this.connection.do_job_get(Lane.getLength(laneID));
 
             for (int i = 0; i < numPoints; i++) {
                 SumoPosition2D point = coords.get(i);
@@ -76,4 +78,6 @@ public class LaneWrap {
     public double getWidth(){
         return width;
     }
+
+    public double getLength(){return length;}
 }
