@@ -49,6 +49,27 @@
     -fx-background-color: -fx-color-grey-middle;
 }
 
+/* 2. The Header Area (The strip behind the tabs) */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: -fx-color-grey-middle;
+}
+
+/* 3. The Individual Tabs (Unselected) */
+.tab-pane .tab {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-background-insets: 0 1 0 1;
+    -fx-background-radius: 5 5 0 0;
+    -fx-padding: 0 20 0 20;
+    -fx-border-color: -fx-color-grey-darkest;
+    -fx-border-insets: 0 1 0 1;
+    -fx-border-radius: 5 5 0 0;
+}
+
+/* 1. Change text color for ALL tabs */
+.tab-pane .tab .tab-label {
+    -fx-text-fill: white;
+}
+
 #dataSep .line {
     -fx-border-color: -fx-color-grey-darkest;
     -fx-border-width: 3;

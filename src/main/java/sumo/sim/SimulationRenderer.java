@@ -29,8 +29,8 @@ public class SimulationRenderer {
 
     private final GraphicsContext gc;
     private final Canvas map;
-    boolean showSelectablePoints;
-    boolean pickedARoute;
+    private boolean showSelectablePoints;
+    private boolean pickedARoute;
     private double zoom;
     private double camX;
     private double camY;
@@ -74,7 +74,7 @@ public class SimulationRenderer {
 
         this.showTrafficLightIDs = true;
         this.showRouteHighlighting = true;
-        this.showDensityAnchor = true;
+        this.showDensityAnchor = false;
 
         this.seeTrafficLightIDs = false;
 
