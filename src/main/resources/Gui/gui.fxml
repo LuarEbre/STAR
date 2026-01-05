@@ -56,21 +56,21 @@
            <children>
                <Canvas fx:id="staticMap" height="447.0" layoutX="200.0" onScroll="#zoomMap" width="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 
-               <AnchorPane fx:id="dataPane" prefHeight="439.0" prefWidth="200.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="-1.0">
+               <AnchorPane fx:id="dataPane" prefHeight="447.0" prefWidth="259.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                   <Separator fx:id="dataSep" orientation="VERTICAL" prefHeight="447.0" prefWidth="266.0" AnchorPane.bottomAnchor="-5.0" AnchorPane.rightAnchor="-7.0" AnchorPane.topAnchor="5.0" />
-                  <TabPane layoutY="3.0" prefHeight="444.0" prefWidth="254.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0">
+                   <Separator fx:id="dataSep" orientation="VERTICAL" prefHeight="446.0" prefWidth="259.0" AnchorPane.bottomAnchor="-5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
+                  <TabPane styleClass="TabPane" layoutY="5.0" prefHeight="442.0" prefWidth="259.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                     <tabs>
-                      <Tab text="Overall">
+                      <Tab styleClass="Tab" text="Overall">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                     <ListView fx:id="listData" layoutY="67.33333333333333" prefHeight="418.0" prefWidth="259.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="0.0" />
+                                     <ListView fx:id="listData" layoutY="67.33333333333333" prefHeight="415.0" prefWidth="259.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                         </content>
                       </Tab>
-                      <Tab text="Selected">
+                      <Tab styleClass="Tab" text="Selected">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -79,7 +79,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                        <Tab text="Filtered">
+                        <Tab styleClass="Tab" text="Filtered">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -136,7 +136,7 @@
                      <children>
                         <CheckBox fx:id="dataView" selected="true" styleClass="viewLabel" text="Data" />
                         <CheckBox fx:id="showButtons" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onButtonToggle" selected="true" styleClass="viewLabel" text="Buttons" />
-                        <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="true" styleClass="viewLabel" text="Density Anchor" />
+                        <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="false" styleClass="viewLabel" text="Density Anchor" />
                         <CheckBox fx:id="showRouteHighlighting" layoutX="10.0" layoutY="45.0" mnemonicParsing="false" onAction="#onRouteHighlightingToggle" selected="true" styleClass="viewLabel" text="Route Highlighting" wrapText="true" />
                         <CheckBox fx:id="showTrafficLightIDs" layoutX="10.0" layoutY="60.0" mnemonicParsing="false" onAction="#onTrafficLightIDToggle" selected="true" styleClass="viewLabel" text="Traffic Light IDs" />
                         <CheckBox mnemonicParsing="false" text="Density Heatmap" />
