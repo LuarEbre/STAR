@@ -71,7 +71,7 @@ public class GuiController {
     @FXML
     private HBox mainButtonBox;
     @FXML
-    private CheckBox showDensityAnchor, showDataOutput, showButtons, showRouteHighlighting, showTrafficLightIDs;
+    private CheckBox showDensityAnchor, showDataOutput, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
@@ -549,6 +549,15 @@ public class GuiController {
     @FXML
     protected void onMiddlePaneHover(){
 
+    }
+
+    @FXML
+    protected void onDensityHeatmapToggle(){
+        if(densityHeatmap.isSelected()) {
+            sr.setViewDensityOn(true);
+        }else{
+            sr.setViewDensityOn(false);
+        }
     }
 
 

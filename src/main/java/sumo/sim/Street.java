@@ -22,7 +22,7 @@ public class Street {
     private String fromJunction;
     private String toJunction;
     private double density;
-    private double noise;
+    //private double noise;
     private double minX,minY,maxX,maxY; // for rendering optimization
     private XML xml;
 
@@ -70,13 +70,10 @@ public class Street {
      */
     public void calcDensity(){
         try{
-            Number num = (Number) con.do_job_get(Edge.getLastStepVehicleNumber(id));
-            Number length = (Number) con.do_job_get(Lane.getLength(id+"_0"));
+            int num = (int) con.do_job_get(Edge.getLastStepVehicleNumber(id));
+            double length = lanes.getFirst().getLength();
 
-            double num_val = num.doubleValue();
-            double length_val = length.doubleValue();
-
-            this.density = num_val/length_val/1000;
+            this.density = num / (length / 1000.0);
         }
         catch (Exception e){
             throw new RuntimeException(e);
@@ -89,10 +86,10 @@ public class Street {
     public void updateStreet() {
         try {
             calcDensity();
-            this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
+            //this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
         } catch (Exception e) {
             this.density = 0;
-            this.noise = 0;
+            //this.noise = 0;
         }
     }
 

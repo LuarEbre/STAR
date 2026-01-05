@@ -191,6 +191,7 @@ public class WrapperController {
             connection.do_timestep();
             vl.updateAllVehicles();
             tl.updateAllCurrentState();
+            sl.updateStreets();
             //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
 
