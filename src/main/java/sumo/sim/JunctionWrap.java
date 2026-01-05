@@ -23,6 +23,7 @@ public class JunctionWrap {
     private String type; // dead end , tl
     private double[] shapeX;
     private double[] shapeY;
+    private double minX, maxX, minY, maxY;
 
     private double distance = Integer.MAX_VALUE; //Used for Dijkstra Initialization
     private String predecessor = null; //Used for Dijkstra
@@ -132,4 +133,27 @@ public class JunctionWrap {
     public double[] getShapeY() {
         return shapeY;
     }
+
+    public void calculateBounds() {
+        minX = Double.MAX_VALUE;
+        maxX = -Double.MAX_VALUE;
+        minY = Double.MAX_VALUE;
+        maxY = -Double.MAX_VALUE;
+
+        for (double x : shapeX) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+        }
+        for (double y : shapeY) {
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+        }
+
+    }
+
+    public double getMinX() { return minX; }
+    public double getMaxX() { return maxX; }
+    public double getMinY() { return minY; }
+    public double getMaxY() { return maxY; }
 }
+

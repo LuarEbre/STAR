@@ -2,9 +2,12 @@ package sumo.sim;
 
 import de.tudresden.sumo.cmd.Edge;
 import de.tudresden.sumo.cmd.Lane;
+import de.tudresden.sumo.objects.SumoGeometry;
+import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
@@ -20,6 +23,7 @@ public class Street {
     private String toJunction;
     private double density;
     private double noise;
+    private double minX,minY,maxX,maxY; // for rendering optimization
     private XML xml;
 
     /**
@@ -121,4 +125,31 @@ public class Street {
      * @return Current traffic density on this street.
      */
     public double getDensity() { return density; }
+
+    public void calculateBounds() {
+        minX = Double.MAX_VALUE;
+        maxX = -Double.MAX_VALUE;
+        minY = Double.MAX_VALUE;
+        maxY = -Double.MAX_VALUE;
+
+        for (LaneWrap lane : lanes) {
+            double[] xCoords = lane.getShapeX();
+            double[] yCoords = lane.getShapeY();
+
+            for (double x : xCoords) {
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+            }
+            for (double y : yCoords) {
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+    }
+
+    public double getMinX() { return minX; }
+    public double getMaxX() { return maxX; }
+    public double getMinY() { return minY; }
+    public double getMaxY() { return maxY; }
 }

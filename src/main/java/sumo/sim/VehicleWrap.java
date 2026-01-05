@@ -78,7 +78,7 @@ public class VehicleWrap {
      * Gets called each step by the Simulation, updates all SUMO internal values using {@link SumoTraciConnection#do_job_get(SumoCommand)}
      * , as well as calculating our live-tracked values.
      */
-    public void updateVehicle() { // updates attributes each step
+    public void updateVehicle() { // updates attributes each step, causes exception (if many cars are updated and delay is changed) needs fixing
         try {
             // retrieve previous frame's speed before updating the vehicle's speed
             double oldSpeed = this.speed;
@@ -111,7 +111,7 @@ public class VehicleWrap {
             }
             this.totalLifetime++;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            this.exists = false;
         }
     }
 
