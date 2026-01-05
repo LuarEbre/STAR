@@ -136,7 +136,7 @@
                      <children>
                         <CheckBox fx:id="dataView" selected="true" styleClass="viewLabel" text="Data" />
                         <CheckBox fx:id="showButtons" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onButtonToggle" selected="true" styleClass="viewLabel" text="Buttons" />
-                        <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="true" styleClass="viewLabel" text="Density Anchor" />
+                        <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="false" styleClass="viewLabel" text="Density Anchor" />
                         <CheckBox fx:id="showRouteHighlighting" layoutX="10.0" layoutY="45.0" mnemonicParsing="false" onAction="#onRouteHighlightingToggle" selected="true" styleClass="viewLabel" text="Route Highlighting" wrapText="true" />
                         <CheckBox fx:id="showTrafficLightIDs" layoutX="10.0" layoutY="60.0" mnemonicParsing="false" onAction="#onTrafficLightIDToggle" selected="true" styleClass="viewLabel" text="Traffic Light IDs" />
                         <CheckBox mnemonicParsing="false" text="Density Heatmap" />

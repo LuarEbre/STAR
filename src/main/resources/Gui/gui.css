@@ -49,25 +49,43 @@
     -fx-background-color: -fx-color-grey-middle;
 }
 
-/* 2. The Header Area (The strip behind the tabs) */
-.tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: -fx-color-grey-middle;
+.tab-pane, .tab-pane .tab {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
 
-/* 3. The Individual Tabs (Unselected) */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: -fx-color-grey-middle;
+    -fx-border-color: -fx-color-grey-darkest;
+    -fx-border-width: 0 0 4 0;
+}
+
 .tab-pane .tab {
     -fx-background-color: -fx-color-grey-light;
     -fx-background-insets: 0 1 0 1;
-    -fx-background-radius: 5 5 0 0;
+    -fx-background-radius: 6 6 0 0;
     -fx-padding: 0 20 0 20;
     -fx-border-color: -fx-color-grey-darkest;
     -fx-border-insets: 0 1 0 1;
     -fx-border-radius: 5 5 0 0;
+    -fx-border-width: 2;
 }
 
-/* 1. Change text color for ALL tabs */
+.tab-pane .tab:selected {
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-font-weight: bold;
+}
+
 .tab-pane .tab .tab-label {
     -fx-text-fill: white;
+}
+
+.tab-pane .control-buttons-tab .arrow {
+    -fx-background-color: -fx-color-grey-dark;
+    -fx-padding: 0.2em;
 }
 
 #dataSep .line {
@@ -477,7 +495,6 @@
     -fx-background-size: 45px 45px;
 }
 
-
 #listData .list-cell {
     -fx-padding: 3 3 3 3;
     -fx-background-color: -fx-color-grey-middle;
@@ -495,5 +512,10 @@
 
 #listData .scroll-bar {
     -fx-background-color: -fx-color-grey-darkest;
+}
+
+.list-view .scroll-bar:vertical .thumb {
+    -fx-background-color: -fx-color-grey-lightest;
+    -fx-background-radius: 5em;
 }
 
