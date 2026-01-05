@@ -31,6 +31,7 @@ public class SimulationRenderer {
     private final Canvas map;
     private boolean showSelectablePoints;
     private boolean pickedARoute;
+    private boolean viewDensityOn;
     private double zoom;
     private double camX;
     private double camY;
@@ -192,6 +193,17 @@ public class SimulationRenderer {
                 }
                 else {
                     gc.setStroke(Color.BLACK);
+                }
+            // density rendering
+            } else if (viewDensityOn){
+                if(s.getDensity() >=100.0){
+                    gc.setStroke(Color.RED);
+                } else if ((s.getDensity() < 100.0) && (s.getDensity() >= 50.0)) {
+                    gc.setStroke(Color.ORANGE);
+                } else if ((s.getDensity() < 50.0) && (s.getDensity() >= 20.0)) {
+                    gc.setStroke(Color.YELLOW);
+                }else{
+                    gc.setStroke(Color.GREEN);
                 }
             } else {
                 gc.setStroke(Color.BLACK);
@@ -509,6 +521,7 @@ public class SimulationRenderer {
     protected void setPickedARoute(boolean pickedARoute) { this.pickedARoute = pickedARoute; }
     protected void setPickedRouteID(String routeID) { this.RouteID = routeID; }
     protected boolean getPickedARoute() { return pickedARoute; }
+    protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
 }
 
 

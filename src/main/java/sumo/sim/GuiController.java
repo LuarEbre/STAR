@@ -65,7 +65,7 @@ public class GuiController {
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
     @FXML
-    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting, showTrafficLightIDs;;
+    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
     @FXML
     private TextField amountField, stateText;
     @FXML
@@ -547,6 +547,15 @@ public class GuiController {
     @FXML
     protected void onMiddlePaneHover(){
 
+    }
+
+    @FXML
+    protected void onDensityHeatmapToggle(){
+        if(densityHeatmap.isSelected()) {
+            sr.setViewDensityOn(true);
+        }else{
+            sr.setViewDensityOn(false);
+        }
     }
 
 
