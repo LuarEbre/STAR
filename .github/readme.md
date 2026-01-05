@@ -1,4 +1,4 @@
-# Real-Time Traffic Simulation with Java
+# ⭐ STAR ⭐ (**S**UMO **T**raffic **A**nalytics in **R**eal-time)
 
 ![Java Version](https://img.shields.io/badge/Java-JDK%2017%2B-orange) 
 ![API](https://img.shields.io/badge/API-TraaS-informational) 
@@ -8,7 +8,7 @@
 ![Linux](https://img.shields.io/badge/Platform-Linux-e7990e?logo=linux&logoColor=F1F1F1) 
 ![University](https://img.shields.io/badge/University-Frankfurt%20UAS-008ec8)
 
-A real-time traffic simulation platform controlling an instance of **[SUMO](https://eclipse.dev/sumo/)** simulation package via the **TraaS API** over a localhost server.
+A real-timetraffic simulation platform controlling an instance of the **[SUMO](https://eclipse.dev/sumo/)** simulation package via the **TraaS API** over a localhost server.
 <br>This application visualizes traffic flow, enables user interaction, and allows for adaptive traffic control strategies as well as statistical analysis of traffic.
 
 Developed for the **Object-Oriented Programming in Java - Advanced Course** module (Winter 25/26) at **Frankfurt University of Applied Sciences**, project supervision by **Prof. Dr. Ghadi Mahmoudi**
@@ -40,7 +40,7 @@ Unlike the native sumo-gui, this platform offers a custom JavaFX GUI that allows
 ### Features elevating our project from the native sumo-gui:
 
 #### Live Control: <br> 
-Users can inject vehicles, manipulate traffic light phases, and apply stress tests to specific road edges to observe and compare congestion behavior.
+Users can inject vehicles, manipulate traffic light phases, and apply stress tests to specific road edges to observe and compare congestion behavior in real-time, as the simulation is running.
 
 #### Data Visualization: <br>
 The road network is rendered in the JavaFX GUI providing live visual feedback on traffic flow, vehicle states, and phase indicators.
@@ -95,11 +95,11 @@ Metrics such as average speed, vehicle density, and travel times, are displayed 
 
 ##### 1. Clone the Repository
 ```bash
-git clone https://github.com/LuarEbre/Real-Time-Traffic-Simulation-with-Java.git Real-Time-Traffic-Simulation-with-Java
+git clone https://github.com/LuarEbre/STAR.git STAR
 ```
-##### 2. Run WrapperController
+##### 2. Run Main
 - Open an IDE of your choosing (IntelliJ, Eclipse, VSCode)
-- Run the class WrapperController.java (contains public static void main(String[] args))
+- Run the class Main.java (contains public static void main(String[] args))
 ##### 3. Windows Users only:
 - Allow elevator.exe to bypass Windows Defender (only if using IntelliJ)
 - Allow sumo to bypass the firewall (otherwise problems might occur when trying to run the server clientside)

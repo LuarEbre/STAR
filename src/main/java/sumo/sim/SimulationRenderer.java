@@ -9,7 +9,7 @@ import javafx.geometry.VPos;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
-
+import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
@@ -21,9 +21,14 @@ import java.util.List;
  * </p>
  */
 public class SimulationRenderer {
+
+    boolean showTrafficLightIDs;
+    boolean showDensityAnchor;
+    boolean showRouteHighlighting;
+    boolean seeTrafficLightIDs;
+
     private final GraphicsContext gc;
     private final Canvas map;
-    boolean showTrafficLightIDs;
     boolean pickedARoute;
     private double zoom;
     private double camX;
@@ -37,6 +42,11 @@ public class SimulationRenderer {
     private final Font tlFont;
     private final RouteList rl;
     private String RouteID;
+
+    private double viewMinX;
+    private double viewMaxX;
+    private double viewMinY;
+    private double viewMaxY;
 
     /**
      * Constructs a new SimulationRenderer called by {@link GuiController}
@@ -60,7 +70,13 @@ public class SimulationRenderer {
      * </p>
      */
     public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls, RouteList rl) {
-        this.showTrafficLightIDs = false;
+
+        this.showTrafficLightIDs = true;
+        this.showRouteHighlighting = true;
+        this.showDensityAnchor = true;
+
+        this.seeTrafficLightIDs = false;
+
         this.tlFont = new Font("Arial", 7);
         this.map = canvas;
         this.gc = gc; // for drawing on canvas
@@ -76,6 +92,12 @@ public class SimulationRenderer {
         this.scale = 1 + (scaleX / scaleY); // should calculate the rough scale of the map
         this.zoom = scale + 1;
         this.rotation = 0;
+        for (Street s: sl.getStreets()) {
+            s.calculateBounds();
+        }
+        for (JunctionWrap j: jl.getJunctions()) {
+            j.calculateBounds();
+        }
         //scale = 1;
     }
 
@@ -87,12 +109,14 @@ public class SimulationRenderer {
      * </p>
      */
     public void initRender() {
+        updateViewportBounds();
         // area the size of canvas : frame -> canvas cords.
         // -> network: only do the following rendering with objects inside this restricting area;
-        gc.setTransform(new Affine()); // transformation matrix
+        gc.setTransform(new Affine()); // transformation matrix, clears canvas
 
         gc.setFill(Paint.valueOf("#86858E")); // background color
         gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
+
         transform();
         renderMap();
     }
@@ -144,7 +168,6 @@ public class SimulationRenderer {
      * </p>
      */
     private void renderMap() {
-
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(scale);
@@ -154,50 +177,88 @@ public class SimulationRenderer {
         for (Street s : sl.getStreets()) {
             String streetId = s.getId();
 
-            if (currentRoute != null && !currentRoute.isEmpty()) {
+            if (currentRoute != null && !currentRoute.isEmpty() && showRouteHighlighting) {
 
                 String startId = currentRoute.getFirst();
 
                 if (streetId.equals(startId)) {
                     gc.setStroke(Color.GREEN);
-                    gc.setFill(Color.GREEN);
-                    gc.setLineWidth(8);
                 }
                 else if (currentRoute.contains(streetId)) {
                     gc.setStroke(Color.RED);
-                    gc.setFill(Color.RED);
-                    gc.setLineWidth(5);
                 }
                 else {
                     gc.setStroke(Color.BLACK);
-                    gc.setFill(Color.BLACK);
-                    gc.setLineWidth(scale);
                 }
             } else {
                 gc.setStroke(Color.BLACK);
-                gc.setFill(Color.BLACK);
-                gc.setLineWidth(scale);
             }
             // stroke Polyline for lanes
+            if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
+                    || s.getMaxY() < viewMinY || s.getMinY() > viewMaxY) continue;
+            int countLanes = s.getLanes().size();
+            int laneIndex = 0;
+            double[] meanLaneX = null;
+            double[] meanLaneY = null;
+
             for (LaneWrap l : s.getLanes()) { // lanes of streets
 
                 double[] rawX = l.getShapeX();
                 double[] rawY = l.getShapeY();
-
                 // needs checking -> error preventing
                 if (rawX == null || rawY == null || rawX.length == 0) continue;
-                // continue -> if true -> skip everything and move to the next object of the loop
-                // if arrays are null or empty skip
 
+                if (meanLaneX == null) {
+                    // only the first time if there are no lanes for this street saved yet
+                    meanLaneX = new double[rawX.length];
+                    meanLaneY = new double[rawY.length];
+                }
+
+                int limit = Math.min(meanLaneX.length, rawX.length); // out of bounce check -> if not the same size
+
+                for (int i = 0; i < limit; i++) {
+                    meanLaneX[i] += rawX[i];
+                    meanLaneY[i] += rawY[i];
+                    // sums up all point for mean calculation later
+                }
+
+                // Draws Lanes
                 if (rawX.length >= 2) {
                     // if there are at least 2 values in pointCount -> it's a line e.g. : [54.7, 38.75]
-                    gc.setLineWidth(5); // should be adjustable
+                    gc.setFill(Color.BLACK);
+                    gc.setLineWidth(3.3); // should be adjustable
+                    gc.setLineDashes(null);
                     gc.strokePolyline(rawX, rawY, rawX.length);
+                }
+            }
+
+            // test, only works if lanesCount == 2 , if odd -> cant place line in the middle, if even: needs offset
+            // Draws lane lines
+            if (meanLaneX != null) {
+                for (int i = 0; i < meanLaneX.length; i++) {
+                    // mean calculation / countLanes -> gets a line exactly in the middle of the road
+                    meanLaneX[i] /= countLanes;
+                    meanLaneY[i] /= countLanes;
+                }
+
+                gc.setStroke(Color.WHITE);
+                gc.setLineWidth(0.25);
+                gc.setLineDashes(10d, 10d);
+
+                // experimental , needs fixing
+                if (countLanes == 2) {
+                    gc.strokePolyline(meanLaneX, meanLaneY, meanLaneX.length); // middle line
+                } else if (countLanes % 2 == 0) {
+
+                } else if (countLanes % 2 == 1) {
+
                 }
             }
         }
 
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
+            if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX
+                    || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
             gc.setFill(Color.BLACK);
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(scale);
@@ -222,27 +283,18 @@ public class SimulationRenderer {
         }
         renderVehicle();
         renderTrafficLight();
-        if (showTrafficLightIDs) displayTrafficLights();
+        if (showDensityAnchor) renderDensityAnchor();
+        if (showTrafficLightIDs && seeTrafficLightIDs) displayTrafficLights();
     }
 
-    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) {
-        this.showTrafficLightIDs = showTrafficLightIDs;
-    }
+    private void updateViewportBounds() {
+        double viewWidthWorld = map.getWidth() / zoom;
+        double viewHeightWorld = map.getHeight() / zoom;
 
-    protected boolean getShowTrafficLightIDs() {
-        return showTrafficLightIDs;
-    }
-
-    protected void setPickedARoute(boolean pickedARoute) {
-        this.pickedARoute = pickedARoute;
-    }
-
-    protected void setPickedRouteID(String routeID) {
-        this.RouteID = routeID;
-    }
-
-    protected boolean getPickedARoute() {
-        return pickedARoute;
+        this.viewMinX = camX - (viewWidthWorld / 2);
+        this.viewMaxX = camX + (viewWidthWorld / 2);
+        this.viewMinY = camY - (viewHeightWorld / 2);
+        this.viewMaxY = camY + (viewHeightWorld / 2);
     }
 
     /**
@@ -286,6 +338,8 @@ public class SimulationRenderer {
         for (VehicleWrap v : vl.getVehicles()) {
             if (!v.exists() && v.getPosition() == null) continue;
             // no need to translate coordinates since translation is already applied to graphics context
+            if (v.getPosition().getX() <= viewMinX || v.getPosition().getX() >= viewMaxX
+             || v.getPosition().getY() <= viewMinY || v.getPosition().getY() >= viewMaxY) continue;
             this.drawTriangleCar(v, 1.5, 3); // ? set length / width in vehicle class -> internal
         }
     }
@@ -309,6 +363,22 @@ public class SimulationRenderer {
             gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
 
             gc.restore(); // restores previous
+        }
+    }
+
+    /**
+     * draws a "density anchor" on the road network, this shows the average car position, which is helpful for visualizing congestion
+     */
+    private void renderDensityAnchor() {
+        Point2D.Double meanPos = vl.getMeanPosition();
+        if (meanPos != null) {
+            double width = 5;
+            // subtracting half the width to account for oval center
+            gc.setFill(Color.rgb(220, 35, 15, 0.8));
+            gc.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
+            width += 2;
+            gc.setFill(Color.rgb(220, 35, 15, 0.2));
+            gc.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
         }
     }
 
@@ -350,28 +420,29 @@ public class SimulationRenderer {
                     double[] rawX = l.getShapeX();
                     double[] rawY = l.getShapeY();
 
-                    double endX = rawX[rawX.length - 1];
-                    double endY = rawY[rawX.length - 1];
+                    double endX = rawX[rawX.length - 1]; // 3
+                    double endY = rawY[rawX.length - 1]; // 2
 
-                    double prevX = rawX[rawX.length - 2];
-                    double prevY = rawY[rawX.length - 2];
+                    double prevX = rawX[rawX.length - 2]; // 2
+                    double prevY = rawY[rawX.length - 2]; // 1
 
-                    //(P_prev -> P_end)
-                    double dx = endX - prevX;
-                    double dy = endY - prevY;
+                    //(P_prev -> P_end) direction vector (target-start)
+                    double dx = endX - prevX; // 1
+                    double dy = endY - prevY; // 1
 
-                    // normalize length
-                    double length = Math.sqrt(dx * dx + dy * dy);
+                    // normalize length to 1 , because value can be really high
+                    double length = Math.sqrt(dx * dx + dy * dy); // 1+1=2
 
                     double ndx = dx / length;
-                    double ndy = dy / length;
+                    double ndy = dy / length; // 0.5
+                    // length of vector is now exactly 1 , can change size here?
 
-                    double perpX = -ndy;
+                    double perpX = -ndy; // rotates 90 degree to the left when negating x and switching x and y
                     double perpY = ndx;
 
-                    double halfWidth = 3.0 / 2.0;
+                    double halfWidth = 2.0 / 2.0; // pre-determined -> should adjust with lane width
 
-                    double lineX1 = endX + (perpX * halfWidth);
+                    double lineX1 = endX + (perpX * halfWidth); // line X2/Y2 <---"-"-*-"+"---> lineX1/Y1 , (* = endpoint)
                     double lineY1 = endY + (perpY * halfWidth);
 
                     double lineX2 = endX - (perpX * halfWidth);
@@ -401,6 +472,18 @@ public class SimulationRenderer {
     public void zoomMap(double z) {
         zoom *= z; // zoom with values > 1 , // unzoom with val < 1
     }
+
+    protected void setSeeTrafficLightIDs(boolean seeTrafficLightIDs) { this.seeTrafficLightIDs = seeTrafficLightIDs; }
+    protected boolean getSeeTrafficLightIDs() { return seeTrafficLightIDs; }
+    protected void setShowDensityAnchor(boolean showDensityAnchor) { this.showDensityAnchor = showDensityAnchor; }
+    protected boolean getShowDensityAnchor() { return this.showDensityAnchor; }
+    protected void setShowRouteHighlighting(boolean showRouteHighlighting) { this.showRouteHighlighting = showRouteHighlighting; }
+    protected boolean getShowRouteHighlighting() { return this.showRouteHighlighting; }
+    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) { this.showTrafficLightIDs = showTrafficLightIDs; }
+    protected boolean getShowTrafficLightIDs() { return this.showTrafficLightIDs; }
+    protected void setPickedARoute(boolean pickedARoute) { this.pickedARoute = pickedARoute; }
+    protected void setPickedRouteID(String routeID) { this.RouteID = routeID; }
+    protected boolean getPickedARoute() { return pickedARoute; }
 }
 
 
