@@ -29,7 +29,6 @@ public class SimulationRenderer {
 
     private final GraphicsContext gc;
     private final Canvas map;
-    boolean showTrafficLightIDs;
     boolean showSelectablePoints;
     boolean pickedARoute;
     private double zoom;
@@ -297,14 +296,6 @@ public class SimulationRenderer {
         this.viewMaxX = camX + (viewWidthWorld / 2);
         this.viewMinY = camY - (viewHeightWorld / 2);
         this.viewMaxY = camY + (viewHeightWorld / 2);
-    }
-
-    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) {
-        this.showTrafficLightIDs = showTrafficLightIDs;
-    }
-
-    protected boolean getShowTrafficLightIDs() {
-        return showTrafficLightIDs;
     }
 
     protected void setSelectablePoints(boolean p) {
