@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -520,29 +521,10 @@ public class GuiController {
     }
 
     @FXML
-    protected void onRouteHighlightingToggle() {
-        sr.setShowRouteHighlighting(showRouteHighlighting.isSelected());
-    }
+    protected void onRouteHighlightingToggle() { sr.setShowRouteHighlighting(showRouteHighlighting.isSelected()); }
 
     @FXML
-    protected void onTrafficLightIDToggle() {
-        sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected());
-    }
-
-    @FXML
-    protected void onDensityAnchorToggle() {
-        sr.setShowDensityAnchor(showDensityAnchor.isSelected());
-    }
-
-    @FXML
-    protected void onRouteHighlightingToggle() {
-        sr.setShowRouteHighlighting(showRouteHighlighting.isSelected());
-    }
-
-    @FXML
-    protected void onTrafficLightIDToggle() {
-        sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected());
-    }
+    protected void onTrafficLightIDToggle() { sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected()); }
 
     @FXML
     protected void onMiddlePaneHover(){
