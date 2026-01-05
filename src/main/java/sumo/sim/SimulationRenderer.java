@@ -29,7 +29,6 @@ public class SimulationRenderer {
 
     private final GraphicsContext gc;
     private final Canvas map;
-    boolean showTrafficLightIDs;
     boolean showSelectablePoints;
     boolean pickedARoute;
     private double zoom;
@@ -91,7 +90,9 @@ public class SimulationRenderer {
         this.camY = jl.getCenterPosY();
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
+        //System.out.println("scaleX: " + scaleX +  " scaleY: " + scaleY);
         this.scale = 1 + (scaleX / scaleY); // should calculate the rough scale of the map
+
         this.zoom = scale + 1;
         this.rotation = 0;
         for (Street s: sl.getStreets()) {
@@ -299,13 +300,6 @@ public class SimulationRenderer {
         this.viewMaxY = camY + (viewHeightWorld / 2);
     }
 
-    protected void setShowTrafficLightIDs(boolean showTrafficLightIDs) {
-        this.showTrafficLightIDs = showTrafficLightIDs;
-    }
-
-    protected boolean getShowTrafficLightIDs() {
-        return showTrafficLightIDs;
-    }
 
     protected void setSelectablePoints(boolean p) {
         this.showSelectablePoints = p;
@@ -491,9 +485,17 @@ public class SimulationRenderer {
      * Is called by {@link GuiController#zoomMap(ScrollEvent)}
      * @param z
      */
-    public void zoomMap(double z) {
-        // should have a zoom min and max cap based on map scale
-        zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+    public void zoomMapIn(double z) {
+        // should have a zoom min and max cap based on map scale , max cap = scale*2
+        if (zoom < scale*2) {
+            zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+        }
+    }
+
+    public void zoomMapOut(double z) {
+        if (zoom > scale / 5) {
+            zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+        }
     }
 
     protected void setSeeTrafficLightIDs(boolean seeTrafficLightIDs) { this.seeTrafficLightIDs = seeTrafficLightIDs; }
