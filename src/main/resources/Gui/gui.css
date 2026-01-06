@@ -201,6 +201,13 @@
     -fx-background-insets: 0, 2;
 }
 
+#createButton {
+    -fx-background-image: url("/Gui/Icons/create.png");
+    -fx-background-size: 50px 50px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
+}
+
 /* Middle style */
 .zoomMenu {
     -fx-fill: -fx-color-grey-light ;

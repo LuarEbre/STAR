@@ -40,15 +40,16 @@ import javafx.stage.Stage;
 public class GuiController {
     // all FXML objects
     @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu;
+    private AnchorPane dataPane, root, middlePane, addMenu,
+            filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu, createMenu;
     @FXML
     private ColorPicker colorSelector;
     @FXML
     private VBox fileMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
+    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;
 
     private ButtonBase[] allButtons;
 
@@ -475,6 +476,11 @@ public class GuiController {
         toggleMenuAtButton(stressTestMenu, stressTestButton);
     }
 
+    @FXML
+    private void onCreate() {
+        toggleMenuAtButton(createMenu, createButton);
+    }
+
     /**
      * <p>
      *     Called when "step button" is pressed.
@@ -857,7 +863,7 @@ public class GuiController {
 
     @FXML
     protected void changeToMap2() {
-        changeMap("TestMap");
+        changeMap("RugMap");
     }
 
     private void changeMap(String mapName) {
@@ -867,8 +873,19 @@ public class GuiController {
         wrapperController.mapSwitch(mapName);
     }
 
+    private void createType() {
+        // all possible choices -> if no entry : empty in xml
+    }
+
     private void importMap() {
 
+    }
+
+    @FXML
+    private void addRoute() {
+        // needs argument: start and end junction id
+        // J0, J11
+        wrapperController.addRoute("J0", "J1", "testID");
     }
 
 }

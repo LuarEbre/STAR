@@ -24,11 +24,11 @@ public class SumoMapManager implements MapLoader{
                 "src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg"
         ));
 
-        maps.put("TestMap", new SumoMapConfig(
-                "TestMap",
-                "src/main/resources/SumoConfig/Map_2/test.net.xml",
-                "src/main/resources/SumoConfig/Map_2/test.rou.xml",
-                "src/main/resources/SumoConfig/Map_2/test.sumocfg"
+        maps.put("RugMap", new SumoMapConfig(
+                "RugMap",
+                "src/main/resources/SumoConfig/RugMap/rugmap.net.xml",
+                "src/main/resources/SumoConfig/RugMap/rugmap.rou.xml",
+                "src/main/resources/SumoConfig/RugMap/rugmap.sumocfg"
         ));
     }
 
