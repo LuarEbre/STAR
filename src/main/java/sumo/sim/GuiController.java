@@ -830,11 +830,11 @@ public class GuiController {
     protected void zoomMap(ScrollEvent event){
 
         if (event.getDeltaY() > 0) { // delta y vertical
-            sr.zoomMap(1.25);
+            sr.zoomMapIn(1.25);
             //System.out.println("zoom");
         } else  {
             //System.out.println("zoomout");
-            sr.zoomMap(0.75);
+            sr.zoomMapOut(0.75);
         }
     }
 
