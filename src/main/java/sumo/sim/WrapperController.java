@@ -5,6 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +59,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         mapConfig = mapManager.getConfig("Frankfurt"); // Frankfurt, TestMap
-        String configFile = mapConfig.getConfigPath();
-        currentNet = mapConfig.getNetPath();
-        currentRou = mapConfig.getRouPath();
+        String configFile = mapConfig.getConfigPath().toString();
+        currentNet = mapConfig.getNetPath().toString();
+        currentRou = mapConfig.getRouPath().toString();
 
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary,configFile);
@@ -222,10 +223,10 @@ public class WrapperController {
             // load new config
             try {
                 mapConfig= mapManager.getConfig(mapName);
-                currentNet = mapConfig.getNetPath();
-                currentRou = mapConfig.getRouPath();
+                currentNet = mapConfig.getNetPath().toString();
+                currentRou = mapConfig.getRouPath().toString();
 
-                this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath()); // new connection
+                this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath().toString()); // new connection
                 simTime = 0;
 
                 // prevents new sim from starting instantly
