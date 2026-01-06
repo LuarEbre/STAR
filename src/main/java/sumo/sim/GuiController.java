@@ -16,6 +16,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import java.util.Locale;
 import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -40,16 +42,15 @@ import javafx.stage.Stage;
 public class GuiController {
     // all FXML objects
     @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu,
-            filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu, createMenu;
+    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu;
     @FXML
     private ColorPicker colorSelector;
     @FXML
     private VBox fileMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton;
+    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select, importMapButton;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;
 
     private ButtonBase[] allButtons;
 
@@ -66,16 +67,19 @@ public class GuiController {
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
     @FXML
-    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
+    private CheckBox buttonView, dataView;
     @FXML
-    private TextField amountField, stateText;
+    private TextField amountField, stateText, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
+    @FXML
+    private TabPane tabPane;
     @FXML
     private HBox mainButtonBox;
+    @FXML
+    private CheckBox showDensityAnchor, showDataOutput, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
-    private Stage stage;
 
     // dragging window
     private double xOffset, yOffset;
@@ -91,7 +95,6 @@ public class GuiController {
     private WrapperController wrapperController;
     private final int defaultDelay;
     private final int maxDelay;
-    private final FileReader fileReader;
 
     /**
      * <p>
@@ -104,12 +107,7 @@ public class GuiController {
     public GuiController() {
         this.defaultDelay = 50;
         this.maxDelay = 999;
-        fileReader = new FileReader();
         panSen = 2;
-    }
-
-    public void setStage(Stage s) {
-        stage = s;
     }
 
     /**
@@ -202,7 +200,7 @@ public class GuiController {
      *     Methods called:
      *  <ul>
      *      <li> {@link #rescale()} rescales GUI elements based on height and width of the frame. </li>
-     *      <li> {@link #updateDataList()} updates data Listview object displayed on the left Pane. </li>
+     *      <li> {@link #updateDataPane()} updates data Listview object displayed on the left Pane. </li>
      *      <li> {@link #validateInput(TextField)} checks weather the given input is correct or not. </li>
      *  </ul>
      * </p>
@@ -210,7 +208,6 @@ public class GuiController {
     @FXML
     public void initialize() {
         rescale(); // rescales menu based on width and height
-        updateDataList();
         setUpInputs(); // Spinner factory etc. initializing
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
@@ -483,11 +480,6 @@ public class GuiController {
         toggleMenuAtButton(stressTestMenu, stressTestButton);
     }
 
-    @FXML
-    private void onCreate() {
-        toggleMenuAtButton(createMenu, createButton);
-    }
-
     /**
      * <p>
      *     Called when "step button" is pressed.
@@ -622,6 +614,7 @@ public class GuiController {
         updateDelay();
         updateCountVeh();
         updateTLPhaseText();
+        this.updateDataPane();
     }
 
     /**
@@ -633,36 +626,52 @@ public class GuiController {
         }
     }
 
+    private String rawSecondsToHMS(int seconds) {
+        StringBuilder sb = new StringBuilder();
+        int h = seconds / 3600; // every 3600 ms is one hour
+        int m = seconds % 3600 / 60; // minutes 0 to 3599 / 60
+        int s =  seconds % 60; // seconds 0 - 59
+        sb.append(String.format("%02d:%02d:%02d", h, m, s));
+        return sb.toString();
+    }
     /**
      * Calculates time provided by {@link WrapperController#getTime()}
      * formats it to: "HH:MM:SS"  and displays it in GUI
      */
     public void updateTime() {
         int time = (int) wrapperController.getTime();
-        StringBuilder b1 = new StringBuilder();
-        int hours = time / 3600; // every 3600 ms is one hour
-        int minutes = time % 3600 / 60; // minutes 0 to 3599 / 60
-        int seconds =  time % 60; // seconds 0 - 59
-        b1.append(String.format("%02d:%02d:%02d", hours, minutes, seconds));
-        timeLabel.setText(b1.toString());
+        timeLabel.setText(this.rawSecondsToHMS(time));
     }
 
     /**
      * Refreshes the data list view (currently placeholder structure).
      */
-    public void updateDataList() {
-        // list of data should be returned from vehicle/tl lists -> entry for every object, maybe list in listdata.getItems().addAll
-        listData.getItems().clear();
+    public void updateDataPane() {
+        Locale.setDefault(Locale.US);
+        VehicleList vehicles = wrapperController.getVehicles();
+        String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
+        if (currentTab.equals("Overall")) {
+            int time = (int) wrapperController.getTime();
+            int activeCount = vehicles.getActiveCount();
+            int currentlyStopped = vehicles.getStoppedCount();
+            int stoppedTime = vehicles.getStoppedTime();
+            float stoppedPercentage = 0f;
+            if (activeCount > 0) { stoppedPercentage = (currentlyStopped / (float) activeCount) * 100; }
 
-        for (int i=0; i<4 ;i++) {
-            listData.getItems().add("---- Vehicle #X ----");
-            listData.getItems().addAll("Vehicle ID: ", "Type: ", "Route ID", "Color: ", "Speed: ", "Position: ",
-                    "Angle: ", "Accel: ", "Decel: ", "Stop Time: ", ""
-            ); // change = set/add(index, String) ; append = set(index, old + " + new text");
-            // needs formula to calculate index for appending?
+            this.activeVehicles.setText(Integer.toString(activeCount));
+            this.VehiclesNotOnScreen.setText("not implemented yet");
+            this.DepartedVehicles.setText("not implemented yet");
+            this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
+            this.TotalTimeSpentStopped.setText(String.format("%s", this.rawSecondsToHMS(stoppedTime)));
+            this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
+            this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
+
+        } else if (currentTab.equals("Selected")) {
+
+        } else {
+
         }
     }
-
 
     /**
      * Updates the vehicle count label.
@@ -769,10 +778,6 @@ public class GuiController {
         //wrapperController.terminate(); // terminates sumo connection and wrapCon thread
     }
 
-    protected void reset(){
-
-    }
-
     /**
      * Initializes the {@link SimulationRenderer}.
      * <p>
@@ -817,7 +822,7 @@ public class GuiController {
 
     /**
      * Handles scrolling events on the map to zoom in or out and calls
-     * {@link SimulationRenderer
+     * {@link SimulationRenderer#zoomMap(double)}
      *
      * @param event the scroll event generated by the mouse wheel.
      */
@@ -825,11 +830,11 @@ public class GuiController {
     protected void zoomMap(ScrollEvent event){
 
         if (event.getDeltaY() > 0) { // delta y vertical
-            sr.zoomMapIn(1.25);
+            sr.zoomMap(1.25);
             //System.out.println("zoom");
         } else  {
             //System.out.println("zoomout");
-            sr.zoomMapOut(0.75);
+            sr.zoomMap(0.75);
         }
     }
 
@@ -870,7 +875,7 @@ public class GuiController {
 
     @FXML
     protected void changeToMap2() {
-        changeMap("RugMap");
+        changeMap("TestMap");
     }
 
     private void changeMap(String mapName) {
@@ -880,21 +885,8 @@ public class GuiController {
         wrapperController.mapSwitch(mapName);
     }
 
-    private void createType() {
-        // all possible choices -> if no entry : empty in xml
-    }
-
-    @FXML
     private void importMap() {
-       // fileReader.chooseFile();
-        fileReader.chooseFile(stage);
-    }
 
-    @FXML
-    private void addRoute() {
-        // needs argument: start and end junction id
-        // J0, J11
-        wrapperController.addRoute("J0", "J1", "testID");
     }
 
 }
