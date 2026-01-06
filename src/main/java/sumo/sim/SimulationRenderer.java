@@ -172,6 +172,7 @@ public class SimulationRenderer {
      * </p>
      */
     private void renderMap() {
+        // map color
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(scale);
@@ -194,19 +195,19 @@ public class SimulationRenderer {
                 else {
                     gc.setStroke(Color.BLACK);
                 }
-            // density rendering
+            // density rendering, colors lanes based on density
             } else if (viewDensityOn){
-                if(s.getDensity() >=100.0){
-                    gc.setStroke(Color.RED);
+                if (s.getDensity() >=100.0){
+                    gc.setStroke(Color.rgb(163, 29, 45, 0.6));
                 } else if ((s.getDensity() < 100.0) && (s.getDensity() >= 50.0)) {
-                    gc.setStroke(Color.ORANGE);
+                    gc.setStroke(Color.rgb(217, 126, 22, 0.6));
                 } else if ((s.getDensity() < 50.0) && (s.getDensity() >= 20.0)) {
-                    gc.setStroke(Color.YELLOW);
-                }else{
-                    gc.setStroke(Color.GREEN);
+                    gc.setStroke(Color.rgb(231, 240, 58, 0.6));
+                }else {
+                    gc.setStroke(Color.rgb(96, 219, 68, 0.6));
                 }
             } else {
-                gc.setStroke(Color.BLACK);
+                gc.setStroke(Color.rgb(0,0,0,0.6)); // standard street color
             }
             // stroke Polyline for lanes
             if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX

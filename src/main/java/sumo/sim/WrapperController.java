@@ -85,7 +85,7 @@ public class WrapperController {
             tl = new TrafficLightList(connection, sl);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
-            rl = new RouteList(currentRou);
+            rl = new RouteList(currentRou, connection);
 
             tl.updateAllCurrentState(); // important for rendering
             start();
@@ -258,6 +258,10 @@ public class WrapperController {
     public void addVehicle(int amount, String type, String route, Color color) {
         // used by guiController, executes addVehicle from WrapperVehicle
         vl.addVehicle(amount, type, route, color);
+    }
+
+    public void addRoute(String start, String end, String id) {
+        rl.generateRoute(start, end, id, jl);
     }
 
     /**
