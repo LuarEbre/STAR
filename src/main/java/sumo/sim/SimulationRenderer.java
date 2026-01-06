@@ -75,7 +75,7 @@ public class SimulationRenderer {
 
         this.showTrafficLightIDs = true;
         this.showRouteHighlighting = true;
-        this.showDensityAnchor = true;
+        this.showDensityAnchor = false;
 
         this.seeTrafficLightIDs = false;
 
