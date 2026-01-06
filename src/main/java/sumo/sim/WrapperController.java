@@ -195,7 +195,6 @@ public class WrapperController {
             sl.updateStreets();
             //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
-
             if (!terminated) {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
