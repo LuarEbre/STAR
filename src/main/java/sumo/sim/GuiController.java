@@ -49,7 +49,7 @@ public class GuiController {
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select, importMapButton;
 
     private ButtonBase[] allButtons;
 
@@ -75,6 +75,7 @@ public class GuiController {
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
+    private Stage stage;
 
     // dragging window
     private double xOffset, yOffset;
@@ -90,6 +91,7 @@ public class GuiController {
     private WrapperController wrapperController;
     private final int defaultDelay;
     private final int maxDelay;
+    private final FileReader fileReader;
 
     /**
      * <p>
@@ -102,7 +104,12 @@ public class GuiController {
     public GuiController() {
         this.defaultDelay = 50;
         this.maxDelay = 999;
+        fileReader = new FileReader();
         panSen = 2;
+    }
+
+    public void setStage(Stage s) {
+        stage = s;
     }
 
     /**
@@ -877,8 +884,10 @@ public class GuiController {
         // all possible choices -> if no entry : empty in xml
     }
 
+    @FXML
     private void importMap() {
-
+       // fileReader.chooseFile();
+        fileReader.chooseFile(stage);
     }
 
     @FXML
