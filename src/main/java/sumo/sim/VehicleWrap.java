@@ -41,7 +41,7 @@ public class VehicleWrap {
     private boolean activeLastFrame; // using oldSpeed could render activeLastFrame useless
     private boolean currentlyStopped;
     private boolean exists; // check for despawning in gui?
-    private boolean departed;
+    private boolean queued;
 
     // could be used for selecting in the GUI later on
     private boolean selected;
@@ -73,7 +73,7 @@ public class VehicleWrap {
         this.totalLifetime = 0;
         this.activeLastFrame = false;
         this.currentlyStopped = false;
-        this.departed = false;
+        this.queued = true;
     }
 
     /**
@@ -201,4 +201,6 @@ public class VehicleWrap {
      */
     public String getRouteID() { return routeID; }
     public boolean isCurrentlyStopped() { return this.currentlyStopped; }
+    protected void setQueued(boolean queued) { this.queued = queued; }
+    protected boolean isQueued()  { return this.queued; }
 }

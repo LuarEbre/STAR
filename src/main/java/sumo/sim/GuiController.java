@@ -3,6 +3,7 @@ package sumo.sim;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -48,7 +49,8 @@ public class GuiController {
     @FXML
     private VBox fileMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
+    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton,
+            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton;
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;
 
@@ -65,9 +67,11 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
+    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector, importMapSelector;
     @FXML
     private CheckBox buttonView, dataView;
+    @FXML
+    private TextField amountField, stateText, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
     @FXML
     private TextField amountField, stateText, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
     @FXML
@@ -96,6 +100,7 @@ public class GuiController {
     private WrapperController wrapperController;
     private final int defaultDelay;
     private final int maxDelay;
+    private SumoMapManager mapManager;
 
     /**
      * <p>
@@ -111,8 +116,9 @@ public class GuiController {
         panSen = 2;
     }
 
-    public void setStage(Stage s) {
-        this.stage = s;
+    public void setStageAndManager(Stage s , SumoMapManager mapManager) {
+        stage = s;
+        this.mapManager = mapManager;
     }
 
     /**
@@ -220,6 +226,12 @@ public class GuiController {
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
         addVehicleButton.setDisable(true);
+
+        importMapSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                changeToImportedMap();
+            }
+        });
     }
 
     private void setUpInputs() {
@@ -391,6 +403,10 @@ public class GuiController {
         // still needs fix for small gap between buttons and menus at the top
     }
 
+    private void disableAllTopMenuButtons() {
+
+    }
+
     /**
      * <p>
      *     Is triggered when pressing "-" on amountButton
@@ -498,6 +514,14 @@ public class GuiController {
 
     // top right menu buttons hovered
 
+
+    private void topMenuButtonToggle(ToggleButton button, AnchorPane menu) {
+        menu.setVisible(button.isSelected());
+    }
+
+    private void topMenuButtonToggle(ToggleButton button, VBox menu) {
+        menu.setVisible(button.isSelected());
+    }
     /**
      * Is triggered when user hovers over "filter" button
      *
@@ -507,30 +531,40 @@ public class GuiController {
      * </p>
      */
     @FXML
-    protected void onFiltersHover(){
+    protected void onFiltersPressed(){
         closeAllMenus();
-        filtersMenuSelect.setVisible(true);
+        topMenuButtonToggle(filterMenuButton, filtersMenuSelect);
     }
 
+
     /**
-     * Equivalent to {@link #onFiltersHover()}
+     * Equivalent to {@link #onFiltersPressed()}
      */
     @FXML
-    protected void onMapsHover(){
+    protected void onMapsPressed(){
         // deactivate all menus
         closeAllMenus();
-        // activate Map menu
-        mapMenuSelect.setVisible(true);
+        topMenuButtonToggle(mapsMenuButton, mapMenuSelect);
     }
 
     /**
-     * Equivalent to {@link #onFiltersHover()}
+     * Equivalent to {@link #onFiltersPressed()}
      */
     @FXML
-    protected void onViewHover(){
+    protected void onViewPressed(){
         closeAllMenus();
-        viewMenuSelect.setVisible(true);
+        topMenuButtonToggle(viewMenuButton, viewMenuSelect);
     }
+
+    /**
+     * Equivalent to {@link #onFiltersPressed()}
+     */
+    @FXML
+    protected void onFilePressed(){
+        closeAllMenus();
+        topMenuButtonToggle(fileMenuButton, fileMenuSelect);
+    }
+
 
     @FXML void onDataOutputToggle() {
 
@@ -555,8 +589,8 @@ public class GuiController {
     protected void onTrafficLightIDToggle() { sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected()); }
 
     @FXML
-    protected void onMiddlePaneHover(){
-
+    protected void onMiddlePaneClicked(){
+        closeAllMenus();
     }
 
     @FXML
@@ -568,15 +602,6 @@ public class GuiController {
         }
     }
 
-
-    /**
-     * Equivalent to {@link #onFiltersHover()}
-     */
-    @FXML
-    protected void onFileHover(){
-        closeAllMenus();
-        fileMenuSelect.setVisible(true);
-    }
 
     // main buttons menu methods
 
@@ -656,25 +681,34 @@ public class GuiController {
         VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
         if (currentTab.equals("Overall")) {
-            int time = (int) wrapperController.getTime();
+            int overallVehicleCount = wrapperController.getAllVehicleCount();
             int activeCount = vehicles.getActiveCount();
+            int queuedCount = vehicles.getQueuedCount();
+            int exitedCount = overallVehicleCount - activeCount - queuedCount;
             int currentlyStopped = vehicles.getStoppedCount();
             int stoppedTime = vehicles.getStoppedTime();
             float stoppedPercentage = 0f;
-            if (activeCount > 0) { stoppedPercentage = (currentlyStopped / (float) activeCount) * 100; }
+            if (activeCount > 0) {
+                stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
+            }
 
             this.activeVehicles.setText(Integer.toString(activeCount));
-            this.VehiclesNotOnScreen.setText("not implemented yet");
-            this.DepartedVehicles.setText("not implemented yet");
+            this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
+            this.DepartedVehicles.setText(Integer.toString(exitedCount));
             this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
             this.TotalTimeSpentStopped.setText(String.format("%s", this.rawSecondsToHMS(stoppedTime)));
             this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
 
         } else if (currentTab.equals("Selected")) {
-
+            return;
+            // if no Object is selected display "Please select a Vehicle using Select Mode" and highlight Select Mode Button
+            // Vehicles:
+            // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
+            // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
         } else {
-
+            return;
+            // Same as Overall, but only taking filtered Vehicles into account, which requires a separate VehicleList...
         }
     }
 
@@ -762,7 +796,6 @@ public class GuiController {
             dataPane.setVisible(true);
             rescale();
         }
-
     }
 
     private void stopRenderer() {
@@ -851,7 +884,9 @@ public class GuiController {
      * </p>
      */
     public void mapPan() {
+
         staticMap.setOnMousePressed(event -> {
+            closeAllMenus(); // closes all top menus when panning
             mousePressedXOld = event.getX(); // old
             mousePressedYOld = event.getY();
             //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
@@ -883,14 +918,29 @@ public class GuiController {
         changeMap("TestMap");
     }
 
+    @FXML
+    protected void changeToImportedMap() {
+        changeMap(importMapSelector.getValue());
+    }
+
     private void changeMap(String mapName) {
         // disable buttons -> prevents spamming of switches
         map1select.setDisable(true);
         map2select.setDisable(true);
-        wrapperController.mapSwitch(mapName);
+        if (mapName != null) {
+            wrapperController.mapSwitch(mapName);
+        }
+        importMapSelector.getSelectionModel().clearSelection(); // resets previous selection
     }
 
     private void importMap() {
+        mapManager.chooseFile(stage);
+        updateImportedMaps();
+    }
+
+    private void updateImportedMaps() {
+        importMapSelector.setItems(FXCollections.observableArrayList(mapManager.getAllImportedMaps()));
+    }
 
     }
 
