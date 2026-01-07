@@ -7,6 +7,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import javax.xml.stream.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Map;
@@ -94,6 +95,38 @@ public class XML {
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public Map<String, String> getConfigInputs() {
+        Map<String, String> inputs = new HashMap<>();
+
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            Document doc = builder.build(new File(path));
+            Element root = doc.getRootElement();
+
+            // only element, children of root
+            Element inputTag = root.getChild("input");
+
+            if (inputTag != null) {
+                // list of all children (net-file, route-files, additional-files...)
+                List<Element> children = inputTag.getChildren();
+
+                for (Element child : children) {
+                    String tagName = child.getName(); // like "net-file" etc.
+                    String value = child.getAttributeValue("value"); // like "test.net.xml"
+
+                    if (value != null) {
+                        inputs.put(tagName, value); // only add if not null
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading input file");
+        }
+
+        return inputs;
     }
 
     /**

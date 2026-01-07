@@ -3,6 +3,7 @@ package sumo.sim;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -16,6 +17,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import java.util.Locale;
 import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -40,15 +43,17 @@ import javafx.stage.Stage;
 public class GuiController {
     // all FXML objects
     @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu, filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu;
+    private AnchorPane dataPane, root, middlePane, addMenu,
+            filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu, createMenu;
     @FXML
     private ColorPicker colorSelector;
     @FXML
     private VBox fileMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
+    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton,
+            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select, importMapButton;
 
     private ButtonBase[] allButtons;
 
@@ -63,19 +68,20 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
+    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector, importMapSelector;
     @FXML
-    private CheckBox buttonView, dataView;
+    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
     @FXML
-    private TextField amountField, stateText;
+    private TextField amountField, stateText, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
+    @FXML
+    private TabPane tabPane;
     @FXML
     private HBox mainButtonBox;
-    @FXML
-    private CheckBox showDensityAnchor, showDataOutput, showButtons, showRouteHighlighting, showTrafficLightIDs;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
+    private Stage stage;
 
     // dragging window
     private double xOffset, yOffset;
@@ -91,6 +97,7 @@ public class GuiController {
     private WrapperController wrapperController;
     private final int defaultDelay;
     private final int maxDelay;
+    private SumoMapManager mapManager;
 
     /**
      * <p>
@@ -104,6 +111,11 @@ public class GuiController {
         this.defaultDelay = 50;
         this.maxDelay = 999;
         panSen = 2;
+    }
+
+    public void setStageAndManager(Stage s , SumoMapManager mapManager) {
+        stage = s;
+        this.mapManager = mapManager;
     }
 
     /**
@@ -196,7 +208,7 @@ public class GuiController {
      *     Methods called:
      *  <ul>
      *      <li> {@link #rescale()} rescales GUI elements based on height and width of the frame. </li>
-     *      <li> {@link #updateDataList()} updates data Listview object displayed on the left Pane. </li>
+     *      <li> {@link #updateDataPane()} updates data Listview object displayed on the left Pane. </li>
      *      <li> {@link #validateInput(TextField)} checks weather the given input is correct or not. </li>
      *  </ul>
      * </p>
@@ -204,7 +216,6 @@ public class GuiController {
     @FXML
     public void initialize() {
         rescale(); // rescales menu based on width and height
-        updateDataList();
         setUpInputs(); // Spinner factory etc. initializing
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
@@ -212,6 +223,12 @@ public class GuiController {
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
         addVehicleButton.setDisable(true);
+
+        importMapSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                changeToImportedMap();
+            }
+        });
     }
 
     private void setUpInputs() {
@@ -383,6 +400,10 @@ public class GuiController {
         // still needs fix for small gap between buttons and menus at the top
     }
 
+    private void disableAllTopMenuButtons() {
+
+    }
+
     /**
      * <p>
      *     Is triggered when pressing "-" on amountButton
@@ -477,6 +498,11 @@ public class GuiController {
         toggleMenuAtButton(stressTestMenu, stressTestButton);
     }
 
+    @FXML
+    private void onCreate() {
+        toggleMenuAtButton(createMenu, createButton);
+    }
+
     /**
      * <p>
      *     Called when "step button" is pressed.
@@ -490,6 +516,14 @@ public class GuiController {
 
     // top right menu buttons hovered
 
+
+    private void topMenuButtonToggle(ToggleButton button, AnchorPane menu) {
+        menu.setVisible(button.isSelected());
+    }
+
+    private void topMenuButtonToggle(ToggleButton button, VBox menu) {
+        menu.setVisible(button.isSelected());
+    }
     /**
      * Is triggered when user hovers over "filter" button
      *
@@ -499,30 +533,40 @@ public class GuiController {
      * </p>
      */
     @FXML
-    protected void onFiltersHover(){
+    protected void onFiltersPressed(){
         closeAllMenus();
-        filtersMenuSelect.setVisible(true);
+        topMenuButtonToggle(filterMenuButton, filtersMenuSelect);
     }
 
+
     /**
-     * Equivalent to {@link #onFiltersHover()}
+     * Equivalent to {@link #onFiltersPressed()}
      */
     @FXML
-    protected void onMapsHover(){
+    protected void onMapsPressed(){
         // deactivate all menus
         closeAllMenus();
-        // activate Map menu
-        mapMenuSelect.setVisible(true);
+        topMenuButtonToggle(mapsMenuButton, mapMenuSelect);
     }
 
     /**
-     * Equivalent to {@link #onFiltersHover()}
+     * Equivalent to {@link #onFiltersPressed()}
      */
     @FXML
-    protected void onViewHover(){
+    protected void onViewPressed(){
         closeAllMenus();
-        viewMenuSelect.setVisible(true);
+        topMenuButtonToggle(viewMenuButton, viewMenuSelect);
     }
+
+    /**
+     * Equivalent to {@link #onFiltersPressed()}
+     */
+    @FXML
+    protected void onFilePressed(){
+        closeAllMenus();
+        topMenuButtonToggle(fileMenuButton, fileMenuSelect);
+    }
+
 
     @FXML void onDataOutputToggle() {
 
@@ -547,19 +591,19 @@ public class GuiController {
     protected void onTrafficLightIDToggle() { sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected()); }
 
     @FXML
-    protected void onMiddlePaneHover(){
-
-    }
-
-
-    /**
-     * Equivalent to {@link #onFiltersHover()}
-     */
-    @FXML
-    protected void onFileHover(){
+    protected void onMiddlePaneClicked(){
         closeAllMenus();
-        fileMenuSelect.setVisible(true);
     }
+
+    @FXML
+    protected void onDensityHeatmapToggle(){
+        if(densityHeatmap.isSelected()) {
+            sr.setViewDensityOn(true);
+        }else{
+            sr.setViewDensityOn(false);
+        }
+    }
+
 
     // main buttons menu methods
 
@@ -602,6 +646,7 @@ public class GuiController {
         updateDelay();
         updateCountVeh();
         updateTLPhaseText();
+        this.updateDataPane();
     }
 
     /**
@@ -613,36 +658,61 @@ public class GuiController {
         }
     }
 
+    private String rawSecondsToHMS(int seconds) {
+        StringBuilder sb = new StringBuilder();
+        int h = seconds / 3600; // every 3600 ms is one hour
+        int m = seconds % 3600 / 60; // minutes 0 to 3599 / 60
+        int s =  seconds % 60; // seconds 0 - 59
+        sb.append(String.format("%02d:%02d:%02d", h, m, s));
+        return sb.toString();
+    }
     /**
      * Calculates time provided by {@link WrapperController#getTime()}
      * formats it to: "HH:MM:SS"  and displays it in GUI
      */
     public void updateTime() {
         int time = (int) wrapperController.getTime();
-        StringBuilder b1 = new StringBuilder();
-        int hours = time / 3600; // every 3600 ms is one hour
-        int minutes = time % 3600 / 60; // minutes 0 to 3599 / 60
-        int seconds =  time % 60; // seconds 0 - 59
-        b1.append(String.format("%02d:%02d:%02d", hours, minutes, seconds));
-        timeLabel.setText(b1.toString());
+        timeLabel.setText(this.rawSecondsToHMS(time));
     }
 
     /**
      * Refreshes the data list view (currently placeholder structure).
      */
-    public void updateDataList() {
-        // list of data should be returned from vehicle/tl lists -> entry for every object, maybe list in listdata.getItems().addAll
-        listData.getItems().clear();
+    public void updateDataPane() {
+        Locale.setDefault(Locale.US);
+        VehicleList vehicles = wrapperController.getVehicles();
+        String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
+        if (currentTab.equals("Overall")) {
+            int overallVehicleCount = wrapperController.getAllVehicleCount();
+            int activeCount = vehicles.getActiveCount();
+            int queuedCount = vehicles.getQueuedCount();
+            int exitedCount = overallVehicleCount - activeCount - queuedCount;
+            int currentlyStopped = vehicles.getStoppedCount();
+            int stoppedTime = vehicles.getStoppedTime();
+            float stoppedPercentage = 0f;
+            if (activeCount > 0) {
+                stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
+            }
 
-        for (int i=0; i<4 ;i++) {
-            listData.getItems().add("---- Vehicle #X ----");
-            listData.getItems().addAll("Vehicle ID: ", "Type: ", "Route ID", "Color: ", "Speed: ", "Position: ",
-                    "Angle: ", "Accel: ", "Decel: ", "Stop Time: ", ""
-            ); // change = set/add(index, String) ; append = set(index, old + " + new text");
-            // needs formula to calculate index for appending?
+            this.activeVehicles.setText(Integer.toString(activeCount));
+            this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
+            this.DepartedVehicles.setText(Integer.toString(exitedCount));
+            this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
+            this.TotalTimeSpentStopped.setText(String.format("%s", this.rawSecondsToHMS(stoppedTime)));
+            this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
+            this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
+
+        } else if (currentTab.equals("Selected")) {
+            return;
+            // if no Object is selected display "Please select a Vehicle using Select Mode" and highlight Select Mode Button
+            // Vehicles:
+            // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
+            // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
+        } else {
+            return;
+            // Same as Overall, but only taking filtered Vehicles into account, which requires a separate VehicleList...
         }
     }
-
 
     /**
      * Updates the vehicle count label.
@@ -728,7 +798,6 @@ public class GuiController {
             dataPane.setVisible(true);
             rescale();
         }
-
     }
 
     private void stopRenderer() {
@@ -747,6 +816,10 @@ public class GuiController {
         renderLoop.stop(); // terminates Animation Timer
         Platform.exit(); // terminates JavaFX thread, runs "stop" method in GuiAppl
         //wrapperController.terminate(); // terminates sumo connection and wrapCon thread
+    }
+
+    protected void reset(){
+
     }
 
     /**
@@ -793,7 +866,7 @@ public class GuiController {
 
     /**
      * Handles scrolling events on the map to zoom in or out and calls
-     * {@link SimulationRenderer#zoomMap(double)}
+     * {@link SimulationRenderer
      *
      * @param event the scroll event generated by the mouse wheel.
      */
@@ -801,11 +874,11 @@ public class GuiController {
     protected void zoomMap(ScrollEvent event){
 
         if (event.getDeltaY() > 0) { // delta y vertical
-            sr.zoomMap(1.25);
+            sr.zoomMapIn(1.25);
             //System.out.println("zoom");
         } else  {
             //System.out.println("zoomout");
-            sr.zoomMap(0.75);
+            sr.zoomMapOut(0.75);
         }
     }
 
@@ -817,7 +890,9 @@ public class GuiController {
      * </p>
      */
     public void mapPan() {
+
         staticMap.setOnMousePressed(event -> {
+            closeAllMenus(); // closes all top menus when panning
             mousePressedXOld = event.getX(); // old
             mousePressedYOld = event.getY();
             //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
@@ -846,18 +921,43 @@ public class GuiController {
 
     @FXML
     protected void changeToMap2() {
-        changeMap("TestMap");
+        changeMap("RugMap");
+    }
+
+    @FXML
+    protected void changeToImportedMap() {
+        changeMap(importMapSelector.getValue());
     }
 
     private void changeMap(String mapName) {
         // disable buttons -> prevents spamming of switches
         map1select.setDisable(true);
         map2select.setDisable(true);
-        wrapperController.mapSwitch(mapName);
+        if (mapName != null) {
+            wrapperController.mapSwitch(mapName);
+        }
+        importMapSelector.getSelectionModel().clearSelection(); // resets previous selection
     }
 
-    private void importMap() {
+    private void createType() {
+        // all possible choices -> if no entry : empty in xml
+    }
 
+    @FXML
+    private void importMap() {
+        mapManager.chooseFile(stage);
+        updateImportedMaps();
+    }
+
+    private void updateImportedMaps() {
+        importMapSelector.setItems(FXCollections.observableArrayList(mapManager.getAllImportedMaps()));
+    }
+
+    @FXML
+    private void addRoute() {
+        // needs argument: start and end junction id
+        // J0, J11
+        wrapperController.addRoute("J0", "J1", "testID");
     }
 
 }

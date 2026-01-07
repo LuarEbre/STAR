@@ -1,5 +1,9 @@
 package sumo.sim;
 
+import de.tudresden.sumo.cmd.Route;
+import de.tudresden.sumo.objects.SumoStringList;
+import it.polito.appeal.traci.SumoTraciConnection;
+
 import java.util.*;
 
 /**
@@ -11,6 +15,7 @@ public class RouteList {
 
     private final Map<String, List<String>> allRoutes;
     private  XML xmlReader;
+    private final SumoTraciConnection con;
 
     /**
      * Constructor for RouteList
@@ -18,8 +23,9 @@ public class RouteList {
      * @param rouXmlFilePath
      * @throws Exception
      */
-    public RouteList(String rouXmlFilePath) throws Exception {
+    public RouteList(String rouXmlFilePath, SumoTraciConnection con) throws Exception {
 
+        this.con = con;
         // parssing the xml file
         xmlReader = new XML(rouXmlFilePath);
         // map of routes(using getRoutes from XML class)
@@ -73,9 +79,11 @@ public class RouteList {
      */
     public void generateRoute(String start, String end, String routeID, JunctionList jl) {
 
+        // needs check if route id already exists
         for (JunctionWrap jw : jl.getJunctions()) {
             jw.setDistance(Double.MAX_VALUE);
             jw.setPredecessor(null);
+            //System.out.println(jw.getID());
         }
 
         JunctionWrap startNode = jl.getJunction(start);
@@ -142,8 +150,30 @@ public class RouteList {
         System.out.println("Junction Path: " + junctionPath); // empty list?
         System.out.println("Junction Path Size: " + junctionPath.size());
 
+        addRoute(edgeList, routeID);
+
         allRoutes.put(routeID, edgeList);
         xmlReader.newRoute(routeID, edgeList);
+    }
+
+    private void addRoute(List<String> edgeList, String routeID) {
+        SumoStringList route = new SumoStringList();
+        //route.addAll(edgeList);
+        // Simulation.findRoute()
+        String[] arr = {"E2", "E3", "E4", "E5"};
+        route.addAll(Arrays.asList(arr));
+        for (String s : route) {
+            System.out.println(s);
+        }
+
+        // adding in Sumo
+        try {
+            //System.out.println(con.do_job_get(Route.getIDCount()));
+            con.do_job_set(Route.add(routeID, route));
+            //System.out.println(con.do_job_get(Route.getIDCount()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

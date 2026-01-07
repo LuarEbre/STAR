@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- generated on 2025-12-13 23:19:24 by Eclipse SUMO netedit Version 1.24.0
 -->
-
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <!-- Routes -->
-    <route id="r_0" edges="-E16 E11 -E10 E12 E13 E14 E5 E6 -E0"/>
-    <route id="r_1" edges="E0 E1 E2 E8 E12 E15 E16" color="magenta"/>
-    <route id="r_2" edges="E0 E1 E2 E3 E4 -E14 -E13 E15 E16" color="cyan"/>
-    <route id="r_3" edges="-E9 E12 E13 E14 E5 E6 -E0" color="white"/>
-    <route id="r_4" edges="-E9 E12 E13 E14 E5 E7 E8 E12 E15 E16" color="black"/>
-    <route id="r_5" edges="-E16 E11 -E10 E12 E13 E14 E5 E7 E8 E9" color="grey"/>
-    <route id="r_6" edges="E0 E1 E2 E3 E4 E5 E6 -E0" color="red"/>
-    <route id="r_7" edges="E0 E1 E2 E8 E9" color="orange"/>
-    <route id="r_8" edges="-E9 E12 E13 E14 E5 E7 E8 E9" color="green"/>
+  <!-- Routes -->
+  <route id="r_0" edges="-E16 E11 -E10 E12 E13 E14 E5 E6 -E0" />
+  <route id="r_1" edges="E0 E1 E2 E8 E12 E15 E16" color="magenta" />
+  <route id="r_2" edges="E0 E1 E2 E3 E4 -E14 -E13 E15 E16" color="cyan" />
+  <route id="r_3" edges="-E9 E12 E13 E14 E5 E6 -E0" color="white" />
+  <route id="r_4" edges="-E9 E12 E13 E14 E5 E7 E8 E12 E15 E16" color="black" />
+  <route id="r_5" edges="-E16 E11 -E10 E12 E13 E14 E5 E7 E8 E9" color="grey" />
+  <route id="r_6" edges="E0 E1 E2 E3 E4 E5 E6 -E0" color="red" />
+  <route id="r_7" edges="E0 E1 E2 E8 E9" color="orange" />
+  <route id="r_8" edges="-E9 E12 E13 E14 E5 E7 E8 E9" color="green" />
+  <vType id="lkw_40t" vClass="truck" guiShape="truck" color="blue" length="2.0" width="2.5" minGap="2.5" maxSpeed="25.0" accel="1.2" decel="1.5" sigma="0.2" tau="1.5" speedFactor="0.95" />
+  <route id="testID" edges="E0" />
 </routes>
