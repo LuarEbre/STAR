@@ -80,6 +80,7 @@ public class GuiController {
     private GraphicsContext gc;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
+    private Stage stage;
 
     // dragging window
     private double xOffset, yOffset;
@@ -108,6 +109,10 @@ public class GuiController {
         this.defaultDelay = 50;
         this.maxDelay = 999;
         panSen = 2;
+    }
+
+    public void setStage(Stage s) {
+        this.stage = s;
     }
 
     /**
