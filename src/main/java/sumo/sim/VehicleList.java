@@ -85,6 +85,8 @@ public class VehicleList {
                     try {
                         v.updateVehicle();
                         v.setExists(true);
+                        // if vehicle is present in activeIDs it is no longer queued, and assuredly is on the road network
+                        v.setQueued(false);
                     } catch (Exception e) {
                         v.setExists(false); // if vehicle despawns
                     }
@@ -206,5 +208,64 @@ public class VehicleList {
      */
     public CopyOnWriteArrayList<VehicleWrap> getVehicles() {
         return vehicles;
+    }
+
+    public VehicleWrap getSelectedVehicle() {
+        for(VehicleWrap v : vehicles) {
+            if(v.isSelected()) return v;
+        }
+        return null;
+    }
+
+    public int getActiveCount() { return activeCount; }
+
+    public int getQueuedCount() {
+        int count = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.isQueued()) count++;
+        }
+        return count;
+    }
+
+    public int getStoppedCount() {
+        int count = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists() && v.isCurrentlyStopped()) count++;
+        }
+        return count;
+    }
+
+    public int getStoppedTime() {
+        int seconds = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) seconds+= v.getWaitingTime();
+        }
+        return seconds;
+    }
+
+    public double getMeanSpeed() {
+        double meanspeed = 0;
+        if(this.activeCount == 0) return meanspeed;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                meanspeed += v.getSpeed();
+            }
+        }
+        meanspeed /= this.activeCount;
+        return meanspeed;
+    }
+
+    public double getSpeedStdDev() {
+        // return 0.0 to avoid division by 0 down the line
+        if(this.activeCount == 0) return 0.0;
+        double meanspeed = this.getMeanSpeed();
+        double sumofsquares = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                double diff = v.getSpeed() - meanspeed;
+                sumofsquares += diff*diff;
+            }
+        }
+        return Math.sqrt(sumofsquares/this.activeCount);
     }
 }

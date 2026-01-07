@@ -47,6 +47,8 @@
 
 #dataPane {
     -fx-background-color: -fx-color-grey-middle;
+    -fx-border-color:-fx-color-grey-darkest;
+    -fx-border-width: 0 6 0 0;
 }
 
 .tab-pane, .tab-pane .tab {
@@ -88,9 +90,24 @@
     -fx-padding: 0.2em;
 }
 
-#dataSep .line {
-    -fx-border-color: -fx-color-grey-darkest;
-    -fx-border-width: 3;
+.text-field {
+    -fx-cursor: inherit;
+    -fx-border-width: 1.5;
+}
+
+.leftText {
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family:"Arial";
+    -fx-font-weight: bold;
+    -fx-background-color: -fx-color-grey-dark;
+    -fx-border-color: linear-gradient(from 0% 0% to 100% 100%, -fx-color-grey-lightest, -fx-color-grey-dark);
+}
+
+.rightText {
+    -fx-text-fill: -fx-color-white;
+
+    -fx-background-color: -fx-color-grey-light;
+    -fx-border-color: linear-gradient(from 0% 0% to 100% 100%, -fx-color-grey-lightest, -fx-color-grey-light);
 }
 
 #topSep .line {

@@ -16,6 +16,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import java.util.Locale;
 import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -48,7 +50,7 @@ public class GuiController {
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton;
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select;
 
     private ButtonBase[] allButtons;
 
@@ -67,7 +69,9 @@ public class GuiController {
     @FXML
     private CheckBox buttonView, dataView;
     @FXML
-    private TextField amountField, stateText;
+    private TextField amountField, stateText, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
+    @FXML
+    private TabPane tabPane;
     @FXML
     private HBox mainButtonBox;
     @FXML
@@ -196,7 +200,7 @@ public class GuiController {
      *     Methods called:
      *  <ul>
      *      <li> {@link #rescale()} rescales GUI elements based on height and width of the frame. </li>
-     *      <li> {@link #updateDataList()} updates data Listview object displayed on the left Pane. </li>
+     *      <li> {@link #updateDataPane()} updates data Listview object displayed on the left Pane. </li>
      *      <li> {@link #validateInput(TextField)} checks weather the given input is correct or not. </li>
      *  </ul>
      * </p>
@@ -204,7 +208,6 @@ public class GuiController {
     @FXML
     public void initialize() {
         rescale(); // rescales menu based on width and height
-        updateDataList();
         setUpInputs(); // Spinner factory etc. initializing
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
@@ -602,6 +605,7 @@ public class GuiController {
         updateDelay();
         updateCountVeh();
         updateTLPhaseText();
+        this.updateDataPane();
     }
 
     /**
@@ -613,36 +617,61 @@ public class GuiController {
         }
     }
 
+    private String rawSecondsToHMS(int seconds) {
+        StringBuilder sb = new StringBuilder();
+        int h = seconds / 3600; // every 3600 ms is one hour
+        int m = seconds % 3600 / 60; // minutes 0 to 3599 / 60
+        int s =  seconds % 60; // seconds 0 - 59
+        sb.append(String.format("%02d:%02d:%02d", h, m, s));
+        return sb.toString();
+    }
     /**
      * Calculates time provided by {@link WrapperController#getTime()}
      * formats it to: "HH:MM:SS"  and displays it in GUI
      */
     public void updateTime() {
         int time = (int) wrapperController.getTime();
-        StringBuilder b1 = new StringBuilder();
-        int hours = time / 3600; // every 3600 ms is one hour
-        int minutes = time % 3600 / 60; // minutes 0 to 3599 / 60
-        int seconds =  time % 60; // seconds 0 - 59
-        b1.append(String.format("%02d:%02d:%02d", hours, minutes, seconds));
-        timeLabel.setText(b1.toString());
+        timeLabel.setText(this.rawSecondsToHMS(time));
     }
 
     /**
      * Refreshes the data list view (currently placeholder structure).
      */
-    public void updateDataList() {
-        // list of data should be returned from vehicle/tl lists -> entry for every object, maybe list in listdata.getItems().addAll
-        listData.getItems().clear();
+    public void updateDataPane() {
+        Locale.setDefault(Locale.US);
+        VehicleList vehicles = wrapperController.getVehicles();
+        String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
+        if (currentTab.equals("Overall")) {
+            int overallVehicleCount = wrapperController.getAllVehicleCount();
+            int activeCount = vehicles.getActiveCount();
+            int queuedCount = vehicles.getQueuedCount();
+            int exitedCount = overallVehicleCount - activeCount - queuedCount;
+            int currentlyStopped = vehicles.getStoppedCount();
+            int stoppedTime = vehicles.getStoppedTime();
+            float stoppedPercentage = 0f;
+            if (activeCount > 0) {
+                stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
+            }
 
-        for (int i=0; i<4 ;i++) {
-            listData.getItems().add("---- Vehicle #X ----");
-            listData.getItems().addAll("Vehicle ID: ", "Type: ", "Route ID", "Color: ", "Speed: ", "Position: ",
-                    "Angle: ", "Accel: ", "Decel: ", "Stop Time: ", ""
-            ); // change = set/add(index, String) ; append = set(index, old + " + new text");
-            // needs formula to calculate index for appending?
+            this.activeVehicles.setText(Integer.toString(activeCount));
+            this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
+            this.DepartedVehicles.setText(Integer.toString(exitedCount));
+            this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
+            this.TotalTimeSpentStopped.setText(String.format("%s", this.rawSecondsToHMS(stoppedTime)));
+            this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
+            this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
+
+        } else if (currentTab.equals("Selected")) {
+            return;
+            // if no Object is selected display "Please select a Vehicle using Select Mode" and highlight Select Mode Button
+            // Vehicles:
+            // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
+            // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
+        } else {
+            return;
+            // Same as Overall, but only taking filtered Vehicles into account, which requires a separate VehicleList...
         }
     }
-
 
     /**
      * Updates the vehicle count label.
