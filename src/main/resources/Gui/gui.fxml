@@ -23,7 +23,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"  prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
@@ -46,7 +46,7 @@
                <Button fx:id="stepButton" mnemonicParsing="false" onAction="#onStep" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                 <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" onAction="#onStressTest" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
             <ToggleButton fx:id="trafficLightButton" layoutX="561.0" layoutY="34.0" mnemonicParsing="false" onAction="#onTrafficLight" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
-            <ToggleButton fx:id="createButton" onAction="#onCreate" layoutX="765.0" layoutY="34.0" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+            <ToggleButton fx:id="createButton" layoutX="765.0" layoutY="34.0" mnemonicParsing="false" onAction="#onCreate" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
            </children>
            <padding>
@@ -162,15 +162,20 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <GridPane prefHeight="417.0" prefWidth="259.0" styleClass="stat-grid" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
-                                      <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                      </columnConstraints>
-                                      <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <Label layoutX="35.0" layoutY="57.0" prefHeight="165.0" prefWidth="199.0" styleClass="notSelected" text="No Object has been selected, to display data of singular Objects, please use the Select Mode" textFill="#f1f1f1" wrapText="true" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="35.0">
+                                       <font>
+                                          <Font name="Arial Black" size="14.0" />
+                                       </font></Label>
+                                    <Label layoutX="40.0" layoutY="60.0" prefHeight="45.0" prefWidth="229.0" styleClass="locationHint" text="highlighted at the bottom left in magenta" textAlignment="CENTER" textFill="#ff1cf0" wrapText="true" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="200.0">
+                                       <font>
+                                          <Font name="Arial Italic" size="12.0" />
+                                       </font></Label>
+                                    <GridPane fx:id="SelectedGrid" alignment="CENTER" opacity="0.0" prefHeight="390.0" prefWidth="259.0" styleClass="stat-grid" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="130.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="129.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -182,7 +187,141 @@
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                      </rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicle ID">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="activeVehicles1" editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicle Type" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesNotOnScreen1" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Color" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Current Speed" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Average Speed" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Peak Speed" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Acceleration" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="DepartedVehicles1" editable="false" layoutX="130.0" layoutY="41.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesCurrentlyStopped1" editable="false" layoutX="120.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="TotalTimeSpentStopped1" editable="false" layoutX="120.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="MeanSpeed1" editable="false" layoutX="120.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD1" editable="false" layoutX="120.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Position" GridPane.rowIndex="7">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Angle" GridPane.rowIndex="8">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Acceleration" GridPane.rowIndex="9">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Total Lifetime" GridPane.rowIndex="10">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Time spent Stopped" GridPane.rowIndex="11">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Stops" GridPane.rowIndex="12">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD11" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD12" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD13" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD14" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD15" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD16" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                       </children>
                                     </GridPane>
                                  </children>
                               </AnchorPane>
@@ -190,7 +329,104 @@
                       </Tab>
                         <Tab styleClass="Tab" text="Filtered">
                            <content>
-                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label layoutY="64.0" prefHeight="165.0" prefWidth="199.0" styleClass="notSelected" text="No Filter has been applied, to display data of filtered Vehicles, please use the Filter Menu" textFill="#f1f1f1" wrapText="true" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="35.0">
+                                       <font>
+                                          <Font name="Arial Black" size="14.0" />
+                                       </font></Label>
+                                    <Label prefHeight="45.0" prefWidth="229.0" styleClass="locationHint" text="highlighted at the top right in magenta" textAlignment="CENTER" textFill="#ff1cf0" wrapText="true" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="200.0">
+                                       <font>
+                                          <Font name="Arial Italic" size="12.0" />
+                                       </font></Label>
+                                    <GridPane fx:id="FilteredGrid" alignment="CENTER" opacity="0.0" prefHeight="282.0" prefWidth="259.0" styleClass="stat-grid" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="130.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="129.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Active Vehicles">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="activeVehiclesFiltered" editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Queued Vehicles" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesNotOnScreenFiltered" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Finished Vehicles" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicles Currently Stopped" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Total Time spent Stopped" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Mean Speed" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Speed σ" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="DepartedVehiclesFiltered" editable="false" layoutX="130.0" layoutY="41.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesCurrentlyStoppedFiltered" editable="false" layoutX="120.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="TotalTimeSpentStoppedFiltered" editable="false" layoutX="120.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="MeanSpeedFiltered" editable="false" layoutX="120.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSDFiltered" editable="false" layoutX="120.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                       </children>
+                                    </GridPane>
+                                 </children></AnchorPane>
                            </content>
                         </Tab>
                     </tabs>
@@ -214,11 +450,11 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0"  prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap1" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
                   <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap2" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button fx:id="importMapButton" onAction="#importMap" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="114.0" text="Import Map" />
+                  <Button fx:id="importMapButton" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" onAction="#importMap" prefHeight="34.0" prefWidth="114.0" text="Import Map" />
                   <Label layoutX="122.0" layoutY="11.0" styleClass="topMenuLabel" text="Choose a Map" textFill="VIOLET">
                      <font>
                         <Font name="Arial Black" size="23.0" />
@@ -229,7 +465,7 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0"  prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -250,7 +486,7 @@
                </padding>
             </AnchorPane>
 
-               <VBox fx:id="fileMenuSelect"  prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <VBox fx:id="fileMenuSelect" prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="fileButtonClose" mnemonicParsing="false" onAction="#closeApplication" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Close">
                      <VBox.margin>
@@ -505,7 +741,7 @@
                   <Insets bottom="5.0" top="5.0" />
                </HBox.margin>
             </Label>
-            <Pane fx:id="exitTopMenu"  prefHeight="30.0" prefWidth="30.0" />
+            <Pane fx:id="exitTopMenu" prefHeight="30.0" prefWidth="30.0" />
             <ToggleButton fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
             <ToggleButton fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
             <ToggleButton fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />

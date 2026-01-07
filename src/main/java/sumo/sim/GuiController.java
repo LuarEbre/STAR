@@ -13,10 +13,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.Locale;
 import java.util.function.UnaryOperator;
@@ -76,6 +73,8 @@ public class GuiController {
     @FXML
     private TabPane tabPane;
     @FXML
+    private GridPane FilteredGrid, SelectedGrid;
+    @FXML
     private HBox mainButtonBox;
 
     private GraphicsContext gc;
@@ -98,6 +97,7 @@ public class GuiController {
     private final int defaultDelay;
     private final int maxDelay;
     private SumoMapManager mapManager;
+    private int opacity;
 
     /**
      * <p>
@@ -111,6 +111,7 @@ public class GuiController {
         this.defaultDelay = 50;
         this.maxDelay = 999;
         panSen = 2;
+        this.opacity = 0;
     }
 
     public void setStageAndManager(Stage s , SumoMapManager mapManager) {
@@ -223,6 +224,10 @@ public class GuiController {
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
         addVehicleButton.setDisable(true);
+        SelectedGrid.setVisible(false);
+        SelectedGrid.setManaged(false);
+        FilteredGrid.setVisible(false);
+        FilteredGrid.setManaged(false);
 
         importMapSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -675,6 +680,19 @@ public class GuiController {
         timeLabel.setText(this.rawSecondsToHMS(time));
     }
 
+    private void highlightToggleButton(ToggleButton tb) {
+        this.opacity = (this.opacity + 10) % 100;
+        Border newBorder = tb.getBorder();
+        CornerRadii myRadii = tb.getBackground().getFills().get(0).getRadii();
+        Border border = new Border(new BorderStroke(
+                Color.hsb(304, 0.89, 1.0, this.opacity / 100.0),
+                BorderStrokeStyle.SOLID,
+                myRadii,
+                new BorderWidths(2)
+        ));
+        tb.setBorder(border);
+    }
+
     /**
      * Refreshes the data list view (currently placeholder structure).
      */
@@ -698,17 +716,21 @@ public class GuiController {
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
             this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
-            this.TotalTimeSpentStopped.setText(String.format("%s", this.rawSecondsToHMS(stoppedTime)));
+            this.TotalTimeSpentStopped.setText(this.rawSecondsToHMS(stoppedTime));
             this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
 
         } else if (currentTab.equals("Selected")) {
+            // EXPERIMENTAL - this.highlightToggleButton(selectButton);
+            // set visible and managed true, only after checking whether object has been selected
+            // SelectedGrid.setVisible(true);
+            // SelectedGrid.setManaged(true);
             return;
-            // if no Object is selected display "Please select a Vehicle using Select Mode" and highlight Select Mode Button
-            // Vehicles:
-            // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
-            // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
         } else {
+            // EXPERIMENTAL - this.highlightToggleButton(filterMenuButton);
+            // set visible and managed true, only after checking whether filter has been applied
+            // FilteredGrid.setVisible(true);
+            // FilteredGrid.setManaged(true);
             return;
             // Same as Overall, but only taking filtered Vehicles into account, which requires a separate VehicleList...
         }
