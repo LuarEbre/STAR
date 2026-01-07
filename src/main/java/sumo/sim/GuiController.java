@@ -642,25 +642,34 @@ public class GuiController {
         VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
         if (currentTab.equals("Overall")) {
-            int time = (int) wrapperController.getTime();
+            int overallVehicleCount = wrapperController.getAllVehicleCount();
             int activeCount = vehicles.getActiveCount();
+            int queuedCount = vehicles.getQueuedCount();
+            int exitedCount = overallVehicleCount - activeCount - queuedCount;
             int currentlyStopped = vehicles.getStoppedCount();
             int stoppedTime = vehicles.getStoppedTime();
             float stoppedPercentage = 0f;
-            if (activeCount > 0) { stoppedPercentage = (currentlyStopped / (float) activeCount) * 100; }
+            if (activeCount > 0) {
+                stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
+            }
 
             this.activeVehicles.setText(Integer.toString(activeCount));
-            this.VehiclesNotOnScreen.setText("not implemented yet");
-            this.DepartedVehicles.setText("not implemented yet");
+            this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
+            this.DepartedVehicles.setText(Integer.toString(exitedCount));
             this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
             this.TotalTimeSpentStopped.setText(String.format("%s", this.rawSecondsToHMS(stoppedTime)));
             this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
 
         } else if (currentTab.equals("Selected")) {
-
+            return;
+            // if no Object is selected display "Please select a Vehicle using Select Mode" and highlight Select Mode Button
+            // Vehicles:
+            // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
+            // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
         } else {
-
+            return;
+            // Same as Overall, but only taking filtered Vehicles into account, which requires a separate VehicleList...
         }
     }
 

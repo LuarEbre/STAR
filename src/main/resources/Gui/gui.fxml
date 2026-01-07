@@ -91,7 +91,7 @@
                                                 <Insets bottom="5.0" left="4.0" top="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicles not on Screen" GridPane.rowIndex="1">
+                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Queued Vehicles" GridPane.rowIndex="1">
                                              <GridPane.margin>
                                                 <Insets bottom="5.0" right="4.0" top="5.0" />
                                              </GridPane.margin>
@@ -101,7 +101,7 @@
                                                 <Insets bottom="5.0" left="4.0" top="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Departed Vehicles" GridPane.rowIndex="2">
+                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Finished Vehicles" GridPane.rowIndex="2">
                                              <GridPane.margin>
                                                 <Insets bottom="5.0" right="4.0" top="5.0" />
                                              </GridPane.margin>
