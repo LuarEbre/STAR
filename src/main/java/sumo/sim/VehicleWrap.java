@@ -2,7 +2,6 @@ package sumo.sim;
 
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoPosition2D;
-import de.tudresden.sumo.subscription.*;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
@@ -27,7 +26,6 @@ public class VehicleWrap {
     private Color color;
     private String routeID; // which route the car is assigned to (could be of RouteWrap if implemented)
 
-    // values tracked via subscription
     private double speed; // m/s
     private Point2D.Double position;
     private double angle;
@@ -37,11 +35,13 @@ public class VehicleWrap {
     private double accel; // m/s²
     private double avgSpeed;
     private int nStops;
-    private double waitingTime;
+    private int waitingTime;
     private int activeTime;
     private int totalLifetime; // = waitingTime + activeTime;
     private boolean activeLastFrame; // using oldSpeed could render activeLastFrame useless
+    private boolean currentlyStopped;
     private boolean exists; // check for despawning in gui?
+    private boolean queued;
 
     // could be used for selecting in the GUI later on
     private boolean selected;
@@ -72,6 +72,8 @@ public class VehicleWrap {
         this.activeTime = 1;
         this.totalLifetime = 0;
         this.activeLastFrame = false;
+        this.currentlyStopped = false;
+        this.queued = true;
     }
 
     /**
@@ -80,6 +82,7 @@ public class VehicleWrap {
      */
     public void updateVehicle() { // updates attributes each step, causes exception (if many cars are updated and delay is changed) needs fixing
         try {
+            this.currentlyStopped = false;
             // retrieve previous frame's speed before updating the vehicle's speed
             double oldSpeed = this.speed;
             // determine whether vehicle has been active last frame via oldSpeed
@@ -104,6 +107,7 @@ public class VehicleWrap {
 
             // determine whether waiting or active
             if(this.speed == 0) {
+                this.currentlyStopped = true;
                 this.waitingTime++;
                 if(this.activeLastFrame) this.nStops++;
             } else {
@@ -166,7 +170,7 @@ public class VehicleWrap {
     /**
      * @return The total time (in seconds) the vehicle has spent waiting.
      */
-    public double getWaitingTime() { return waitingTime; }
+    public int getWaitingTime() { return waitingTime; }
     /**
      * @return The maximum recorded speed of this vehicle.
      */
@@ -196,4 +200,7 @@ public class VehicleWrap {
      * @return ID of the route this vehicle is following.
      */
     public String getRouteID() { return routeID; }
+    public boolean isCurrentlyStopped() { return this.currentlyStopped; }
+    protected void setQueued(boolean queued) { this.queued = queued; }
+    protected boolean isQueued()  { return this.queued; }
 }
