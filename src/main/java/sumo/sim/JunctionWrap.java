@@ -4,6 +4,8 @@ import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.objects.SumoGeometry;
 import de.tudresden.sumo.objects.SumoPosition2D;
 import it.polito.appeal.traci.SumoTraciConnection;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
@@ -16,8 +18,8 @@ import static java.lang.Math.abs;
  * @author simonr
  * @author LeleZss
  */
-public class JunctionWrap {
-    private final String id;
+public class JunctionWrap extends SimulationObject {
+    //private final String id;
     private final Point2D.Double position;
     private final SumoTraciConnection con;
     private String type; // dead end , tl
@@ -33,11 +35,12 @@ public class JunctionWrap {
     /**
      * Constructor for JunctionWrap.
      * Initializes all parameters
+     *
      * @param id
      * @param con
      */
     public JunctionWrap(String id, SumoTraciConnection con) {
-        this.id = id;
+        super(id);
         this.con = con;
         this.spawnable = false;
         try {
@@ -57,6 +60,23 @@ public class JunctionWrap {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        calculateBounds(shapeX, shapeY);
+    }
+
+    // rendering
+
+    @Override
+    public void draw(GraphicsContext gc, double zoom) {
+        gc.setFill(Color.BLACK);
+        // gc.setStroke(Color.BLACK);
+        // gc.setLineWidth(1.0);
+
+        if (shapeX.length >= 3) {
+            gc.fillPolygon(shapeX, shapeY, shapeX.length);
+        } else if (shapeX.length > 0) {
+            double size = 4.0;
+            gc.fillOval(shapeX[0] - size / 2, shapeY[0] - size / 2, size, size);
         }
     }
 

@@ -29,8 +29,9 @@ public class SimulationRenderer {
 
     private final GraphicsContext gc;
     private final Canvas map;
-    boolean showSelectablePoints;
-    boolean pickedARoute;
+    private boolean showSelectablePoints;
+    private boolean pickedARoute;
+    private boolean viewDensityOn;
     private double zoom;
     private double camX;
     private double camY;
@@ -90,7 +91,9 @@ public class SimulationRenderer {
         this.camY = jl.getCenterPosY();
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
+        //System.out.println("scaleX: " + scaleX +  " scaleY: " + scaleY);
         this.scale = 1 + (scaleX / scaleY); // should calculate the rough scale of the map
+
         this.zoom = scale + 1;
         this.rotation = 0;
         for (Street s: sl.getStreets()) {
@@ -169,6 +172,7 @@ public class SimulationRenderer {
      * </p>
      */
     private void renderMap() {
+        // map color
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(scale);
@@ -191,8 +195,19 @@ public class SimulationRenderer {
                 else {
                     gc.setStroke(Color.BLACK);
                 }
+            // density rendering, colors lanes based on density
+            } else if (viewDensityOn){
+                if (s.getDensity() >=100.0){
+                    gc.setStroke(Color.rgb(163, 29, 45, 0.6));
+                } else if ((s.getDensity() < 100.0) && (s.getDensity() >= 50.0)) {
+                    gc.setStroke(Color.rgb(217, 126, 22, 0.6));
+                } else if ((s.getDensity() < 50.0) && (s.getDensity() >= 20.0)) {
+                    gc.setStroke(Color.rgb(231, 240, 58, 0.6));
+                }else {
+                    gc.setStroke(Color.rgb(96, 219, 68, 0.6));
+                }
             } else {
-                gc.setStroke(Color.BLACK);
+                gc.setStroke(Color.rgb(0,0,0,0.6)); // standard street color
             }
             // stroke Polyline for lanes
             if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
@@ -297,6 +312,7 @@ public class SimulationRenderer {
         this.viewMinY = camY - (viewHeightWorld / 2);
         this.viewMaxY = camY + (viewHeightWorld / 2);
     }
+
 
     protected void setSelectablePoints(boolean p) {
         this.showSelectablePoints = p;
@@ -482,9 +498,17 @@ public class SimulationRenderer {
      * Is called by {@link GuiController#zoomMap(ScrollEvent)}
      * @param z
      */
-    public void zoomMap(double z) {
-        // should have a zoom min and max cap based on map scale
-        zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+    public void zoomMapIn(double z) {
+        // should have a zoom min and max cap based on map scale , max cap = scale*2
+        if (zoom < scale*2) {
+            zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+        }
+    }
+
+    public void zoomMapOut(double z) {
+        if (zoom > scale / 5) {
+            zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+        }
     }
 
     protected void setSeeTrafficLightIDs(boolean seeTrafficLightIDs) { this.seeTrafficLightIDs = seeTrafficLightIDs; }
@@ -498,6 +522,7 @@ public class SimulationRenderer {
     protected void setPickedARoute(boolean pickedARoute) { this.pickedARoute = pickedARoute; }
     protected void setPickedRouteID(String routeID) { this.RouteID = routeID; }
     protected boolean getPickedARoute() { return pickedARoute; }
+    protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
 }
 
 

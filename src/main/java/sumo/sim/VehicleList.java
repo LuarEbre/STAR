@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -180,6 +181,15 @@ public class VehicleList {
             if (v.exists()) r++;
         }
         return r;
+    }
+
+    public List<Color> getAllColors() {
+        // experimental for filtering, needs null check, maybe string list return
+        List<Color> colors = new ArrayList<>();
+        for (VehicleWrap v : vehicles) {
+            colors.add(v.getColor());
+        }
+        return colors;
     }
 
     public Point2D.Double getMeanPosition() {

@@ -5,6 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +59,9 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         mapConfig = mapManager.getConfig("Frankfurt"); // Frankfurt, TestMap
-        String configFile = mapConfig.getConfigPath();
-        currentNet = mapConfig.getNetPath();
-        currentRou = mapConfig.getRouPath();
+        String configFile = mapConfig.getConfigPath().toString();
+        currentNet = mapConfig.getNetPath().toString();
+        currentRou = mapConfig.getRouPath().toString();
 
         // create new connection with the binary and map config file
         this.connection = new SumoTraciConnection(sumoBinary,configFile);
@@ -85,7 +86,7 @@ public class WrapperController {
             tl = new TrafficLightList(connection, sl);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
-            rl = new RouteList(currentRou);
+            rl = new RouteList(currentRou, connection);
 
             tl.updateAllCurrentState(); // important for rendering
             start();
@@ -191,6 +192,7 @@ public class WrapperController {
             connection.do_timestep();
             vl.updateAllVehicles();
             tl.updateAllCurrentState();
+            sl.updateStreets();
             //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
             if (!terminated) {
@@ -220,10 +222,10 @@ public class WrapperController {
             // load new config
             try {
                 mapConfig= mapManager.getConfig(mapName);
-                currentNet = mapConfig.getNetPath();
-                currentRou = mapConfig.getRouPath();
+                currentNet = mapConfig.getNetPath().toString();
+                currentRou = mapConfig.getRouPath().toString();
 
-                this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath()); // new connection
+                this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath().toString()); // new connection
                 simTime = 0;
 
                 // prevents new sim from starting instantly
@@ -256,6 +258,10 @@ public class WrapperController {
     public void addVehicle(int amount, String type, String route, Color color) {
         // used by guiController, executes addVehicle from WrapperVehicle
         vl.addVehicle(amount, type, route, color);
+    }
+
+    public void addRoute(String start, String end, String id) {
+        rl.generateRoute(start, end, id, jl);
     }
 
     /**
