@@ -3,6 +3,7 @@ package sumo.sim;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -47,7 +48,8 @@ public class GuiController {
     @FXML
     private VBox fileMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton;
+    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton,
+            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton;
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select, importMapButton;
 
@@ -64,7 +66,7 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector;
+    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector, importMapSelector;
     @FXML
     private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
     @FXML
@@ -91,7 +93,7 @@ public class GuiController {
     private WrapperController wrapperController;
     private final int defaultDelay;
     private final int maxDelay;
-    private final FileReader fileReader;
+    private SumoMapManager mapManager;
 
     /**
      * <p>
@@ -104,12 +106,12 @@ public class GuiController {
     public GuiController() {
         this.defaultDelay = 50;
         this.maxDelay = 999;
-        fileReader = new FileReader();
         panSen = 2;
     }
 
-    public void setStage(Stage s) {
+    public void setStageAndManager(Stage s , SumoMapManager mapManager) {
         stage = s;
+        this.mapManager = mapManager;
     }
 
     /**
@@ -218,6 +220,12 @@ public class GuiController {
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
         addVehicleButton.setDisable(true);
+
+        importMapSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                changeToImportedMap();
+            }
+        });
     }
 
     private void setUpInputs() {
@@ -389,6 +397,10 @@ public class GuiController {
         // still needs fix for small gap between buttons and menus at the top
     }
 
+    private void disableAllTopMenuButtons() {
+
+    }
+
     /**
      * <p>
      *     Is triggered when pressing "-" on amountButton
@@ -501,6 +513,14 @@ public class GuiController {
 
     // top right menu buttons hovered
 
+
+    private void topMenuButtonToggle(ToggleButton button, AnchorPane menu) {
+        menu.setVisible(button.isSelected());
+    }
+
+    private void topMenuButtonToggle(ToggleButton button, VBox menu) {
+        menu.setVisible(button.isSelected());
+    }
     /**
      * Is triggered when user hovers over "filter" button
      *
@@ -510,30 +530,40 @@ public class GuiController {
      * </p>
      */
     @FXML
-    protected void onFiltersHover(){
+    protected void onFiltersPressed(){
         closeAllMenus();
-        filtersMenuSelect.setVisible(true);
+        topMenuButtonToggle(filterMenuButton, filtersMenuSelect);
     }
 
+
     /**
-     * Equivalent to {@link #onFiltersHover()}
+     * Equivalent to {@link #onFiltersPressed()}
      */
     @FXML
-    protected void onMapsHover(){
+    protected void onMapsPressed(){
         // deactivate all menus
         closeAllMenus();
-        // activate Map menu
-        mapMenuSelect.setVisible(true);
+        topMenuButtonToggle(mapsMenuButton, mapMenuSelect);
     }
 
     /**
-     * Equivalent to {@link #onFiltersHover()}
+     * Equivalent to {@link #onFiltersPressed()}
      */
     @FXML
-    protected void onViewHover(){
+    protected void onViewPressed(){
         closeAllMenus();
-        viewMenuSelect.setVisible(true);
+        topMenuButtonToggle(viewMenuButton, viewMenuSelect);
     }
+
+    /**
+     * Equivalent to {@link #onFiltersPressed()}
+     */
+    @FXML
+    protected void onFilePressed(){
+        closeAllMenus();
+        topMenuButtonToggle(fileMenuButton, fileMenuSelect);
+    }
+
 
     @FXML void onDataOutputToggle() {
 
@@ -558,8 +588,8 @@ public class GuiController {
     protected void onTrafficLightIDToggle() { sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected()); }
 
     @FXML
-    protected void onMiddlePaneHover(){
-
+    protected void onMiddlePaneClicked(){
+        closeAllMenus();
     }
 
     @FXML
@@ -571,15 +601,6 @@ public class GuiController {
         }
     }
 
-
-    /**
-     * Equivalent to {@link #onFiltersHover()}
-     */
-    @FXML
-    protected void onFileHover(){
-        closeAllMenus();
-        fileMenuSelect.setVisible(true);
-    }
 
     // main buttons menu methods
 
@@ -748,7 +769,6 @@ public class GuiController {
             dataPane.setVisible(true);
             rescale();
         }
-
     }
 
     private void stopRenderer() {
@@ -841,7 +861,9 @@ public class GuiController {
      * </p>
      */
     public void mapPan() {
+
         staticMap.setOnMousePressed(event -> {
+            closeAllMenus(); // closes all top menus when panning
             mousePressedXOld = event.getX(); // old
             mousePressedYOld = event.getY();
             //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
@@ -873,11 +895,19 @@ public class GuiController {
         changeMap("RugMap");
     }
 
+    @FXML
+    protected void changeToImportedMap() {
+        changeMap(importMapSelector.getValue());
+    }
+
     private void changeMap(String mapName) {
         // disable buttons -> prevents spamming of switches
         map1select.setDisable(true);
         map2select.setDisable(true);
-        wrapperController.mapSwitch(mapName);
+        if (mapName != null) {
+            wrapperController.mapSwitch(mapName);
+        }
+        importMapSelector.getSelectionModel().clearSelection(); // resets previous selection
     }
 
     private void createType() {
@@ -886,8 +916,12 @@ public class GuiController {
 
     @FXML
     private void importMap() {
-       // fileReader.chooseFile();
-        fileReader.chooseFile(stage);
+        mapManager.chooseFile(stage);
+        updateImportedMaps();
+    }
+
+    private void updateImportedMaps() {
+        importMapSelector.setItems(FXCollections.observableArrayList(mapManager.getAllImportedMaps()));
     }
 
     @FXML

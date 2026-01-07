@@ -99,6 +99,10 @@
     -fx-text-fill: -fx-color-magenta;
 }
 
+.topmenu-button:pressed {
+
+}
+
 .topMenuBackground {
     -fx-background-color: -fx-color-grey-dark;
 }

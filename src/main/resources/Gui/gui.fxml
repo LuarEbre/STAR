@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#closeAllMenus" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"  prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
@@ -53,7 +53,7 @@
        </HBox>
 
        <!-- Middle pane -->
-       <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseEntered="#onMiddlePaneHover" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
+       <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseClicked="#onMiddlePaneClicked" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
            <children>
                <Canvas fx:id="staticMap" height="447.0" layoutX="200.0" onScroll="#zoomMap" width="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 
@@ -95,7 +95,7 @@
             </AnchorPane>
 
             <!-- Menus from Top right buttons -->
-            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" onMouseExited="#closeAllMenus" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <CheckBox layoutX="171.0" layoutY="32.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Color" />
                   <CheckBox layoutX="169.0" layoutY="88.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Speed" />
@@ -110,7 +110,7 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" onMouseExited="#closeAllMenus" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0"  prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap1" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
                   <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap2" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
@@ -125,7 +125,7 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" onMouseExited="#closeAllMenus" prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0"  prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -146,7 +146,7 @@
                </padding>
             </AnchorPane>
 
-               <VBox fx:id="fileMenuSelect" onMouseExited="#closeAllMenus" prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <VBox fx:id="fileMenuSelect"  prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="fileButtonClose" mnemonicParsing="false" onAction="#closeApplication" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Close">
                      <VBox.margin>
@@ -401,11 +401,11 @@
                   <Insets bottom="5.0" top="5.0" />
                </HBox.margin>
             </Label>
-            <Pane fx:id="exitTopMenu" onMouseEntered="#closeAllMenus" prefHeight="30.0" prefWidth="30.0" />
-            <Button mnemonicParsing="false" onMouseEntered="#onMapsHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
-            <Button mnemonicParsing="false" onMouseEntered="#onFiltersHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
-            <Button mnemonicParsing="false" onMouseEntered="#onViewHover" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
-            <Button mnemonicParsing="false" onMouseEntered="#onFileHover" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
+            <Pane fx:id="exitTopMenu"  prefHeight="30.0" prefWidth="30.0" />
+            <ToggleButton fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
+            <ToggleButton fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
+            <ToggleButton fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
+            <ToggleButton fx:id="fileMenuButton" mnemonicParsing="false" onAction="#onFilePressed" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
          </children>
       </HBox>
 
