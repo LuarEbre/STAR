@@ -134,6 +134,10 @@
     -fx-text-fill: -fx-color-magenta;
 }
 
+.topmenu-button:pressed {
+
+}
+
 .topMenuBackground {
     -fx-background-color: -fx-color-grey-dark;
 }
@@ -234,6 +238,13 @@
     -fx-border-color: -fx-color-grey-light;
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
     -fx-background-insets: 0, 2;
+}
+
+#createButton {
+    -fx-background-image: url("/Gui/Icons/create.png");
+    -fx-background-size: 50px 50px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center
 }
 
 /* Middle style */

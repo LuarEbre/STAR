@@ -1,13 +1,15 @@
 package sumo.sim;
 
+import java.io.File;
+
 public class SumoMapConfig {
     private final String name;
-    private final String netPath;
-    private final String rouPath;
-    private final String configPath;
+    private final File netPath;
+    private final File rouPath;
+    private final File configPath;
     private boolean chosen;
 
-    public SumoMapConfig(String name, String netPath, String rouPath, String configPath) {
+    public SumoMapConfig(String name, File netPath, File rouPath, File configPath) {
         this.name = name;
         this.rouPath = rouPath;
         this.netPath = netPath;
@@ -19,13 +21,13 @@ public class SumoMapConfig {
     public String  getName() {
         return name;
     }
-    public String getRouPath() {
+    public File getRouPath() {
         return rouPath;
     }
-    public String getNetPath() {
+    public File getNetPath() {
         return netPath;
     }
-    public String getConfigPath() {
+    public File getConfigPath() {
         return configPath;
     }
 

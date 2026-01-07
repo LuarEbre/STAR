@@ -23,11 +23,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#closeAllMenus" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"  prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
-       <HBox fx:id="mainButtonBox" alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="750.0" spacing="40.0" AnchorPane.bottomAnchor="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+       <HBox fx:id="mainButtonBox" alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="881.0" spacing="40.0" AnchorPane.bottomAnchor="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
            <children>
 
                <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
@@ -46,6 +46,7 @@
                <Button fx:id="stepButton" mnemonicParsing="false" onAction="#onStep" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                 <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" onAction="#onStressTest" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
             <ToggleButton fx:id="trafficLightButton" layoutX="561.0" layoutY="34.0" mnemonicParsing="false" onAction="#onTrafficLight" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+            <ToggleButton fx:id="createButton" onAction="#onCreate" layoutX="765.0" layoutY="34.0" mnemonicParsing="false" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
            </children>
            <padding>
@@ -54,7 +55,7 @@
        </HBox>
 
        <!-- Middle pane -->
-       <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseEntered="#onMiddlePaneHover" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
+       <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseClicked="#onMiddlePaneClicked" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
            <children>
                <Canvas fx:id="staticMap" height="447.0" layoutX="200.0" onScroll="#zoomMap" width="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 
@@ -198,7 +199,7 @@
             </AnchorPane>
 
             <!-- Menus from Top right buttons -->
-            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" onMouseExited="#closeAllMenus" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <CheckBox layoutX="171.0" layoutY="32.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Color" />
                   <CheckBox layoutX="169.0" layoutY="88.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Speed" />
@@ -208,33 +209,27 @@
                   <Label layoutX="32.0" layoutY="120.0" prefHeight="18.0" prefWidth="92.0" styleClass="topMenuLabel" text="X, Y Position" />
                   <TextField layoutX="25.0" layoutY="139.0" prefHeight="26.0" prefWidth="56.0" />
                   <TextField layoutX="25.0" layoutY="84.0" prefHeight="18.0" prefWidth="123.0" />
-                  <Spinner layoutX="25.0" layoutY="28.0" prefHeight="18.0" prefWidth="123.0" />
+                  <ChoiceBox layoutX="25.0" layoutY="28.0" prefHeight="18.0" prefWidth="123.0" />
                   <TextField layoutX="96.0" layoutY="139.0" prefHeight="26.0" prefWidth="56.0" />
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" onMouseExited="#closeAllMenus" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0"  prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap1" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
                   <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap2" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button layoutX="313.0" layoutY="241.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="Import" />
-                  <Label layoutX="14.0" layoutY="241.0" styleClass="topMenuLabel" text="Real-Time Traffic Simulation with Java v1.0" textFill="VIOLET">
-                     <font>
-                        <Font size="9.0" />
-                     </font></Label>
-                  <Label layoutX="28.0" layoutY="254.0" styleClass="topMenuLabel" text="Copyright 2026 NB, KK, LL, RE, SR. ALL RIGHTS RESERVED" textFill="VIOLET">
-                     <font>
-                        <Font size="8.0" />
-                     </font></Label>
+                  <Button fx:id="importMapButton" onAction="#importMap" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="114.0" text="Import Map" />
                   <Label layoutX="122.0" layoutY="11.0" styleClass="topMenuLabel" text="Choose a Map" textFill="VIOLET">
                      <font>
                         <Font name="Arial Black" size="23.0" />
                      </font>
                   </Label>
+                  <ChoiceBox fx:id="importMapSelector" layoutX="32.0" layoutY="235.0" prefHeight="26.0" prefWidth="206.0" />
+                  <Label layoutX="33.0" layoutY="215.0" prefHeight="18.0" prefWidth="150.0" text="Imported Maps" />
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" onMouseExited="#closeAllMenus" prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0"  prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -243,7 +238,7 @@
                         <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="false" styleClass="viewLabel" text="Density Anchor" />
                         <CheckBox fx:id="showRouteHighlighting" layoutX="10.0" layoutY="45.0" mnemonicParsing="false" onAction="#onRouteHighlightingToggle" selected="true" styleClass="viewLabel" text="Route Highlighting" wrapText="true" />
                         <CheckBox fx:id="showTrafficLightIDs" layoutX="10.0" layoutY="60.0" mnemonicParsing="false" onAction="#onTrafficLightIDToggle" selected="true" styleClass="viewLabel" text="Traffic Light IDs" />
-                        <CheckBox mnemonicParsing="false" text="Density Heatmap" />
+                        <CheckBox fx:id="densityHeatmap" mnemonicParsing="false" onAction="#onDensityHeatmapToggle" styleClass="viewLabel" text="Density Heatmap" />
                      </children>
                      <padding>
                         <Insets bottom="10.0" top="10.0" />
@@ -255,7 +250,7 @@
                </padding>
             </AnchorPane>
 
-               <VBox fx:id="fileMenuSelect" onMouseExited="#closeAllMenus" prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <VBox fx:id="fileMenuSelect"  prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="fileButtonClose" mnemonicParsing="false" onAction="#closeApplication" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Close">
                      <VBox.margin>
@@ -318,6 +313,71 @@
             <TextField fx:id="stateText" editable="false" layoutX="7.0" layoutY="236.0" prefHeight="26.0" prefWidth="238.0" />
             <Label layoutX="14.0" layoutY="215.0" styleClass="addMenu-labels" text="Current Phase" />
            </children>
+       </AnchorPane>
+
+       <AnchorPane fx:id="createMenu" layoutX="600.0" layoutY="50.0" prefHeight="443.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false">
+         <children>
+            <TabPane layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+              <tabs>
+                <Tab text="Create Type">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <VBox prefHeight="303.0" prefWidth="178.0">
+                                       <children>
+                                          <Label text="Name" />
+                                          <Label layoutX="10.0" layoutY="10.0" text="Length" />
+                                          <Label layoutX="10.0" layoutY="28.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="45.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="63.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="80.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="98.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="116.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="133.0" text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="303.0" prefWidth="166.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Create Route">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox layoutX="95.0" layoutY="66.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Label text="Start Junction" />
+                                    <ChoiceBox prefWidth="150.0" />
+                                    <Button mnemonicParsing="false" text="Select Start" />
+                                    <Label layoutX="10.0" layoutY="10.0" text="End Junction" />
+                                    <ChoiceBox layoutX="10.0" layoutY="28.0" prefWidth="150.0" />
+                                    <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="84.0" text="Select End" />
+                                    <Label layoutX="60.0" layoutY="94.0" text="ID " />
+                                    <TextField />
+                                    <Label text="Status: " />
+                                    <Separator prefWidth="200.0" />
+                                    <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="154.0" text="ADD" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="50.0" right="50.0" top="20.0" />
+                                 </padding>
+                              </VBox>
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+            <Label layoutX="89.0" text="Create">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+         </children>
        </AnchorPane>
 
        <AnchorPane fx:id="stressTestMenu" layoutX="364.0" layoutY="164.0" prefHeight="275.0" prefWidth="386.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
@@ -445,11 +505,11 @@
                   <Insets bottom="5.0" top="5.0" />
                </HBox.margin>
             </Label>
-            <Pane fx:id="exitTopMenu" onMouseEntered="#closeAllMenus" prefHeight="30.0" prefWidth="30.0" />
-            <Button mnemonicParsing="false" onMouseEntered="#onMapsHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
-            <Button mnemonicParsing="false" onMouseEntered="#onFiltersHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
-            <Button mnemonicParsing="false" onMouseEntered="#onViewHover" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
-            <Button mnemonicParsing="false" onMouseEntered="#onFileHover" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
+            <Pane fx:id="exitTopMenu"  prefHeight="30.0" prefWidth="30.0" />
+            <ToggleButton fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
+            <ToggleButton fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
+            <ToggleButton fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
+            <ToggleButton fx:id="fileMenuButton" mnemonicParsing="false" onAction="#onFilePressed" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
          </children>
       </HBox>
 
