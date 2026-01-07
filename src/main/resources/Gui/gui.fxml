@@ -351,17 +351,17 @@
                            <children>
                               <VBox layoutX="95.0" layoutY="66.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="Start Junction" />
-                                    <ChoiceBox prefWidth="150.0" />
+                                    <Label text="Start Street" />
+                                    <ChoiceBox fx:id="startStreetSelector" prefWidth="150.0" />
                                     <Button mnemonicParsing="false" text="Select Start" />
-                                    <Label layoutX="10.0" layoutY="10.0" text="End Junction" />
-                                    <ChoiceBox layoutX="10.0" layoutY="28.0" prefWidth="150.0" />
+                                    <Label layoutX="10.0" layoutY="10.0" text="End Street" />
+                                    <ChoiceBox fx:id="endStreetSelector" layoutX="10.0" layoutY="28.0" prefWidth="150.0" />
                                     <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="84.0" text="Select End" />
                                     <Label layoutX="60.0" layoutY="94.0" text="ID " />
                                     <TextField />
                                     <Label text="Status: " />
                                     <Separator prefWidth="200.0" />
-                                    <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="154.0" text="ADD" />
+                                    <Button onAction="#addRoute" mnemonicParsing="false" prefHeight="26.0" prefWidth="154.0" text="ADD" />
                                  </children>
                                  <padding>
                                     <Insets left="50.0" right="50.0" top="20.0" />
@@ -506,10 +506,10 @@
                </HBox.margin>
             </Label>
             <Pane fx:id="exitTopMenu"  prefHeight="30.0" prefWidth="30.0" />
-            <ToggleButton fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
-            <ToggleButton fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
-            <ToggleButton fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
-            <ToggleButton fx:id="fileMenuButton" mnemonicParsing="false" onAction="#onFilePressed" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
+            <Button fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
+            <Button fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
+            <Button fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
+            <Button fx:id="fileMenuButton" mnemonicParsing="false" onAction="#onFilePressed" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
          </children>
       </HBox>
 

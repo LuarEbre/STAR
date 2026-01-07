@@ -86,7 +86,7 @@ public class WrapperController {
             tl = new TrafficLightList(connection, sl);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
-            rl = new RouteList(currentRou, connection);
+            rl = new RouteList(currentRou, connection, this);
 
             tl.updateAllCurrentState(); // important for rendering
             start();
@@ -261,9 +261,12 @@ public class WrapperController {
     }
 
     public void addRoute(String start, String end, String id) {
-        rl.generateRoute(start, end, id, jl);
+        rl.addRoute(start,end,id);
     }
 
+    public void updateRoutes() {
+        Platform.runLater(guiController::initializeDropDowns);
+    }
     /**
      * Spread the amount of vehicles determined by the stress test setting evenly across all existing routes
      * @param amount number of cars (set in Stress Test Menu)
@@ -337,6 +340,7 @@ public class WrapperController {
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
     public String[] getRouteList() { return (rl != null) ? rl.getAllRoutesID() : new String[0]; }
     public String[] getTLids() { return (tl != null) ? tl.getIDs() : new String[0]; }
+    public String[] getSelectableStreets() {return sl.getSelectableStreets(); }
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }

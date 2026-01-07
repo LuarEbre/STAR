@@ -50,10 +50,11 @@ public class GuiController {
     @FXML
     private VBox fileMenuSelect;
     @FXML
-    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton,
-            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton;
+    private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton;
+
     @FXML
-    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton, map1select, map2select, importMapButton;
+    private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton,
+            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton, map1select, map2select, importMapButton;
 
     private ButtonBase[] allButtons;
 
@@ -68,7 +69,8 @@ public class GuiController {
     @FXML
     private ListView<String> listData; // list displaying data as a string
     @FXML
-    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector, importMapSelector;
+    private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector, importMapSelector,
+            startStreetSelector, endStreetSelector;
     @FXML
     private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
     @FXML
@@ -158,7 +160,7 @@ public class GuiController {
         startRenderer();
     }
 
-    private void initializeDropDowns() {
+    public void initializeDropDowns() {
         if (wrapperController==null) return;
 
         // displays all available types found in xml
@@ -194,6 +196,9 @@ public class GuiController {
         tlSelector.setItems(FXCollections.observableArrayList(wrapperController.getTLids()));
         tlSelector.setValue(wrapperController.getTLids()[0]);
 
+        // slow
+       // startStreetSelector.setItems(FXCollections.observableArrayList(wrapperController.getSelectableStreets()));
+       // endStreetSelector.setItems(FXCollections.observableArrayList(wrapperController.getSelectableStreets()));
     }
 
     /**
@@ -517,13 +522,15 @@ public class GuiController {
     // top right menu buttons hovered
 
 
-    private void topMenuButtonToggle(ToggleButton button, AnchorPane menu) {
-        menu.setVisible(button.isSelected());
+    private void topMenuButtonToggle(Node menu) {
+        boolean wasVisible = menu.isVisible(); // saves state
+        closeAllMenus();
+
+        if (!wasVisible) {
+            menu.setVisible(true); // if it was closed-> open
+        }
     }
 
-    private void topMenuButtonToggle(ToggleButton button, VBox menu) {
-        menu.setVisible(button.isSelected());
-    }
     /**
      * Is triggered when user hovers over "filter" button
      *
@@ -534,8 +541,7 @@ public class GuiController {
      */
     @FXML
     protected void onFiltersPressed(){
-        closeAllMenus();
-        topMenuButtonToggle(filterMenuButton, filtersMenuSelect);
+        topMenuButtonToggle(filtersMenuSelect);
     }
 
 
@@ -544,9 +550,7 @@ public class GuiController {
      */
     @FXML
     protected void onMapsPressed(){
-        // deactivate all menus
-        closeAllMenus();
-        topMenuButtonToggle(mapsMenuButton, mapMenuSelect);
+        topMenuButtonToggle(mapMenuSelect);
     }
 
     /**
@@ -554,8 +558,7 @@ public class GuiController {
      */
     @FXML
     protected void onViewPressed(){
-        closeAllMenus();
-        topMenuButtonToggle(viewMenuButton, viewMenuSelect);
+        topMenuButtonToggle(viewMenuSelect);
     }
 
     /**
@@ -563,8 +566,7 @@ public class GuiController {
      */
     @FXML
     protected void onFilePressed(){
-        closeAllMenus();
-        topMenuButtonToggle(fileMenuButton, fileMenuSelect);
+        topMenuButtonToggle(fileMenuSelect);
     }
 
 
@@ -818,8 +820,29 @@ public class GuiController {
         //wrapperController.terminate(); // terminates sumo connection and wrapCon thread
     }
 
-    protected void reset(){
+    /**
+     * Method used to reset UI elements after map switch is performed
+     */
+    protected void reset() {
+        unselectButtons();
+        closeAllMainButtonMenus();
+    }
 
+    private void unselectButtons() {
+        addButton.setSelected(false);
+        selectButton.setSelected(false);
+        playButton.setSelected(false);
+        trafficLightButton.setSelected(false);
+        createButton.setSelected(false);
+        stressTestButton.setSelected(false);
+    }
+
+    private void closeAllMainButtonMenus() {
+        addMenu.setVisible(false);
+        trafficLightMenu.setVisible(false);
+        createMenu.setVisible(false);
+        stressTestMenu.setVisible(false);
+        //closeAllMenus();
     }
 
     /**
@@ -937,6 +960,7 @@ public class GuiController {
             wrapperController.mapSwitch(mapName);
         }
         importMapSelector.getSelectionModel().clearSelection(); // resets previous selection
+        reset(); // resets ui elements
     }
 
     private void createType() {
@@ -955,9 +979,10 @@ public class GuiController {
 
     @FXML
     private void addRoute() {
-        // needs argument: start and end junction id
-        // J0, J11
-        wrapperController.addRoute("J0", "J1", "testID");
+        // needs argument: start and end edge id , and given id name (must check if available)
+        // dropDownMenus must be updated and data retrieved from / or select via map
+
+        wrapperController.addRoute("E0", "E4", "testID");
     }
 
 }
