@@ -159,6 +159,7 @@ public class RouteList {
     private void addRoute(List<String> edgeList, String routeID) {
         SumoStringList route = new SumoStringList();
         //route.addAll(edgeList);
+        // Simulation.findRoute()
         String[] arr = {"E2", "E3", "E4", "E5"};
         route.addAll(Arrays.asList(arr));
         for (String s : route) {

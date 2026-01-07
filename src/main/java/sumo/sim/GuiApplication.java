@@ -77,7 +77,7 @@ public class GuiApplication extends Application {
         SumoMapManager mapManager = new SumoMapManager(); // initializes Maps
         wrapper = new WrapperController(guiController, mapManager);
         guiController.initializeCon(wrapper);
-        guiController.setStage(stage);
+        guiController.setStageAndManager(stage, mapManager);
     }
 
     @Override

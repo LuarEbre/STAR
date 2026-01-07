@@ -86,6 +86,8 @@ public class VehicleList {
                     try {
                         v.updateVehicle();
                         v.setExists(true);
+                        // if vehicle is present in activeIDs it is no longer queued, and assuredly is on the road network
+                        v.setQueued(false);
                     } catch (Exception e) {
                         v.setExists(false); // if vehicle despawns
                     }
@@ -226,6 +228,14 @@ public class VehicleList {
     }
 
     public int getActiveCount() { return activeCount; }
+
+    public int getQueuedCount() {
+        int count = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.isQueued()) count++;
+        }
+        return count;
+    }
 
     public int getStoppedCount() {
         int count = 0;
