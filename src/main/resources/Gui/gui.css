@@ -154,6 +154,11 @@
     -fx-font-family:"Arial Black";
 }
 
+.magentaLabel {
+    -fx-text-fill: -fx-color-magenta;
+    -fx-font-family:"Arial Black";
+}
+
 .viewLabel {
     -fx-text-fill: -fx-color-grey-lightest;
     -fx-font-family:"Arial Black";
@@ -198,43 +203,65 @@
     -fx-background-position: center
 }
 
+/* TL Menu */
+
+#applyButton {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family:"Arial Black";
+}
+
+#applyButton:pressed {
+    -fx-text-fill: -fx-color-magenta;
+}
+
+#stateText .list-cell {
+    -fx-text-fill: white;
+    -fx-background-color: -fx-color-grey-light;
+}
+
+#stateText {
+    -fx-text-fill: white;
+    -fx-background-color: -fx-color-grey;
+}
+
 /* Top left delay menu -> Spinner consist of multiple components */
 
-#delaySelect {
+.spinner {
     -fx-background-color: -fx-color-grey-darkest;
 }
 
-#delaySelect .text-field {
+.spinner .text-field {
     -fx-background-color: -fx-color-grey-darkest;
     -fx-border-color: -fx-color-grey-light;
     -fx-text-fill: white;
     -fx-font-family:"Arial Black";
 }
 
-#delaySelect .text-field:hover {
+.spinner .text-field:hover {
     -fx-border-color: -fx-color-grey-light;
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
     -fx-background-insets: 0, 2;
 }
 
 
-#delaySelect .increment-arrow-button {
+.spinner .increment-arrow-button {
     -fx-background-color: -fx-color-grey-darkest;
     -fx-border-color: -fx-color-grey-light;
 }
 
-#delaySelect .increment-arrow-button:hover {
+.spinner .increment-arrow-button:hover {
     -fx-border-color: -fx-color-grey-light;
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
     -fx-background-insets: 0, 2;
 }
 
-#delaySelect .decrement-arrow-button {
+.spinner .decrement-arrow-button {
     -fx-background-color: -fx-color-grey-darkest;
     -fx-border-color: -fx-color-grey-light;
 }
 
-#delaySelect .decrement-arrow-button:hover {
+.spinner .decrement-arrow-button:hover {
     -fx-border-color: -fx-color-grey-light;
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
     -fx-background-insets: 0, 2;
