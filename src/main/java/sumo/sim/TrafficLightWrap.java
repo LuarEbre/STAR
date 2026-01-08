@@ -24,7 +24,7 @@ import java.util.*;
  * </p>
  *
  */
-public class TrafficLightWrap {
+public class TrafficLightWrap extends SelectableObject {
 
     private final SumoTraciConnection con;
     private final String id;
@@ -60,6 +60,7 @@ public class TrafficLightWrap {
      * @throws RuntimeException if there is an error parsing data or communicating with TraCI.
      */
     public TrafficLightWrap(String id, Map<String,String> Data, SumoTraciConnection con) {
+        super();
         this.id = id;
         this.con = con;
         this.controlledStreets = new HashSet<>();

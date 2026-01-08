@@ -324,6 +324,13 @@ public class WrapperController {
         return "Frankfurt";
     }
 
+    public SelectableObject getSelectedObject() {
+        // works because only one object can be selected at a time
+        for(VehicleWrap v : vl.getVehicles()) if (v.isSelected()) return v;
+        for(TrafficLightWrap tl : tl.getTrafficlights()) if (tl.isSelected()) return tl;
+        return null;
+    }
+
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }
     public int getDelay() { return delay; }
