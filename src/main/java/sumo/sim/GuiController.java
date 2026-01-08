@@ -18,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
@@ -67,16 +68,17 @@ public class GuiController {
     @FXML
     private Slider playSlider;
     @FXML
-    private ListView<String> listData; // list displaying data as a string
+    private ListView<String> stateText; // list displaying data as a string
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector, importMapSelector,
-            startStreetSelector, endStreetSelector;
+            startStreetSelector, endStreetSelector, phaseIndexSelector;
     @FXML
-    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting, showTrafficLightIDs, densityHeatmap;
+    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
+            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently;
     @FXML
-    private TextField amountField, stateText, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
+    private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
     @FXML
-    private TabPane tabPane;
+    private TabPane tabPane, trafficLightTabPane;
     @FXML
     private HBox mainButtonBox;
 
@@ -468,6 +470,16 @@ public class GuiController {
     protected void onTrafficLight() {
         sr.setSeeTrafficLightIDs(!sr.getSeeTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
+        List<TrafficLightPhase> phases;
+        String[] count;
+
+        phases =  wrapperController.getTrafficLightPhases(tlSelector.getValue()); // for displaying phases
+        count = new String[phases.size()];
+        for (int i = 0; i < phases.size(); i++) {
+            count[i] = ""+i;
+        }
+        phaseIndexSelector.setItems(FXCollections.observableArrayList(count));
+
     }
 
     /**
@@ -625,8 +637,23 @@ public class GuiController {
     @FXML
     protected void applyTLsettings() {
         String id = tlSelector.getValue();
-        int duration = durationTL.getValue();
-        wrapperController.setTlSettings(id, duration);
+        String currentTab = trafficLightTabPane.getSelectionModel().getSelectedItem().getText();
+        if (currentTab.equals("Duration")) {
+            if (toggleTrafficLightPermanently.isSelected()) {
+                // needs check , maybe display all phases and only highlight current phase?
+
+            } else {
+                int duration = durationTL.getValue();
+                wrapperController.setTlSettings(id, duration);
+            }
+        } else if (currentTab.equals("Phase")) {
+
+        } else {
+
+        }
+
+
+
     }
 
 
@@ -716,6 +743,8 @@ public class GuiController {
         }
     }
 
+
+
     /**
      * Updates the vehicle count label.
      * <p>
@@ -733,14 +762,24 @@ public class GuiController {
      * <p>
      * Shows the current phase string and the remaining time until the next switch
      * for the selected Traffic Light in this format: <br>
-     * "Grr, dur: 67/82" <br>
+     * "Phase x: Grr, dur: 67/82" <br>
      * State, remaining dur and absolute duration of this state
      *
      * </p>
      */
     private void updateTLPhaseText() {
         if (trafficLightMenu.isVisible()) {
+            stateText.getItems().clear(); // clears old content
             String[] stateDur = wrapperController.getTlStateDuration(tlSelector.getValue());
+            List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(tlSelector.getValue());
+            String[] output = new String[phases.size()+1]; // size of phases + additional line
+            int j = 0;
+            for  (TrafficLightPhase phase : phases) {
+                output[j] = "Phase: "+phase.getIndex() +", " + phase.getState() +", dur:"+ phase.getDuration();
+                j++;
+            }
+
+            String phaseIndex = String.valueOf(wrapperController.getCurrentTLPhaseIndex(tlSelector.getValue()));
             String text ="";
             double nextSwitchAbsolute = Double.parseDouble(stateDur[stateDur.length-1]); // returns time when tl is switched
             double currentTime = wrapperController.getTime(); // current time of sim
@@ -748,10 +787,12 @@ public class GuiController {
             for (int i=0; i<stateDur.length-2; i++) {
                 text = text + stateDur[i];
             }
-            text = text + ", dur: "+ remaining +"/"+ stateDur[stateDur.length-2];
-            stateText.setText(text);
+            text = "Curr Phase "+phaseIndex+": " +text + ", dur: "+ remaining +"/"+ stateDur[stateDur.length-2];
+            output[output.length-1] = text;
+            stateText.setItems(FXCollections.observableArrayList(output));
+            //stateText.setText(text);
         } else {
-            stateText.setText("");
+            //stateText.setText("");
         }
 
         // later: forcing with xml writing and do job get
@@ -824,8 +865,12 @@ public class GuiController {
      * Method used to reset UI elements after map switch is performed
      */
     protected void reset() {
+        // Buttons / Menu resets0
         unselectButtons();
         closeAllMainButtonMenus();
+
+        // Text reset
+        vehicleCount.setText("0");
     }
 
     private void unselectButtons() {
