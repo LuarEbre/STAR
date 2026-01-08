@@ -176,7 +176,7 @@ public class TrafficLightList {
      */
     public void updateTLs(){
         for(TrafficLightWrap tl : trafficlights ){
-            tl.update_TL();
+            tl.updateTL();
         }
 
     }

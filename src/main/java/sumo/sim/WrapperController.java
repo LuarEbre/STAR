@@ -308,9 +308,7 @@ public class WrapperController {
      */
     public void setTlSettings(String tlid, int duration) {
         tl.getTL(tlid).setPhaseDuration(duration);
-        double check = tl.getTL(tlid).getDuration();
-        System.out.println("Duration: " + check);
-
+        //double check = tl.getTL(tlid).getDuration();
     }
 
     // getter
@@ -335,6 +333,8 @@ public class WrapperController {
     public VehicleList getVehicles() { return vl; }
     public TrafficLightList getTrafficLights() { return tl; }
     public RouteList getRoutes()  { return rl; }
+    public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
+    public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
