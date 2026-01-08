@@ -10,6 +10,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -77,6 +79,8 @@ public class GuiController {
     private TabPane tabPane;
     @FXML
     private HBox mainButtonBox;
+    @FXML
+    private LineChart<String, Number> activeVehiclesChart;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
@@ -98,6 +102,9 @@ public class GuiController {
     private final int defaultDelay;
     private final int maxDelay;
     private SumoMapManager mapManager;
+
+    //Charts
+    private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
 
     /**
      * <p>
@@ -219,6 +226,9 @@ public class GuiController {
         setUpInputs(); // Spinner factory etc. initializing
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
+
+        //Setup Graphs of Stats Section
+        setupCharts();
 
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
@@ -708,6 +718,15 @@ public class GuiController {
             // Vehicles:
             // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
             // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
+        } else if (currentTab.equals("Graphs")){
+
+            //Get Graph Data
+            int activeCount = vehicles.getActiveCount();
+            int simTime = (int)wrapperController.getTime();
+
+            //Setup new Axis Data
+            activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
+
         } else {
             return;
             // Same as Overall, but only taking filtered Vehicles into account, which requires a separate VehicleList...
@@ -820,6 +839,15 @@ public class GuiController {
 
     protected void reset(){
 
+    }
+
+    public void setupCharts(){
+        activeVehiclesSeries.setName("ActiveVehicles");
+
+        activeVehiclesChart.getData().clear();
+        activeVehiclesChart.getData().add(activeVehiclesSeries);
+
+        activeVehiclesChart.setAnimated(false);
     }
 
     /**
