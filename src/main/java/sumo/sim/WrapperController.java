@@ -311,6 +311,14 @@ public class WrapperController {
         //double check = tl.getTL(tlid).getDuration();
     }
 
+    public void setTrafficLightDurationPermanently(String id, int phaseIndex,  double newDuration ) {
+        tl.getTL(id).setPhaseDurationPermanently(phaseIndex, newDuration);
+    }
+
+    public void setTrafficLightPhase(String id, int phaseIndex) {
+        tl.getTL(id).setPhaseNumber(phaseIndex);
+    }
+
     // getter
 
     public String getChosenMap(){

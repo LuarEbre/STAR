@@ -296,8 +296,8 @@
                          <ChoiceBox fx:id="tlSelector" prefHeight="26.0" prefWidth="171.0" />
                </children>
                </HBox>
-            <Label layoutX="35.0" layoutY="237.0" styleClass="addMenu-labels" text="Current Phase" />
-            <TabPane fx:id="trafficLightTabPane" layoutY="87.0" prefHeight="150.0" prefWidth="259.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <Label layoutX="14.0" layoutY="237.0" styleClass="addMenu-labels" text="Current Phase" />
+            <TabPane fx:id="trafficLightTabPane" layoutY="87.0" prefHeight="130.0" prefWidth="259.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
               <tabs>
                 <Tab text="Duration">
                   <content>
@@ -305,11 +305,11 @@
                            <children>
                               <HBox layoutX="25.0" layoutY="41.0" prefHeight="188.0" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <VBox prefHeight="194.0" prefWidth="143.0" spacing="8.0">
+                                    <VBox prefHeight="194.0" prefWidth="143.0" spacing="10.0">
                                        <children>
                                                  <Label styleClass="addMenu-labels" text="Duration" />
-                                          <CheckBox fx:id="toggleTrafficLightPermanently" mnemonicParsing="false" text="Permanently" />
-                                          <Label text="Phase" />
+                                          <CheckBox fx:id="toggleTrafficLightPermanently" mnemonicParsing="false" onAction="#onTogglePermanently" styleClass="whiteLabel" text="Permanently" />
+                                          <Label styleClass="magentaLabel" text="Phase" />
                                        </children>
                                        <padding>
                                           <Insets left="10.0" top="15.0" />
@@ -317,7 +317,7 @@
                                     </VBox>
                                     <VBox prefHeight="182.0" prefWidth="154.0" spacing="5.0">
                                        <children>
-                                                 <Spinner fx:id="durationTL" />
+                                                 <Spinner fx:id="durationTL" styleClass="spinner" />
                                           <Label />
                                           <ChoiceBox fx:id="phaseIndexSelector" prefWidth="150.0" />
                                        </children>
@@ -334,29 +334,30 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                <Tab text="Phase">
+                <Tab styleClass="magentaLabel" text="Phase">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <Label layoutX="34.0" layoutY="25.0" text="Set Phase" />
+                              <Label layoutX="14.0" layoutY="47.0" prefHeight="18.0" prefWidth="86.0" styleClass="magentaLabel" text="Set Phase" />
+                              <ChoiceBox fx:id="phaseSetSelector" layoutX="131.0" layoutY="43.0" prefHeight="26.0" prefWidth="114.0" />
                            </children>
                         </AnchorPane>
                   </content>
                 </Tab>
                   <Tab text="Program">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="128.0" prefWidth="259.0">
                            <children>
-                              <Label layoutX="63.0" layoutY="32.0" styleClass="addMenu-labels" text="Set Program " />
-                              <ChoiceBox layoutX="43.0" layoutY="65.0" prefWidth="150.0" />
-                              <CheckBox layoutX="73.0" layoutY="109.0" mnemonicParsing="false" text="Adaptive" />
+                              <Label layoutX="21.0" layoutY="25.0" prefHeight="18.0" prefWidth="110.0" styleClass="addMenu-labels" text="Set Program " />
+                              <ChoiceBox layoutX="151.0" layoutY="21.0" prefHeight="26.0" prefWidth="100.0" />
+                              <CheckBox layoutX="21.0" layoutY="62.0" mnemonicParsing="false" styleClass="whiteLabel" text="Adaptive" />
                            </children>
                         </AnchorPane>
                      </content>
                   </Tab>
               </tabs>
             </TabPane>
-            <Button layoutX="130.0" layoutY="233.0" mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="10.0" prefWidth="79.0" text="Apply" />
+            <Button fx:id="applyButton" layoutX="151.0" layoutY="233.0" mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="10.0" prefWidth="79.0" text="Apply" />
             <ListView fx:id="stateText" layoutX="5.0" layoutY="265.0" prefHeight="102.0" prefWidth="250.0" />
            </children>
        </AnchorPane>
@@ -568,7 +569,7 @@
                </HBox.margin>
             </Label>
 
-             <Spinner fx:id="delaySelect" prefHeight="0.0" prefWidth="66.0">
+             <Spinner fx:id="delaySelect" prefHeight="0.0" prefWidth="66.0" styleClass="spinner">
                <HBox.margin>
                   <Insets />
                </HBox.margin>

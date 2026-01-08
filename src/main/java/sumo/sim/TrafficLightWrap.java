@@ -158,7 +158,6 @@ public class TrafficLightWrap {
      * @throws RuntimeException if the TraCI command fails.
      */
     public void setPhaseNumber(int index) {
-        //TODO: check if index exists in TL
         try {
             con.do_job_set(Trafficlight.setPhase(id,index));
         } catch (Exception e) {
@@ -196,8 +195,25 @@ public class TrafficLightWrap {
     }
 
     public void setPhaseDurationPermanently(int phaseIndex, double newDuration) {
-
+        // program id check how many T-logic -> else always 0 // force logic 0 else need ProgramID
+        try {
+            System.out.println("Set by: " + newDuration);
+            SumoTLSController controller = (SumoTLSController) con.do_job_get(Trafficlight.getCompleteRedYellowGreenDefinition(id));
+            SumoTLSProgram program = controller.programs.get("0"); // specific hashmap index (state)
+            if (program == null && !controller.programs.isEmpty()) {
+                program = controller.programs.values().iterator().next(); // take the next if null
+            }
+            if (program != null) {
+                SumoTLSPhase phase = program.phases.get(phaseIndex); // gets specified phase
+                phase.duration = newDuration; // overwrites new phase
+                con.do_job_set(Trafficlight.setCompleteRedYellowGreenDefinition(id, program));
+                phases.get(phaseIndex).setDuration(newDuration);
+            }
+        } catch (Exception e) {
+            return;
+        }
     }
+
 
     /**
      * Sets phase duration with {@link XML} class (unused)
@@ -275,6 +291,15 @@ public class TrafficLightWrap {
         return ret;
     }
 
+    public int getProgramNumber() {
+        try {
+            SumoTLSController controller = (SumoTLSController) con.do_job_get(Trafficlight.getCompleteRedYellowGreenDefinition(id));
+            return controller.programs.size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     public String getPhaseName() {
         try {
             return (String) con.do_job_get(Trafficlight.getPhaseName(id));
@@ -308,6 +333,9 @@ public class TrafficLightWrap {
         return phases;
     }
 
+    public void getControlledLanes() {
+        // con.do_job_get(Trafficlight.getControlledLanes(id));
+    }
 
     public String getProgram() {
         try {
