@@ -1,5 +1,6 @@
 package sumo.sim;
 
+import de.tudresden.sumo.cmd.Vehicle;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ScrollEvent;
@@ -26,6 +27,7 @@ public class SimulationRenderer {
     boolean showDensityAnchor;
     boolean showRouteHighlighting;
     boolean seeTrafficLightIDs;
+    boolean selectMode;
 
     private final GraphicsContext gc;
     private final Canvas map;
@@ -123,6 +125,9 @@ public class SimulationRenderer {
 
         transform();
         renderMap();
+        if(this.selectMode) {
+            this.renderSelectableObjects();
+        }
     }
 
     // [ mxx , mxy , tx ]
@@ -161,6 +166,17 @@ public class SimulationRenderer {
         transform.appendTranslation(-camX, -camY); // centralizes our view
         gc.setTransform(transform); // applies new matrix to gc matrix
 
+    }
+
+    private void renderSelectableObjects() {
+        gc.setFill(Color.rgb(66,245,245,0.7));
+        float width = 6;
+        for(VehicleWrap v: vl.getVehicles()) {
+            gc.fillOval(v.getPosition().x-width/2, v.getPosition().y-width/2, width, width);
+        }
+        for(TrafficLightWrap tl : tls.getTrafficlights()) {
+            gc.fillOval(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
+        }
     }
 
     /**
@@ -523,6 +539,8 @@ public class SimulationRenderer {
     protected void setPickedRouteID(String routeID) { this.RouteID = routeID; }
     protected boolean getPickedARoute() { return pickedARoute; }
     protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
+    protected boolean getSelectMode(boolean selectMode) { return selectMode; }
+    protected void setSelectMode(boolean selectMode) { this.selectMode = selectMode; }
 }
 
 

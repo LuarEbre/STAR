@@ -476,9 +476,17 @@ public class GuiController {
     @FXML
     protected void onSelect(){
         if (selectButton.isSelected()) {
-
+            sr.setSelectMode(true);
+            this.playButton.setDisable(true);
+            this.playButton.setSelected(false);
+            this.stepButton.setDisable(true);
+            wrapperController.stopSim();
+            System.out.println("Select Mode enabled");
         } else {
-
+            sr.setSelectMode(false);
+            this.playButton.setDisable(false);
+            this.stepButton.setDisable(false);
+            System.out.println("Select Mode disabled");
         }
     }
 
