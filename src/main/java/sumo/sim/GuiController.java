@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -80,7 +81,9 @@ public class GuiController {
     @FXML
     private HBox mainButtonBox;
     @FXML
-    private LineChart<String, Number> activeVehiclesChart;
+    private LineChart<String, Number> activeVehiclesChart, percentStoppedChart;
+    @FXML
+    private NumberAxis percentStoppedYAxis;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
@@ -105,6 +108,7 @@ public class GuiController {
 
     //Charts
     private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
+    private XYChart.Series<String, Number> percentStoppedSeries = new XYChart.Series<>();
 
     /**
      * <p>
@@ -692,18 +696,30 @@ public class GuiController {
         Locale.setDefault(Locale.US);
         VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
-        if (currentTab.equals("Overall")) {
-            int overallVehicleCount = wrapperController.getAllVehicleCount();
-            int activeCount = vehicles.getActiveCount();
-            int queuedCount = vehicles.getQueuedCount();
-            int exitedCount = overallVehicleCount - activeCount - queuedCount;
-            int currentlyStopped = vehicles.getStoppedCount();
-            int stoppedTime = vehicles.getStoppedTime();
-            float stoppedPercentage = 0f;
-            if (activeCount > 0) {
-                stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
-            }
 
+        //Graphs Updates
+        //must be outside of if, else it would only update if on graph tab
+
+        //Get Graph Data
+        int activeCount = vehicles.getActiveCount();
+        int simTime = (int)wrapperController.getTime();
+        int overallVehicleCount = wrapperController.getAllVehicleCount();
+        int queuedCount = vehicles.getQueuedCount();
+        int exitedCount = overallVehicleCount - activeCount - queuedCount;
+        int currentlyStopped = vehicles.getStoppedCount();
+        int stoppedTime = vehicles.getStoppedTime();
+
+        float stoppedPercentage = 0f;
+        if (activeCount > 0) {
+            stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
+        }
+
+        //Setup new Axis Data
+        activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
+        percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+
+
+        if (currentTab.equals("Overall")) {
             this.activeVehicles.setText(Integer.toString(activeCount));
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
@@ -719,13 +735,6 @@ public class GuiController {
             // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
             // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
         } else if (currentTab.equals("Graphs")){
-
-            //Get Graph Data
-            int activeCount = vehicles.getActiveCount();
-            int simTime = (int)wrapperController.getTime();
-
-            //Setup new Axis Data
-            activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
 
         } else {
             return;
@@ -842,12 +851,32 @@ public class GuiController {
     }
 
     public void setupCharts(){
+        //activeVehicles
+        activeVehiclesChart.getXAxis().setTickLabelsVisible(false);
+
         activeVehiclesSeries.setName("ActiveVehicles");
 
         activeVehiclesChart.getData().clear();
         activeVehiclesChart.getData().add(activeVehiclesSeries);
 
         activeVehiclesChart.setAnimated(false);
+
+        //percentageStopped
+
+        percentStoppedYAxis.setAutoRanging(false);
+        percentStoppedYAxis.setLowerBound(0);
+        percentStoppedYAxis.setUpperBound(100);
+        percentStoppedYAxis.setTickUnit(10); // 0,10,20,...100
+
+        percentStoppedChart.getXAxis().setTickLabelsVisible(false);
+
+        percentStoppedSeries.setName("PercentStopped");
+
+        percentStoppedChart.getData().clear();
+        percentStoppedChart.getData().add(percentStoppedSeries);
+
+        percentStoppedChart.setAnimated(false);
+
     }
 
     /**
@@ -962,6 +991,10 @@ public class GuiController {
         map1select.setDisable(true);
         map2select.setDisable(true);
         if (mapName != null) {
+            //Reset Graphs
+            activeVehiclesSeries.getData().clear();
+            percentStoppedSeries.getData().clear();
+
             wrapperController.mapSwitch(mapName);
         }
         importMapSelector.getSelectionModel().clearSelection(); // resets previous selection

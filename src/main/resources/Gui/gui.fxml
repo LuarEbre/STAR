@@ -211,6 +211,17 @@
                                           <Insets left="3.0" right="3.0" />
                                        </padding>
                                     </LineChart>
+                                    <LineChart id="percentStoppedGraph" fx:id="percentStoppedChart" createSymbols="false" horizontalZeroLineVisible="false" layoutY="160.0" prefHeight="92.0" prefWidth="259.0" title="Vehicles Stopped (in %)" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                       <xAxis>
+                                          <CategoryAxis side="BOTTOM" />
+                                       </xAxis>
+                                       <yAxis>
+                                          <NumberAxis fx:id = "percentStoppedYAxis" side="LEFT" />
+                                       </yAxis>
+                                       <padding>
+                                          <Insets left="3.0" right="3.0" />
+                                       </padding>
+                                    </LineChart>
                                  </children>
                               </AnchorPane>
                            </content>
