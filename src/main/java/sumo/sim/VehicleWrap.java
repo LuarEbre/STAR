@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link VehicleWrap#avgSpeed},{@link VehicleWrap#accel},
  * {@link VehicleWrap#totalLifetime} and properties critical for rendering such as {@link VehicleWrap#color}
  */
-public class VehicleWrap {
+public class VehicleWrap extends SelectableObject {
 
     // currently, to set the currentStreet of a vehicle as a Street, each car would have to have a reference to Street_List
     // therefore it could be beneficial to just use a String of EdgeID
@@ -34,7 +34,7 @@ public class VehicleWrap {
     private double maxSpeed;
     private double accel; // m/s²
     private double avgSpeed;
-    private int nStops;
+    private int numberOfStops;
     private int waitingTime;
     private int activeTime;
     private int totalLifetime; // = waitingTime + activeTime;
@@ -42,9 +42,6 @@ public class VehicleWrap {
     private boolean currentlyStopped;
     private boolean exists; // check for despawning in gui?
     private boolean queued;
-
-    // could be used for selecting in the GUI later on
-    private boolean selected;
 
     /**
      * Constructor initializes most values to 0 before they can be set by {@link VehicleWrap#updateVehicle()}
@@ -55,6 +52,7 @@ public class VehicleWrap {
      * @param color Vehicle Color
      */
     public VehicleWrap(String id , SumoTraciConnection con, String type, String route, Color color) {
+        super();
         this.id = id;
         this.type = type;
         this.con = con;
@@ -62,12 +60,9 @@ public class VehicleWrap {
         this.routeID = route;
         this.speed = 0.0;
         this.position = new Point2D.Double(0.0,0.0);
-        // this.angle = 0.0;
         this.maxSpeed = 0.0;
-        // this.accel = 0.0;
         this.avgSpeed = 0.0;
-        this.nStops = 0;
-        // activeTime = 1, waitingTime = -1 -> first frame of existence = active
+        this.numberOfStops = 0;
         this.waitingTime = -1;
         this.activeTime = 1;
         this.totalLifetime = 0;
@@ -109,7 +104,7 @@ public class VehicleWrap {
             if(this.speed == 0) {
                 this.currentlyStopped = true;
                 this.waitingTime++;
-                if(this.activeLastFrame) this.nStops++;
+                if(this.activeLastFrame) this.numberOfStops++;
             } else {
                 this.activeTime++;
             }
@@ -160,13 +155,9 @@ public class VehicleWrap {
      */
     public String getType() { return type; }
     /**
-     * @return true: if the vehicle is currently selected by the user in the GUI<br>false: else
-     */
-    public boolean isSelected() { return selected; }
-    /**
      * @return The number of times the vehicle has stopped.
      */
-    public int getnStops() { return nStops; }
+    public int getNumberOfStops() { return numberOfStops; }
     /**
      * @return The total time (in seconds) the vehicle has spent waiting.
      */

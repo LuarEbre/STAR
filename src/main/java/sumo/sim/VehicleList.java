@@ -141,7 +141,7 @@ public class VehicleList {
                         v.getAccel(),
                         v.getWaitingTime(),
                         v.getActiveTime(),
-                        v.getnStops(),
+                        v.getNumberOfStops(),
                         v.getTotalLifetime()
                 );
             }
@@ -163,7 +163,7 @@ public class VehicleList {
             sb.append(currVehicle.getID()).append(",");
             //sb.append(currVehicle.getSpeed()).append(",");
             sb.append(currVehicle.getType()).append(",");
-            sb.append(currVehicle.getnStops()).append(",");
+            sb.append(currVehicle.getNumberOfStops()).append(",");
             sb.append(currVehicle.getWaitingTime()).append(",");
             sb.append(currVehicle.getMaxSpeed()).append(",");
             //sb.append(pos.x).append(",").append(pos.y).append(",");
@@ -281,5 +281,11 @@ public class VehicleList {
             }
         }
         return Math.sqrt(sumofsquares/this.activeCount);
+    }
+
+    public void deselectAll() {
+        for(VehicleWrap v : vehicles) {
+            v.deselect();
+        }
     }
 }

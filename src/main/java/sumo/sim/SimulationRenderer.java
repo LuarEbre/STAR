@@ -1,5 +1,6 @@
 package sumo.sim;
 
+import de.tudresden.sumo.cmd.Vehicle;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ScrollEvent;
@@ -27,7 +28,9 @@ public class SimulationRenderer {
     boolean showDensityAnchor;
     boolean showRouteHighlighting;
     boolean seeTrafficLightIDs;
+    boolean selectMode;
 
+    private Affine currentTransform = new Affine();
     private final GraphicsContext gc;
     private final Canvas map;
     private boolean showSelectablePoints;
@@ -124,6 +127,9 @@ public class SimulationRenderer {
 
         transform();
         renderMap();
+        if(this.selectMode) {
+            this.renderSelectableObjects();
+        }
     }
 
     // [ mxx , mxy , tx ]
@@ -149,19 +155,39 @@ public class SimulationRenderer {
      * </p>
      */
     private void transform() {
-        Affine transform = new Affine();
-        transform.appendTranslation(map.getWidth() / 2, map.getHeight() / 2); // moves 0,0 to map middle : add/sub
+        this.currentTransform.setToIdentity();
+        this.currentTransform.appendTranslation(map.getWidth() / 2, map.getHeight() / 2); // moves 0,0 to map middle : add/sub
         // [ 1 , 0 , width ]        [ x + w ] <-- this is our point x -> + is to the right on x
         // [ 0 , 1 , height ]  *    [ y+h ]  <-- this is our point y
         // [ 0 , 0 , 1 ]            [ 1 ] <-- homogeneuos (added 1 row )
-        transform.appendRotation(rotation);
-        transform.appendScale(zoom, -zoom); // - y because sumo y coords are reversed : mul / div
+        this.currentTransform.appendRotation(rotation);
+        this.currentTransform.appendScale(zoom, -zoom); // - y because sumo y coords are reversed : mul / div
         // [ xSc , 0 , 0 ]        [ x * xSc ]  Scales our point with xSc and ySc
         // [ 0 , ySC , 0 ]  *    [ y * ySc ]
         // [ 0 , 0 , 1 ]            [ 1 ]
-        transform.appendTranslation(-camX, -camY); // centralizes our view
-        gc.setTransform(transform); // applies new matrix to gc matrix
+        this.currentTransform.appendTranslation(-camX, -camY); // centralizes our view
+        gc.setTransform(currentTransform); // applies new matrix to gc matrix
+    }
 
+    public Point2D.Double screenToWorld(double x, double y) {
+        try {
+            javafx.geometry.Point2D worldPos = currentTransform.inverseTransform(x, y);
+            return new java.awt.geom.Point2D.Double(worldPos.getX(), worldPos.getY());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void renderSelectableObjects() {
+        gc.setFill(Color.rgb(66,245,245,0.7));
+        for(VehicleWrap v: vl.getVehicles()) {
+            float width = v.getSelectRadius()*2;
+            gc.fillRect(v.getPosition().x-width/2, v.getPosition().y-width/2, width, width);
+        }
+        for(TrafficLightWrap tl : tls.getTrafficlights()) {
+            float width = tl.getSelectRadius()*2;
+            gc.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
+        }
     }
 
     /**
@@ -629,6 +655,8 @@ public class SimulationRenderer {
     protected void setPickedRouteID(String routeID) { this.RouteID = routeID; }
     protected boolean getPickedARoute() { return pickedARoute; }
     protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
+    protected boolean getSelectMode() { return selectMode; }
+    protected void setSelectMode(boolean selectMode) { this.selectMode = selectMode; }
 }
 
 
