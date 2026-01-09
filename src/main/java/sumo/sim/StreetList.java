@@ -5,6 +5,8 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages an {@link ArrayList} of {@link Street} objects.
@@ -15,6 +17,9 @@ public class StreetList {
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
     private final SumoTraciConnection connection;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(StreetList.class.getName());
 
     /**
      * Initializes the {@link Street} objects inside the List via {@link XML#readAllEdges()}
@@ -35,10 +40,12 @@ public class StreetList {
                     Street s = new Street(id, from, to, con);
                     streets.add(s);
                 } catch (RuntimeException e) {
+                    logger.log(Level.WARNING, "Failed to initialize Streets", e);
                     // System.out.println("Info: Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
                 }
             }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to initialize Streets and Data", e);
             throw new RuntimeException(e);
         }
     }

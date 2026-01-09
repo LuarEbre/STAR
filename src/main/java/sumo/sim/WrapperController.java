@@ -5,6 +5,11 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
+import java.io.FileInputStream;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +50,9 @@ public class WrapperController {
     public static String currentRou = null;
     public String sumoBinary;
 
+    //Logger
+    private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
+
     /**
      * The constructor of the Wrapper controller.
      *
@@ -77,6 +85,7 @@ public class WrapperController {
 
     private void initializeSimulationStart() {
         connection.addOption("start", "true");
+
         try {
             connection.runServer(8813); // preventing random port
             System.out.println("Connected to Sumo.");
@@ -92,6 +101,8 @@ public class WrapperController {
             start();
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to start Sumo Simulation", e);
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -115,6 +126,7 @@ public class WrapperController {
             try {
                 doStepUpdate(); // sim step
             } catch (IllegalStateException e) {
+                logger.log(Level.WARNING, "Failed to do a Simulation Step", e);
                 terminate();
             }
 
@@ -139,6 +151,7 @@ public class WrapperController {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "Failed to shutdown executor", e);
                 executor.shutdownNow();
             }
         }
@@ -147,7 +160,9 @@ public class WrapperController {
             try {
                 connection.close();
             } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to close connection", e);
                 System.err.println("Error while closing connection: " + e.getMessage());
+                throw new RuntimeException();
             }
         }
     }
@@ -199,6 +214,7 @@ public class WrapperController {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to update Sim Step", e);
             terminate();
             throw new RuntimeException(e);
         }
@@ -241,6 +257,7 @@ public class WrapperController {
                 Platform.runLater(() -> guiController.initializeCon(this));
 
             } catch (Exception e) {
+                logger.log(Level.FINE, "Failed to switch maps", e);
                 System.err.println("Error switching maps: " + e.getMessage());
             }
         }).start();

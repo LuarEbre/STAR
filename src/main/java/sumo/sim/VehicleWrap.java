@@ -6,6 +6,8 @@ import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
 import java.awt.geom.Point2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper of {@link Vehicle} allowing for instancing of individual vehicles
@@ -45,6 +47,9 @@ public class VehicleWrap {
 
     // could be used for selecting in the GUI later on
     private boolean selected;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(VehicleWrap.class.getName());
 
     /**
      * Constructor initializes most values to 0 before they can be set by {@link VehicleWrap#updateVehicle()}
@@ -115,6 +120,7 @@ public class VehicleWrap {
             }
             this.totalLifetime++;
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to update specific vehicle", e);
             this.exists = false;
         }
     }
@@ -127,6 +133,7 @@ public class VehicleWrap {
         try {
             con.do_job_set(Vehicle.setSpeed(id, speed));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set speed of specific Vehicle", e);
             throw new RuntimeException(e);
         }
     }

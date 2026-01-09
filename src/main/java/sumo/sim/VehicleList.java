@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages a {@link CopyOnWriteArrayList} of {@link VehicleWrap} objects.
@@ -24,6 +26,9 @@ public class VehicleList {
     private int count; // vehicles in list, latest car number: "v"+ count
     private int activeCount; // vehicles currently on the road network
     // needs possible routes maybe? for car creation
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(VehicleList.class.getName());
 
     /**
      * Initializes our VehicleList with a count of 0 vehicles
@@ -54,6 +59,7 @@ public class VehicleList {
                 count++; // increment to prevent identical car ids
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to add vehicle", e);
             throw new RuntimeException(e);
         }
         vehicles.addAll(newVehicles); // thread save list is really slow
@@ -89,6 +95,7 @@ public class VehicleList {
                         // if vehicle is present in activeIDs it is no longer queued, and assuredly is on the road network
                         v.setQueued(false);
                     } catch (Exception e) {
+                        logger.log(Level.FINE, "Failed to update all vehicles", e);
                         v.setExists(false); // if vehicle despawns
                     }
                 } else {
@@ -96,6 +103,7 @@ public class VehicleList {
                 }
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to update all vehicles", e);
             throw new RuntimeException(e);
         }
     }
