@@ -219,14 +219,14 @@
                <children>
                   <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap1" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
                   <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap2" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button fx:id="importMapButton" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" onAction="#importMap" prefHeight="34.0" prefWidth="114.0" text="Import Map" />
+                  <Button fx:id="importMapButton" styleClass="std-btn" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" onAction="#importMap" prefHeight="34.0" prefWidth="114.0" text="Import Map" />
                   <Label layoutX="122.0" layoutY="11.0" styleClass="topMenuLabel" text="Choose a Map" textFill="VIOLET">
                      <font>
                         <Font name="Arial Black" size="23.0" />
                      </font>
                   </Label>
                   <ChoiceBox fx:id="importMapSelector" layoutX="32.0" layoutY="235.0" prefHeight="26.0" prefWidth="206.0" />
-                  <Label layoutX="33.0" layoutY="215.0" prefHeight="18.0" prefWidth="150.0" text="Imported Maps" />
+                  <Label styleClass="magentaLabel" layoutX="33.0" layoutY="215.0" prefHeight="18.0" prefWidth="150.0" text="Imported Maps" />
                </children>
             </AnchorPane>
 

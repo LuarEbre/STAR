@@ -46,13 +46,6 @@ public class SumoMapManager {
                 new File ("src/main/resources/SumoConfig/RugMap/rugmap.rou.xml"),
                 new File ("src/main/resources/SumoConfig/RugMap/rugmap.sumocfg")
         ));
-
-        maps.put("MiquelAllee", new SumoMapConfig(
-                "MiquelAllee",
-                new File ("src/main/resources/SumoConfig/MiquelAllee/MiquelAllee.net.xml"),
-                new File ("src/main/resources/SumoConfig/MiquelAllee/MiquelAllee.rou.xml"),
-                new File ("src/main/resources/SumoConfig/MiquelAllee/MiquelAllee.sumocfg")
-        ));
     }
 
     public void chooseFile(Stage stage) {
@@ -83,11 +76,11 @@ public class SumoMapManager {
         }
 
         Map<String, String> inputs = xml.getConfigInputs(); // all inputs in sumoconfig
-        // only get net and route files
+        // filter only get net and route files (problem if multiple?)
         String netFileString = inputs.get("net-file");
         String rouFileString = inputs.get("route-files");
 
-        if (netFileString !=null || rouFileString !=null) {
+        if (netFileString !=null && rouFileString !=null) {
 
             File netFile = new File(file.getParent(), netFileString);
             File rouFile = new File(file.getParent(), rouFileString);

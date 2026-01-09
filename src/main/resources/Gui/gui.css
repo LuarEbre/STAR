@@ -278,6 +278,30 @@
     -fx-background-position: center
 }
 
+.std-btn {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-background-radius: 15;
+    -fx-alignment: center;
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Black";
+}
+
+.std-btn:hover {
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 3, 3;
+    -fx-border-insets: 0, 2;
+    -fx-border-style: solid, solid;
+    -fx-border-radius: 15, 13;
+}
+
+.std-btn:selected {
+    -fx-background-color: -fx-color-grey-lightest;
+    -fx-border-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-border-width: 4;
+    -fx-background-radius: 15;
+    -fx-border-radius: 13;
+}
+
 /* Middle style */
 .zoomMenu {
     -fx-fill: -fx-color-grey-light ;
