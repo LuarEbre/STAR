@@ -20,10 +20,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SumoMapManager {
 
     private final Map<String, SumoMapConfig> maps = new HashMap<>(); // hashmap of configs
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(SumoMapManager.class.getName());
 
     public SumoMapManager(){
         loadDefaultMaps();
@@ -72,6 +77,7 @@ public class SumoMapManager {
             xml = new XML(file.toString());
         } catch (Exception e) {
             // fail to create XML reader
+            logger.log(Level.WARNING, "Failed to create XML reader", e);
             throw new RuntimeException(e);
         }
 

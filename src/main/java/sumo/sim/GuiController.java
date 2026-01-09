@@ -23,6 +23,9 @@ import javafx.scene.layout.VBox;
 
 import java.util.Locale;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -109,6 +112,9 @@ public class GuiController {
     //Charts
     private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
     private XYChart.Series<String, Number> percentStoppedSeries = new XYChart.Series<>();
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(GuiController.class.getName());
 
     /**
      * <p>
@@ -369,8 +375,10 @@ public class GuiController {
             editor.setText(String.valueOf(val));
 
         } catch (NumberFormatException e) { // catches exception
+            logger.log(Level.WARNING, "Invalid input", e);
             delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
             editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
+            throw new RuntimeException(e);
         }
     }
 
@@ -898,7 +906,12 @@ public class GuiController {
      * Called by {@link #startRenderer()} to update {@link SimulationRenderer#initRender()} ~60 times per frame
      */
     public void renderUpdate(){
-        sr.initRender();
+        try{
+            sr.initRender();
+        } catch (RenderingException e) {
+            logger.log(Level.SEVERE, "Error while initializing render", e);
+            throw new RenderingException("Error while initializing render");
+        }
     }
 
     /**

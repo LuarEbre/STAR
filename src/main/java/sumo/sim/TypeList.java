@@ -6,12 +6,17 @@ import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TypeList {
     // has a list of all current (and newly created) Vehicle types
 
     private final Map<String, Type> types = new HashMap<>(); // string key unique: type id
     private final SumoTraciConnection connection;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(TypeList.class.getName());
 
     /*
     type_id -> list(color,max speed)
@@ -35,6 +40,7 @@ public class TypeList {
                 types.put(id, type); // type and hashmap same ID
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to initialize Types", e);
             throw new RuntimeException(e);
         }
     }

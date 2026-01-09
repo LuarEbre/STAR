@@ -6,6 +6,8 @@ import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.ArrayList;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Holds every JunctionWrap Object
@@ -17,6 +19,9 @@ public class JunctionList {
     private int count;
     private Map<String, Set<String>> adjacency = new HashMap<>();
     private final StreetList streets;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(JunctionList.class.getName());
 
     /**
      *
@@ -34,6 +39,7 @@ public class JunctionList {
             updateAdjacency();
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to load JunctionList", e);
             throw new RuntimeException(e);
         }
     }
