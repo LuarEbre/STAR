@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -510,6 +511,111 @@ public class SimulationRenderer {
             zoom *= z; // zoom with values > 1 , // unzoom with val < 1
         }
     }
+
+    public void renderTrafficLightPreview(String id, String[] streets, String phase, Canvas canvas, GraphicsContext gcTL) {
+        TrafficLightWrap tl = tls.getTL(id);
+        if (tl == null) return;
+
+        // filter irrelevant information of streets array
+        String[] streetsOnly = new String[streets.length/2];
+        int j=1;
+        for  (int i = 0; i < streetsOnly.length; i++) {
+            streetsOnly[i] = streets[j];
+            j+=2;
+        }
+
+        gcTL.save();
+        gcTL.setFill(Color.GRAY);
+        gcTL.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        Point2D pos = tl.getPosition();
+        double previewZoom = 3.5;
+
+        // transform
+        Affine transform = new Affine();
+        transform.appendTranslation(canvas.getWidth() / 2, canvas.getHeight() / 2); // move to middle
+        transform.appendScale(previewZoom, -previewZoom);
+        transform.appendTranslation(-pos.getX(), -pos.getY());
+        gcTL.setTransform(transform);
+
+        // render junctions
+        JunctionWrap jw = jl.getJunction(id);
+        if (jw != null) {
+            // should check shape mean to determine camera?
+            double[] jx = jw.getShapeX();
+            double[] jy = jw.getShapeY();
+            if (jx != null && jx.length > 2) {
+                gcTL.setFill(Color.rgb(30, 30, 30));
+                gcTL.fillPolygon(jx, jy, jx.length);
+            }
+        }
+
+        // render streets
+        Color colorTL;
+        gcTL.setLineWidth(3.5);
+
+        for (Street controlledStreet : tl.getControlledStreets()) {
+            for (LaneWrap l : controlledStreet.getLanes()) {
+                for (int i = 0; i < streetsOnly.length; i++) {
+                    if (streetsOnly[i] == null) continue;
+                    if (streetsOnly[i].equals(l.getLaneID())) { //  maybe performance hashmap
+                        double[] rawX = l.getShapeX();
+                        double[] rawY = l.getShapeY();
+                        gcTL.setStroke(Color.DARKGRAY);
+                        gcTL.strokePolyline(rawX, rawY, rawX.length);
+                        switch (""+phase.charAt(i)) { // if state like "g" equals...
+                            case "G", "g" -> colorTL = Color.GREEN;
+                            case "y" -> colorTL = Color.YELLOW;
+                            case "r" -> colorTL = Color.RED;
+                            default -> colorTL = Color.GRAY;
+                        }
+                        gcTL.setStroke(colorTL);
+                        gcTL.setLineWidth(2.5);
+                        break;
+                    }
+
+                }
+                // render TL
+                double[] rawX = l.getShapeX();
+                double[] rawY = l.getShapeY();
+
+                double endX = rawX[rawX.length - 1]; // 3
+                double endY = rawY[rawX.length - 1]; // 2
+
+                double prevX = rawX[rawX.length - 2]; // 2
+                double prevY = rawY[rawX.length - 2]; // 1
+
+                //(P_prev -> P_end) direction vector (target-start)
+                double dx = endX - prevX; // 1
+                double dy = endY - prevY; // 1
+
+                // normalize length to 1 , because value can be really high
+                double length = Math.sqrt(dx * dx + dy * dy); // 1+1=2
+
+                double ndx = dx / length;
+                double ndy = dy / length; // 0.5
+                // length of vector is now exactly 1 , can change size here?
+
+                double perpX = -ndy; // rotates 90 degree to the left when negating x and switching x and y
+                double perpY = ndx;
+
+                double halfWidth = 2.0 / 2.0; // pre-determined -> should adjust with lane width
+
+                double lineX1 = endX + (perpX * halfWidth); // line X2/Y2 <---"-"-*-"+"---> lineX1/Y1 , (* = endpoint)
+                double lineY1 = endY + (perpY * halfWidth);
+
+                double lineX2 = endX - (perpX * halfWidth);
+                double lineY2 = endY - (perpY * halfWidth);
+
+                gcTL.strokeLine(lineX1, lineY1, lineX2, lineY2);
+            }
+
+        }
+
+
+        gcTL.restore();
+    }
+
 
     protected void setSeeTrafficLightIDs(boolean seeTrafficLightIDs) { this.seeTrafficLightIDs = seeTrafficLightIDs; }
     protected boolean getSeeTrafficLightIDs() { return seeTrafficLightIDs; }
