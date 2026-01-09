@@ -217,12 +217,16 @@
 
 #stateText .list-cell {
     -fx-text-fill: white;
+    -fx-background-color: -fx-color-grey-lightest;
+}
+
+#stateText .list-cell:selected {
+    -fx-text-fill: magenta;
     -fx-background-color: -fx-color-grey-light;
 }
 
 #stateText {
-    -fx-text-fill: white;
-    -fx-background-color: -fx-color-grey;
+    -fx-background-color: -fx-color-grey-light;
 }
 
 /* Top left delay menu -> Spinner consist of multiple components */
