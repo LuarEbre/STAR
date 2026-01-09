@@ -282,24 +282,6 @@ public class WrapperController {
         }
     }
 
-    /**
-     * Returns the duration of the phase of which the selected traffic light is currently on
-     *
-     * @param tlID
-     * @return e.g.: [g,r,y,80] -> state , last element is duration
-     */
-    public String[] getTlStateDuration(String tlID) {
-        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
-        int j = 0;
-        for (int i=0; i<ret.length-2; i++) {
-            ret[i] = tl.getTL(tlID).getCurrentState()[j];
-            j += 2; // 0,2,4,8
-        }
-        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
-        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
-
-        return ret; // [g,r,y,80] -> state , last element is duration
-    }
 
     /**
      * Sets the duration of the phase the traffic light is currently on.
@@ -321,6 +303,25 @@ public class WrapperController {
 
     // getter
 
+    /**
+     * Returns the duration of the phase of which the selected traffic light is currently on
+     *
+     * @param tlID
+     * @return e.g.: [g,r,y,80] -> state , last element is duration
+     */
+    public String[] getTlStateDuration(String tlID) {
+        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
+        int j = 0;
+        for (int i=0; i<ret.length-2; i++) {
+            ret[i] = tl.getTL(tlID).getCurrentState()[j];
+            j += 2; // 0,2,4,8
+        }
+        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
+        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
+
+        return ret; // [g,r,y,80] -> state , last element is duration
+    }
+
     public String getChosenMap(){
         List<String> maps = mapManager.getNames();
         for(String key : maps) {
@@ -333,6 +334,7 @@ public class WrapperController {
         return "Frankfurt";
     }
 
+    public String[] getTLCurrentState(String id) {return tl.getTL(id).getCurrentState();}
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }
     public int getDelay() { return delay; }
@@ -341,6 +343,7 @@ public class WrapperController {
     public VehicleList getVehicles() { return vl; }
     public TrafficLightList getTrafficLights() { return tl; }
     public RouteList getRoutes()  { return rl; }
+    public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
     public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
     public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
 
