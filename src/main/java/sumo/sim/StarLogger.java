@@ -10,7 +10,7 @@ public class StarLogger {
     public static void setupLogger() {
         try {
 
-            LogManager.getLogManager().readConfiguration(new FileInputStream("mylogging.properties"));
+           // LogManager.getLogManager().readConfiguration(new FileInputStream("mylogging.properties"));
 
             Logger rootLogger = Logger.getLogger("");
 
@@ -19,7 +19,7 @@ public class StarLogger {
             }
 
             // FileHandler
-            FileHandler fileHandler = new FileHandler("Logs/logger.log", 2_000_000, 5, true);
+            FileHandler fileHandler = new FileHandler("src/main/resources/Logs/logger.log", 2_000_000, 5, true);
             fileHandler.setFormatter(new LoggFormatter());
             fileHandler.setFilter(new LoggFilter());
 
