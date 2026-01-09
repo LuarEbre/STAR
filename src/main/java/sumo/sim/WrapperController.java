@@ -86,7 +86,7 @@ public class WrapperController {
             tl = new TrafficLightList(connection, sl);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
-            rl = new RouteList(currentRou, connection);
+            rl = new RouteList(currentRou, connection, this);
 
             tl.updateAllCurrentState(); // important for rendering
             start();
@@ -261,9 +261,12 @@ public class WrapperController {
     }
 
     public void addRoute(String start, String end, String id) {
-        rl.generateRoute(start, end, id, jl);
+        rl.addRoute(start,end,id);
     }
 
+    public void updateRoutes() {
+        Platform.runLater(guiController::initializeDropDowns);
+    }
     /**
      * Spread the amount of vehicles determined by the stress test setting evenly across all existing routes
      * @param amount number of cars (set in Stress Test Menu)
@@ -278,6 +281,27 @@ public class WrapperController {
             addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
         }
     }
+
+
+    /**
+     * Sets the duration of the phase the traffic light is currently on.
+     * @param tlid
+     * @param duration
+     */
+    public void setTlSettings(String tlid, int duration) {
+        tl.getTL(tlid).setPhaseDuration(duration);
+        //double check = tl.getTL(tlid).getDuration();
+    }
+
+    public void setTrafficLightDurationPermanently(String id, int phaseIndex,  double newDuration ) {
+        tl.getTL(id).setPhaseDurationPermanently(phaseIndex, newDuration);
+    }
+
+    public void setTrafficLightPhase(String id, int phaseIndex) {
+        tl.getTL(id).setPhaseNumber(phaseIndex);
+    }
+
+    // getter
 
     /**
      * Returns the duration of the phase of which the selected traffic light is currently on
@@ -298,20 +322,6 @@ public class WrapperController {
         return ret; // [g,r,y,80] -> state , last element is duration
     }
 
-    /**
-     * Sets the duration of the phase the traffic light is currently on.
-     * @param tlid
-     * @param duration
-     */
-    public void setTlSettings(String tlid, int duration) {
-        tl.getTL(tlid).setPhaseDuration(duration);
-        double check = tl.getTL(tlid).getDuration();
-        System.out.println("Duration: " + check);
-
-    }
-
-    // getter
-
     public String getChosenMap(){
         List<String> maps = mapManager.getNames();
         for(String key : maps) {
@@ -324,6 +334,7 @@ public class WrapperController {
         return "Frankfurt";
     }
 
+    public String[] getTLCurrentState(String id) {return tl.getTL(id).getCurrentState();}
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }
     public int getDelay() { return delay; }
@@ -332,11 +343,15 @@ public class WrapperController {
     public VehicleList getVehicles() { return vl; }
     public TrafficLightList getTrafficLights() { return tl; }
     public RouteList getRoutes()  { return rl; }
+    public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
+    public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
+    public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
     public String[] getRouteList() { return (rl != null) ? rl.getAllRoutesID() : new String[0]; }
     public String[] getTLids() { return (tl != null) ? tl.getIDs() : new String[0]; }
+    public String[] getSelectableStreets() {return sl.getSelectableStreets(); }
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }

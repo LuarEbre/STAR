@@ -13,5 +13,4 @@
   <route id="r_7" edges="E0 E1 E2 E8 E9" color="orange" />
   <route id="r_8" edges="-E9 E12 E13 E14 E5 E7 E8 E9" color="green" />
   <vType id="lkw_40t" vClass="truck" guiShape="truck" color="blue" length="2.0" width="2.5" minGap="2.5" maxSpeed="25.0" accel="1.2" decel="1.5" sigma="0.2" tau="1.5" speedFactor="0.95" />
-  <route id="testID" edges="E0" />
 </routes>
