@@ -34,6 +34,10 @@ public class VehicleList {
         this.con = con;
     }
 
+    public void setSpeedForAll(double speed) {
+
+    }
+
     /**
      * Adds n vehicles to the SUMO simulation {@link SumoTraciConnection} via the native {@link Vehicle#addFull(String, String, String, String, String, String, String, String, String, String, String, String, String, int, int)}
      * @param n number of desired vehicles

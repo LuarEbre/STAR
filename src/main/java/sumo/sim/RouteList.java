@@ -1,6 +1,8 @@
 package sumo.sim;
 
 import de.tudresden.sumo.cmd.Route;
+import de.tudresden.sumo.cmd.Simulation;
+import de.tudresden.sumo.objects.SumoStage;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
@@ -16,6 +18,7 @@ public class RouteList {
     private final Map<String, List<String>> allRoutes;
     private  XML xmlReader;
     private final SumoTraciConnection con;
+    private final WrapperController controller;
 
     /**
      * Constructor for RouteList
@@ -23,8 +26,9 @@ public class RouteList {
      * @param rouXmlFilePath
      * @throws Exception
      */
-    public RouteList(String rouXmlFilePath, SumoTraciConnection con) throws Exception {
+    public RouteList(String rouXmlFilePath, SumoTraciConnection con, WrapperController controller) throws Exception {
 
+        this.controller = controller;
         this.con = con;
         // parssing the xml file
         xmlReader = new XML(rouXmlFilePath);
@@ -150,30 +154,35 @@ public class RouteList {
         System.out.println("Junction Path: " + junctionPath); // empty list?
         System.out.println("Junction Path Size: " + junctionPath.size());
 
-        addRoute(edgeList, routeID);
 
         allRoutes.put(routeID, edgeList);
         xmlReader.newRoute(routeID, edgeList);
     }
 
-    private void addRoute(List<String> edgeList, String routeID) {
+    public void addRoute(String start, String end, String routeID) {
         SumoStringList route = new SumoStringList();
         //route.addAll(edgeList);
-        // Simulation.findRoute()
-        String[] arr = {"E2", "E3", "E4", "E5"};
-        route.addAll(Arrays.asList(arr));
+        SumoStage routeResult;
+        try {
+            routeResult = (SumoStage) con.do_job_get(Simulation.findRoute(start,end,"", 0 , 0));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        route.addAll(routeResult.edges);
         for (String s : route) {
             System.out.println(s);
         }
 
         // adding in Sumo
         try {
-            //System.out.println(con.do_job_get(Route.getIDCount()));
+            System.out.println(con.do_job_get(Route.getIDCount()));
             con.do_job_set(Route.add(routeID, route));
-            //System.out.println(con.do_job_get(Route.getIDCount()));
+            System.out.println(con.do_job_get(Route.getIDCount()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        allRoutes.put(routeID, route);
+        controller.updateRoutes();
     }
 
     /**
