@@ -81,7 +81,13 @@ public class TrafficLightWrap {
     }
 
 
-
+    /**
+     * Loads all Traffic Light phases this. TL
+     *
+     * <p>
+     *     Creates {@link TrafficLightPhase} objects containing phase index, state, duration of each Phase.
+     * </p>
+     */
     private void loadPhases() {
         try {
 
@@ -99,7 +105,7 @@ public class TrafficLightWrap {
 
                 int index = 0;
                 for (SumoTLSPhase p : prog.phases) {
-                    String rawString = p.toString();
+                    String rawString = p.toString(); // phase : "Grryrr#3#3" etc.
                     String cleanState = rawString.split("#")[0]; // cutting of everything after #
                     this.phases.add(new TrafficLightPhase(index, cleanState, p.duration));
                     index++;
@@ -112,6 +118,9 @@ public class TrafficLightWrap {
         }
     }
 
+    /**
+     * Should automatically adjust Traffic Light configurations based on Vehicle density and waiting time.
+     */
     public void enableAdaptiveTrafficLightLogic() {
         // based on numbers of vehicles and waiting time -> adjust tl timings
     }
@@ -194,10 +203,21 @@ public class TrafficLightWrap {
         }
     }
 
+    /**
+     * Forces a permanent duration change for any TrafficLight phase.
+     *
+     * <p>
+     *     By retrieving the program from {@link SumoTLSProgram} and selecting a specific phase
+     *     from {@link SumoTLSPhase} this method adjust the duration value stored inside .net XML
+     *     to a new value, until the program is terminated.
+     * </p>
+     *
+     * @param phaseIndex to select the Phase index of the current Traffic Light
+     * @param newDuration value to change the duration with.
+     */
     public void setPhaseDurationPermanently(int phaseIndex, double newDuration) {
         // program id check how many T-logic -> else always 0 // force logic 0 else need ProgramID
         try {
-            System.out.println("Set by: " + newDuration);
             SumoTLSController controller = (SumoTLSController) con.do_job_get(Trafficlight.getCompleteRedYellowGreenDefinition(id));
             SumoTLSProgram program = controller.programs.get("0"); // specific hashmap index (state)
             if (program == null && !controller.programs.isEmpty()) {
@@ -215,44 +235,7 @@ public class TrafficLightWrap {
     }
 
 
-    /**
-     * Sets phase duration with {@link XML} class (unused)
-     * <p>
-     * This calls {@link #updateTL()} after setting the value.
-     * </p>
-     *
-     * @param phaseIndex    The index of the phase to modify.
-     * @param phaseDuration The new duration for the phase.
-     * @throws RuntimeException if the TraCI command or XML operation fails.
-     */
-    public void setSpecificPhaseDuration(int phaseIndex, double phaseDuration) {
-        try {
-            String ProgramID = (String) con.do_job_get(Trafficlight.getProgram(id));
-            xml.setPhaseDuration(id, ProgramID, phaseIndex, phaseDuration);
-            updateTL();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Modifies the duration of a phase identified by its state string (e.g., "GGrr").
-     *
-     * @param state         The state string identifying the phase.
-     * @param phaseDuration The new duration for the phase.
-     * @throws RuntimeException if the TraCI command or XML operation fails.
-     */
-    public void setPhaseDurationByState(String state, double phaseDuration) {
-        try {
-            String ProgramID = (String) con.do_job_get(Trafficlight.getProgram(id));
-            xml.setPhaseDurationByState(id, ProgramID, state, phaseDuration);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void setProgram(String programID) {
-        //TODO: check for programID
         try {
             con.do_job_set(Trafficlight.setProgram(id, programID));
         } catch (Exception e) {
@@ -261,7 +244,6 @@ public class TrafficLightWrap {
     }
 
     public void setRedYellowGreenState(String state) {
-        //TODO: string check
         try {
             con.do_job_set(Trafficlight.setRedYellowGreenState(id, state));
         } catch (Exception e) {
@@ -307,6 +289,24 @@ public class TrafficLightWrap {
             throw new RuntimeException(e);
         }
     }
+
+    public String getPhaseAtIndex(int index) {
+        SumoTLSController controller = null;
+        try {
+            controller = (SumoTLSController) con.do_job_get(Trafficlight.getCompleteRedYellowGreenDefinition(id));
+            SumoTLSProgram program = controller.programs.get("0"); // specific hashmap index (state)
+            if (program == null && !controller.programs.isEmpty()) {
+                program = controller.programs.values().iterator().next(); // take the next if null
+            }
+            if (program != null) {
+                return program.phases.get(index).phasedef; // gets specified phase "Grrr"
+            }
+            return "";
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
 
     public double getDuration() {
         double duration = 0;

@@ -44,7 +44,7 @@ import javafx.stage.Stage;
 public class GuiController {
     // all FXML objects
     @FXML
-    private AnchorPane dataPane, root, middlePane, addMenu,
+    private AnchorPane dataPane, root, middlePane, addMenu, tlVisualizerPane,
             filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu, createMenu;
     @FXML
     private ColorPicker colorSelector;
@@ -62,7 +62,7 @@ public class GuiController {
     @FXML
     private Spinner <Integer> delaySelect, durationTL;
     @FXML
-    private Canvas staticMap, dynamicMap;
+    private Canvas staticMap, dynamicMap, tlCanvas;
     @FXML
     private Label timeLabel, vehicleCount;
     @FXML
@@ -295,6 +295,20 @@ public class GuiController {
             }
         });
 
+        stateText.setOnMouseClicked(event -> {
+            String selectedData = stateText.getSelectionModel().getSelectedItem(); // which line is clicked on
+
+
+            if (selectedData != null) {
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("Phase:\\s*(\\d+)").matcher(selectedData);
+                if (m.find()) {
+                    int index = Integer.parseInt(m.group(1));
+                    tlVisualizerPane.setVisible(true);
+                    trafficLightPreview(index);
+                }
+            }
+        });
+
         // initializes tl duration spinner
         SpinnerValueFactory<Integer> duration =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 20); //min, max, start
@@ -389,6 +403,9 @@ public class GuiController {
     private void toggleMenuAtButton(Pane menu, Node button) {
         if (menu.isVisible()) {
             menu.setVisible(false);
+            if(menu == trafficLightMenu) {
+                tlVisualizerPane.setVisible(false);
+            }
             return;
         }
         menu.setVisible(true);
@@ -401,6 +418,15 @@ public class GuiController {
 
         menu.setLayoutX(localPos.getX());
         menu.setLayoutY(localPos.getY());
+
+        if (menu == trafficLightMenu) {
+            if (!tlVisualizerPane.isVisible()) {
+                tlVisualizerPane.setLayoutY(menu.getLayoutY() + 50 + menu.getLayoutY() / 2);
+                double gap = 5.0;
+                double visualizerX = menu.getLayoutX() - tlVisualizerPane.getPrefWidth() - gap;
+                tlVisualizerPane.setLayoutX(visualizerX);
+            }
+        }
     }
 
     /**
@@ -454,6 +480,7 @@ public class GuiController {
      */
     @FXML
     protected void onPlayStart() {
+        tlVisualizerPane.setVisible(false);
         stepButton.setDisable(true);
         playButton.setDisable(false);
         if (playButton.isSelected()) { // toggled
@@ -603,6 +630,8 @@ public class GuiController {
             button.setDisable(!showButtons.isSelected());
             button.setVisible(showButtons.isSelected());
         }
+        //middlePane.heightProperty().
+        //staticMap.heightProperty().bind(middlePane.heightProperty().multiply(1.25));
     }
 
     @FXML
@@ -914,6 +943,7 @@ public class GuiController {
         trafficLightMenu.setVisible(false);
         createMenu.setVisible(false);
         stressTestMenu.setVisible(false);
+        tlVisualizerPane.setVisible(false);
         //closeAllMenus();
     }
 
@@ -1056,6 +1086,16 @@ public class GuiController {
         // dropDownMenus must be updated and data retrieved from / or select via map
 
         wrapperController.addRoute("E0", "E4", "testID");
+    }
+
+    private void trafficLightPreview (int index) {
+        String id = tlSelector.getValue();
+        if (id == null) return;
+        String phase = wrapperController.getPhaseAtIndex(id,index);
+        //List<String> controlledStreets = wrapperController.getControlledLanesAtIndex(tlSelector.getValue(), Integer.parseInt(phaseIndexSelector.getValue()));
+        String[] controlledStreets = wrapperController.getTLCurrentState(id);
+        GraphicsContext gcTL = tlCanvas.getGraphicsContext2D();
+        sr.renderTrafficLightPreview(tlSelector.getValue(), controlledStreets, phase, tlCanvas, gcTL );
     }
 
 }
