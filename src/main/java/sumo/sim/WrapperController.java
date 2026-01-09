@@ -161,7 +161,14 @@ public class WrapperController {
     public void changeDelay(int delay) {
         this.delay = delay;
         if (!executor.isShutdown() && executor!= null) {
-            executor.shutdownNow();
+            try {
+                executor.shutdown();
+                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         terminated = false;
         paused = false;
@@ -249,7 +256,7 @@ public class WrapperController {
     // Main Button features
 
     /**
-     * Used by {@link GuiController} to add Vehicles
+     * Used by {@link GuiController} to add Vechicles
      * @param amount How many Vehicles will spawn
      * @param type Sets type based on existing types in .rou XML
      * @param route Sets route
