@@ -34,6 +34,7 @@ public class StreetList {
                     // if id is not known -> error , needs to be checked in other lists too
                     Street s = new Street(id, from, to, con);
                     streets.add(s);
+                    count++;
                 } catch (RuntimeException e) {
                     // System.out.println("Info: Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
                 }
@@ -61,6 +62,15 @@ public class StreetList {
      */
     public List<Street> getStreets() {
         return streets;
+    }
+
+    public String[] getSelectableStreets() {
+        String[] ret = new String[streets.size()];
+        for (int i = 0; i < streets.size(); i++) {
+            ret[i] = streets.get(i).getId();
+            System.out.println("fsafa");
+        }
+        return ret;
     }
 
     /**
