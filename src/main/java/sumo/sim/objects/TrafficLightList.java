@@ -183,10 +183,15 @@ public class TrafficLightList {
      * Does the update_TL method for every TrafficLight in TrafficLightList
      * This updates their attributes to current Simulation data
      */
-    public void updateTLs(){
+    public void updateTLs() {
         for(TrafficLightWrap tl : trafficlights ){
             tl.updateTL();
         }
+    }
 
+    public void deselectAll() {
+        for(TrafficLightWrap tl : trafficlights) {
+            tl.deselect();
+        }
     }
 }

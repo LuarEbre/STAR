@@ -234,4 +234,10 @@ public class VehicleList {
         }
         return Math.sqrt(sumofsquares/this.activeCount);
     }
+
+    public void deselectAll() {
+        for(VehicleWrap v : vehicles) {
+            v.deselect();
+        }
+    }
 }

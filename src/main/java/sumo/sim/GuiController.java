@@ -15,10 +15,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.List;
 import java.util.Locale;
@@ -73,7 +70,7 @@ public class GuiController {
     @FXML
     private Canvas staticMap, dynamicMap, tlCanvas;
     @FXML
-    private Label timeLabel, vehicleCount;
+    private Label timeLabel, vehicleCount, notSelectedLabel1, notSelectedLabel2;
     @FXML
     private Slider playSlider;
     @FXML
@@ -85,9 +82,12 @@ public class GuiController {
     private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
             showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently;
     @FXML
-    private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD;
+    private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD,
+                        vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops;
     @FXML
     private TabPane tabPane, trafficLightTabPane;
+    @FXML
+    private GridPane FilteredGrid, SelectedGrid;
     @FXML
     private HBox mainButtonBox;
     @FXML
@@ -115,6 +115,7 @@ public class GuiController {
     private final int defaultDelay;
     private final int maxDelay;
     private SumoMapManager mapManager;
+    private int opacity;
 
     //Charts
     private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
@@ -135,6 +136,7 @@ public class GuiController {
         this.defaultDelay = 50;
         this.maxDelay = 999;
         panSen = 2;
+        this.opacity = 0;
     }
 
     public void setStageAndManager(Stage s , SumoMapManager mapManager) {
@@ -247,6 +249,7 @@ public class GuiController {
     public void initialize() {
         rescale(); // rescales menu based on width and height
         setUpInputs(); // Spinner factory etc. initializing
+        setupSelectionHandler(); // setup SelectMode MouseEvent
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
 
@@ -256,6 +259,10 @@ public class GuiController {
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
         addVehicleButton.setDisable(true);
+        SelectedGrid.setVisible(false);
+        SelectedGrid.setManaged(false);
+        FilteredGrid.setVisible(false);
+        FilteredGrid.setManaged(false);
 
         importMapSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -448,7 +455,6 @@ public class GuiController {
 
         if (menu == trafficLightMenu) {
             if (!tlVisualizerPane.isVisible()) {
-
                 tlVisualizerPane.setLayoutY(menu.getLayoutY() + 50 + menu.getLayoutY() / 2);
                 tlVisualizerPane.applyCss();
                 tlVisualizerPane.layout();
@@ -563,9 +569,17 @@ public class GuiController {
     @FXML
     protected void onSelect(){
         if (selectButton.isSelected()) {
-
+            sr.setSelectMode(true);
+            this.playButton.setDisable(true);
+            this.playButton.setSelected(false);
+            this.stepButton.setDisable(true);
+            wrapperController.stopSim();
+            System.out.println("Select Mode enabled");
         } else {
-
+            sr.setSelectMode(false);
+            this.playButton.setDisable(false);
+            this.stepButton.setDisable(false);
+            System.out.println("Select Mode disabled");
         }
     }
 
@@ -607,7 +621,6 @@ public class GuiController {
     }
 
     // top right menu buttons hovered
-
 
     private void topMenuButtonToggle(Node menu) {
         boolean wasVisible = menu.isVisible(); // saves state
@@ -789,10 +802,24 @@ public class GuiController {
         timeLabel.setText(this.rawSecondsToHMS(time));
     }
 
+    private void highlightToggleButton(ToggleButton tb) {
+        this.opacity = (this.opacity + 10) % 100;
+        Border newBorder = tb.getBorder();
+        CornerRadii myRadii = tb.getBackground().getFills().get(0).getRadii();
+        Border border = new Border(new BorderStroke(
+                Color.hsb(304, 0.89, 1.0, this.opacity / 100.0),
+                BorderStrokeStyle.SOLID,
+                myRadii,
+                new BorderWidths(2)
+        ));
+        tb.setBorder(border);
+    }
+
     /**
      * Refreshes the data list view (currently placeholder structure).
      */
     public void updateDataPane() {
+
         Locale.setDefault(Locale.US);
         VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
@@ -824,19 +851,61 @@ public class GuiController {
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
             this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
-            this.TotalTimeSpentStopped.setText(String.format("%s", this.rawSecondsToHMS(stoppedTime)));
+            this.TotalTimeSpentStopped.setText(this.rawSecondsToHMS(stoppedTime));
             this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
 
         } else if (currentTab.equals("Selected")) {
-            return;
-            // if no Object is selected display "Please select a Vehicle using Select Mode" and highlight Select Mode Button
-            // Vehicles:
-            // ID, Type, Route ID, Color (displayed in color, if possible), max Speed (maximum speed reached), current Speed, average Speed
-            // Angle, Acceleration, Deceleration, Total Lifetime, Overall Stop Time, number of Stops
+
+            SelectableObject selectedObject = wrapperController.getSelectedObject();
+            if(selectedObject != null) {
+                // if selected object is a Vehicle, the GridPane for Traffic Lights needs to be set !visible & !managed and vice versa (SelectedGridTL does not exist yet)
+                if (selectedObject instanceof VehicleWrap v) {
+
+                    SelectedGrid.setVisible(true);
+                    SelectedGrid.setManaged(true);
+                    // SelectedGridTL.setVisible(false);
+                    // SelectedGridTL.setManaged(false);
+
+                    this.vehicleID.setText(v.getID());
+                    this.vehicleType.setText(v.getType());
+                    this.route.setText(v.getRouteID());
+                    String hex = String.format("#%02X%02X%02X",
+                            (int)(v.getColor().getRed() * 255),
+                            (int)(v.getColor().getGreen() * 255),
+                            (int)(v.getColor().getBlue() * 255));
+                    this.color.setStyle("-fx-background-color: " + hex + ";");
+                    this.currentSpeed.setText(String.format("%.2f m/s",v.getSpeed()));
+                    this.averageSpeed.setText(String.format("%.2f m/s",v.getAvgSpeed()));
+                    this.peakSpeed.setText(String.format("%.2f m/s",v.getMaxSpeed()));
+                    double accel = v.getAccel();
+                    if(accel < 0) hex = "#C14E4E";
+                    else hex = "#089622";
+                    this.acceleration.setStyle("-fx-text-fill: " + hex + ";");
+                    this.acceleration.setText(String.format("%.2f m/s²",v.getAccel()));
+                    this.position.setText(String.format("%.2f | %.2f",v.getPosition().x, v.getPosition().y));
+                    this.angle.setText(String.format("%.2f°",v.getAngle()));
+                    this.totalLifetime.setText(this.rawSecondsToHMS(v.getTotalLifetime()));
+                    this.timeSpentStopped.setText(this.rawSecondsToHMS(v.getWaitingTime()));
+                    this.Stops.setText(Integer.toString(v.getNumberOfStops()));
+
+                } else if (selectedObject instanceof TrafficLightWrap tl) {
+
+                    // SelectedGridTL.setVisible(true);
+                    // SelectedGridTL.setManaged(true);
+                    SelectedGrid.setVisible(false);
+                    SelectedGrid.setManaged(false);
+
+                    // TO DO: Make Traffic Light Object show up in Traffic Light Menu Dropdown Menu, display Traffic Light Stats in a new GridPane with similar structure
+                }
+            }
         } else if (currentTab.equals("Graphs")){
 
-        } else {
+           } else {
+            // EXPERIMENTAL - this.highlightToggleButton(filterMenuButton);
+            // set visible and managed true, only after checking whether filter has been applied
+            // FilteredGrid.setVisible(true);
+            // FilteredGrid.setManaged(true);
             return;
             // Same as Overall, but only taking filtered Vehicles into account, which requires a separate VehicleList...
         }
@@ -854,6 +923,67 @@ public class GuiController {
         int c = wrapperController.updateCountVehicle(); // updates count everytime a new veh is added
         int all = wrapperController.getAllVehicleCount();
         vehicleCount.setText(all+"/"+c);
+    }
+
+    private SelectableObject findClickableObject(double worldX, double worldY) {
+        for(VehicleWrap v : wrapperController.getVehicles().getVehicles()) {
+            var pos = v.getPosition();
+            int radius = v.getSelectRadius();
+            double minX = pos.x - radius;
+            double maxX = pos.x + radius;
+            double minY = pos.y - radius;
+            double maxY = pos.y + radius;
+            if(worldX <= maxX &&  worldX >= minX && worldY <= maxY && worldY >= minY) {
+                return v;
+            }
+        }
+        for(TrafficLightWrap tl : wrapperController.getTrafficLights().getTrafficlights()) {
+            var pos = tl.getPosition();
+            int radius = tl.getSelectRadius();
+            double minX = pos.x - radius;
+            double maxX = pos.x + radius;
+            double minY = pos.y - radius;
+            double maxY = pos.y + radius;
+            if(worldX <= maxX &&  worldX >= minX && worldY <= maxY && worldY >= minY) {
+                return tl;
+            }
+        }
+        return null;
+    }
+
+    public void setupSelectionHandler() {
+        staticMap.setOnMouseClicked(event -> {
+            if (sr.getSelectMode()) {
+                double mouseX = event.getX();
+                double mouseY = event.getY();
+                java.awt.geom.Point2D.Double pos = sr.screenToWorld(mouseX, mouseY);
+                try {
+                    SelectableObject so = this.findClickableObject(pos.x, pos.y);
+                    if(so != null) {
+                        // deselect all other selectableElements first
+                        wrapperController.getVehicles().deselectAll();
+                        wrapperController.getTrafficLights().deselectAll();
+                        // select Object returned by findClickableObject
+                        so.select();
+                        notSelectedLabel1.setVisible(false);
+                        notSelectedLabel2.setVisible(false);
+                        // switch over to "Selected" Tab
+                        tabPane.getSelectionModel().select(1);
+                        // switch off Select Mode button
+                        selectButton.setSelected(false);
+                        this.onSelect();
+                        this.updateDataPane();
+                        if(so instanceof TrafficLightWrap tl) {
+                            if(!trafficLightButton.isSelected()) onTrafficLight();
+                            trafficLightButton.setSelected(true);
+                            tlSelector.setValue(tl.getId());
+                        }
+                    }
+                } catch (NullPointerException e) {
+                   System.err.println(e);
+                }
+            }
+        });
     }
 
     /**
