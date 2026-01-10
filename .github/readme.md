@@ -26,7 +26,6 @@ Developed for the **Object-Oriented Programming in Java - Advanced Course** modu
 - [Team Members](#team-members)
 
 ## Project Description
->**Disclaimer**: *This list includes both implemented functionalities and features planned for future releases.*
 
 This project is a real-time traffic simulation platform developed in Java, designed to interface with the **SUMO** engine. <br>
 By wrapping the **TraaS** API's functionalities, our application bridges the gap between simulation data and visualization / manipulation.
@@ -40,52 +39,32 @@ Unlike the native sumo-gui, this platform offers a custom JavaFX GUI that allows
 ### Features elevating our project from the native sumo-gui:
 
 #### Live Control: <br> 
-Users can inject vehicles, manipulate traffic light phases, and apply stress tests to specific road edges to observe and compare congestion behavior in real-time, as the simulation is running.
+Users can inject vehicles, manipulate traffic light phases, and apply stress tests on the road network to observe and compare congestion behavior in real-time, as the simulation is running.
 
 #### Data Visualization: <br>
 The road network is rendered in the JavaFX GUI providing live visual feedback on traffic flow, vehicle states, and phase indicators.
 
 #### Analytics: <br>
-Metrics such as average speed, vehicle density, and travel times, are displayed live, as well as exported to CSV and PDF for detailed reports.
+Metrics such as average speed, vehicle density, and average vehicle waiting time, are displayed live, as well as exported to CSV and PDF for detailed reports.
 
 ## Features
 ### Current Features
-- 3 simple, temporary maps for test purposes
-- Run an instance of sumo / sumo-gui (only used for visualisation until we develop our own GUI)
-- Run simulation for 400 seconds / ticks
-- Inject vehicles of pre-determined type "t_0" into a pre-determined route (from .rou.xml file)
-- Print out specific cars attributes (velocity, position, angle, etc.)
-- Cleanly close simulation
----
-### Future Features
-- 2 fleshed out maps – 1 very detailed, 1 a bit simpler
-- Run only sumo, visualisation now being rendered in a JavaFX GUI
-- Full wrapper classes for all classes essential to project scope
-
+- 2 preinstalled maps, but also allowing for user imports
 - Map Select
-  <p align="center">
-    <img src="mapselect.png" width="700" alt="Map Select GUI" />
-  </p>
-* Simulation Dashboard
-    * Inject Vehicle button
-    * Stop / Start button
-    * Single step button
-    * Select mode button
-    * Stress test mode button
-  * Rendered map based on telemetry data of vehicles 
-    * Allows for zooming, panning, and camera rotation
-  * Statistical output of selected elements (vehicle / traffic light)
-  <p align="center">
-    <img src="dashboard.png" width="700" alt="Dashboard" />
-  </p>
+- Run an instance of sumo on localhost
+- Render UI using JavaFX
+- Inject vehicles, allowing for the following variables
+  - 1 - 1000 vehicles
+  - 1 out of 16,777,216 possible Colors
+  - Selectable Vehicle Type
+  - Selectable Route for the vehicle to take
 - Traffic light manipulation
-- Filter vehicles by attributes (color, speed, route, etc.)
-- Live statistical analysis as well as output as .csv
-  <p align="center">
-    <img src="analytics.png" width="700" alt="Analytics" />
-  </p>
+- Display vehicles and traffic light data in a Data Pane
+- Filter vehicles by attributes (color, speed, route, type)
+- Output Data to .csv as well as .pdf
+
 ## Prerequisites
-- JDK 17+
+- JDK 25+
 - [SUMO 1.24](https://sourceforge.net/projects/sumo/files/sumo/version%201.24.0/sumo-win64extra-1.24.0.msi/download) (Windows 64 Extra version)
 
 ### Included Dependencies (included in pom.xml)
@@ -99,7 +78,7 @@ git clone https://github.com/LuarEbre/STAR.git STAR
 ```
 ##### 2. Run Main
 - Open an IDE of your choosing (IntelliJ, Eclipse, VSCode)
-- Run the class Main.java (contains public static void main(String[] args))
+- Run the class Main.java
 ##### 3. Windows Users only:
 - Allow elevator.exe to bypass Windows Defender (only if using IntelliJ)
 - Allow sumo to bypass the firewall (otherwise problems might occur when trying to run the server clientside)
