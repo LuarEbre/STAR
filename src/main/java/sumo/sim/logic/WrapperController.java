@@ -8,13 +8,9 @@ import sumo.sim.*;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
-import java.io.FileInputStream;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;

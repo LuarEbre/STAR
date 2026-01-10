@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 public abstract class SelectableObject {
     protected boolean isSelected;
