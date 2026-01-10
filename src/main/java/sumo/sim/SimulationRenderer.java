@@ -179,7 +179,7 @@ public class SimulationRenderer {
     }
 
     private void renderSelectableObjects() {
-        gc.setFill(Color.rgb(66,245,245,0.7));
+        gc.setFill(Color.rgb(66,245,245,0.5));
         for(VehicleWrap v: vl.getVehicles()) {
             float width = v.getSelectRadius()*2;
             gc.fillRect(v.getPosition().x-width/2, v.getPosition().y-width/2, width, width);
