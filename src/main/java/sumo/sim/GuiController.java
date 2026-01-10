@@ -810,6 +810,7 @@ public class GuiController {
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
 
         } else if (currentTab.equals("Selected")) {
+
             SelectableObject selectedObject = wrapperController.getSelectedObject();
             if(selectedObject != null) {
                 // if selected object is a Vehicle, the GridPane for Traffic Lights needs to be set !visible & !managed and vice versa (SelectedGridTL does not exist yet)
