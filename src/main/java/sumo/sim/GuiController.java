@@ -72,7 +72,7 @@ public class GuiController {
     private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
             showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently;
     @FXML
-    private TextField amountField, stateText, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD,
+    private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD,
                         vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops;
     @FXML
     private TabPane tabPane, trafficLightTabPane;
@@ -849,9 +849,6 @@ public class GuiController {
                     SelectedGrid.setVisible(false);
                     SelectedGrid.setManaged(false);
 
-                    // open TrafficLight Menu
-                    trafficLightButton.setSelected(true);
-                    onTrafficLight();
                     // TO DO: Make Traffic Light Object show up in Traffic Light Menu Dropdown Menu, display Traffic Light Stats in a new GridPane with similar structure
                 }
             }
@@ -927,6 +924,11 @@ public class GuiController {
                         selectButton.setSelected(false);
                         this.onSelect();
                         this.updateDataPane();
+                        if(so instanceof TrafficLightWrap tl) {
+                            if(!trafficLightButton.isSelected()) onTrafficLight();
+                            trafficLightButton.setSelected(true);
+                            tlSelector.setValue(tl.getId());
+                        }
                     }
                 } catch (NullPointerException e) {
                    System.err.println(e);
