@@ -1,12 +1,16 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import sumo.sim.*;
+import sumo.sim.objects.*;
+import sumo.sim.util.Util;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -45,6 +49,9 @@ public class WrapperController {
     public static String currentRou = null;
     public String sumoBinary;
 
+    //Logger
+    private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
+
     /**
      * The constructor of the Wrapper controller.
      *
@@ -77,6 +84,7 @@ public class WrapperController {
 
     private void initializeSimulationStart() {
         connection.addOption("start", "true");
+
         try {
             connection.runServer(8813); // preventing random port
             System.out.println("Connected to Sumo.");
@@ -92,6 +100,8 @@ public class WrapperController {
             start();
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to start Sumo Simulation", e);
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -115,6 +125,7 @@ public class WrapperController {
             try {
                 doStepUpdate(); // sim step
             } catch (IllegalStateException e) {
+                logger.log(Level.WARNING, "Failed to do a Simulation Step", e);
                 terminate();
             }
 
@@ -139,6 +150,7 @@ public class WrapperController {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "Failed to shutdown executor", e);
                 executor.shutdownNow();
             }
         }
@@ -147,7 +159,9 @@ public class WrapperController {
             try {
                 connection.close();
             } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to close connection", e);
                 System.err.println("Error while closing connection: " + e.getMessage());
+                throw new RuntimeException();
             }
         }
     }
@@ -161,7 +175,14 @@ public class WrapperController {
     public void changeDelay(int delay) {
         this.delay = delay;
         if (!executor.isShutdown() && executor!= null) {
-            executor.shutdownNow();
+            try {
+                executor.shutdown();
+                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         terminated = false;
         paused = false;
@@ -199,6 +220,7 @@ public class WrapperController {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to update Sim Step", e);
             terminate();
             throw new RuntimeException(e);
         }
@@ -241,6 +263,7 @@ public class WrapperController {
                 Platform.runLater(() -> guiController.initializeCon(this));
 
             } catch (Exception e) {
+                logger.log(Level.FINE, "Failed to switch maps", e);
                 System.err.println("Error switching maps: " + e.getMessage());
             }
         }).start();
@@ -249,7 +272,7 @@ public class WrapperController {
     // Main Button features
 
     /**
-     * Used by {@link GuiController} to add Vehicles
+     * Used by {@link GuiController} to add Vechicles
      * @param amount How many Vehicles will spawn
      * @param type Sets type based on existing types in .rou XML
      * @param route Sets route

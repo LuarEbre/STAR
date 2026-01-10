@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.objects.SumoGeometry;
@@ -6,6 +6,8 @@ import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper of {@link Lane} allowing for instancing of individual Lanes within a Street
@@ -20,6 +22,9 @@ public class LaneWrap {
     private final double[] shapeY;
     private final double width;
     private final double length;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(LaneWrap.class.getName());
 
     /**
      * Initializes this lane's shape via {@link SumoTraciConnection#do_job_get(SumoCommand)}
@@ -50,6 +55,7 @@ public class LaneWrap {
 
             width = (double) connection.do_job_get(Lane.getWidth(laneID));
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to load Lane Geometry", e);
             throw new RuntimeException(e);
         }
     }

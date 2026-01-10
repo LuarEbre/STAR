@@ -10,9 +10,11 @@ import javafx.geometry.VPos;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
+import sumo.sim.objects.*;
+
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Handles the graphical rendering of the SUMO simulation onto a JavaFX {@link Canvas}.
@@ -53,6 +55,9 @@ public class SimulationRenderer {
     private double viewMaxX;
     private double viewMinY;
     private double viewMaxY;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(SimulationRenderer.class.getName());
 
     /**
      * Constructs a new SimulationRenderer called by {@link GuiController}
@@ -116,7 +121,8 @@ public class SimulationRenderer {
      * This method is called by {@link GuiController#renderUpdate()} method ~60 times per second
      * </p>
      */
-    public void initRender() {
+    public void initRender() throws RenderingException {
+
         updateViewportBounds();
         // area the size of canvas : frame -> canvas cords.
         // -> network: only do the following rendering with objects inside this restricting area;
@@ -131,7 +137,6 @@ public class SimulationRenderer {
             this.renderSelectableObjects();
         }
     }
-
     // [ mxx , mxy , tx ]
     // [ myx , myy , ty ]
     // [  0  ,  0  ,  1 ]
@@ -198,7 +203,7 @@ public class SimulationRenderer {
      *     Performs rendering by parsing raw shapes of objects onto gc via the given lists
      * </p>
      */
-    private void renderMap() {
+    private void renderMap() throws RenderingException {
         // map color
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
@@ -390,7 +395,7 @@ public class SimulationRenderer {
     /**
      * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(VehicleWrap, double, double)} for every vehicle (still on the map)
      */
-    private void renderVehicle() {
+    private void renderVehicle() throws RenderingException {
         for (VehicleWrap v : vl.getVehicles()) {
             if (!v.exists() && v.getPosition() == null) continue;
             // no need to translate coordinates since translation is already applied to graphics context
