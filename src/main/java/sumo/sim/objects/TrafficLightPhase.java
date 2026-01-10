@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import javafx.scene.paint.Color;
 

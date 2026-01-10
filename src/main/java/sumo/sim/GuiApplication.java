@@ -8,8 +8,10 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
 import javafx.stage.StageStyle;
+import sumo.sim.logic.SumoMapManager;
+import sumo.sim.logic.WrapperController;
+import java.util.logging.Logger;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -25,6 +27,10 @@ import java.util.Objects;
 public class GuiApplication extends Application {
     private static GuiController guiController; // static because you dont instance guiCon -> javafx instances the controller
     private WrapperController wrapper;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(GuiApplication.class.getName());
+
 
     /**
      * Loads FXML file and CSS file and sets the stage

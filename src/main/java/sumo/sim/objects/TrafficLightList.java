@@ -1,14 +1,17 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Trafficlight;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class for managing all TrafficLights
@@ -19,6 +22,9 @@ public class TrafficLightList {
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final StreetList streetList;
     private int count;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLightList.class.getName());
 
     /**
      * Constructor for TrafficLightList
@@ -42,11 +48,13 @@ public class TrafficLightList {
                     trafficlights.add(tl);
 
                 } catch (Exception e) {
+                    logger.log(Level.FINE, "Failed to initialize Traffic Light List", e);
                     System.out.println(e.getMessage()); // fails if not known in Sumo and skips tl
                 }
             }
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to initialize Traffic Light List and Data", e);
             throw new RuntimeException(e);
         }
         setAllControlledStreets();
@@ -157,6 +165,7 @@ public class TrafficLightList {
                 }
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set all Controlled Streets", e);
             throw new RuntimeException(e);
         }
     }
