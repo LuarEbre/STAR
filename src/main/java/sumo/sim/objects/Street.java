@@ -1,13 +1,11 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Lane;
-import de.tudresden.sumo.objects.SumoGeometry;
-import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.data.XML;
+
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)

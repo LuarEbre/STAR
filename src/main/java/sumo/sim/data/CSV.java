@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.data;
 
 import java.io.FileWriter;
 import java.io.IOException;

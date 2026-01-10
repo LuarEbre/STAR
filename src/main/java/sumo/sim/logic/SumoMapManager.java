@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -10,16 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 // XML parser
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
+import sumo.sim.data.XML;
+import sumo.sim.util.Util;
 
 public class SumoMapManager {
 
@@ -88,8 +81,7 @@ public class SumoMapManager {
             if (netFile.exists() && rouFile.exists()) {
 
                 String mapName = file.getName().replace(".sumocfg", ""); // name from sumo config
-
-                //String mapName = "test"; // needs name input and check if already exists
+                mapName = Util.checkDuplicate(maps, mapName); // check and changes Name if there is a duplicate
                 SumoMapConfig newConfig = new SumoMapConfig(mapName, netFile, rouFile, file);
                 maps.put(mapName, newConfig); // put in list
                 System.out.println(maps.get(mapName));

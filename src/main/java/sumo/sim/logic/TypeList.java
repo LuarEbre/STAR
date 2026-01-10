@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 import de.tudresden.sumo.cmd.Vehicletype;
 import de.tudresden.sumo.objects.SumoStringList;

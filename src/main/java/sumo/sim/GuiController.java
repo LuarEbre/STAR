@@ -3,7 +3,6 @@ package sumo.sim;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -23,6 +22,10 @@ import java.util.Locale;
 import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import sumo.sim.logic.SumoMapManager;
+import sumo.sim.logic.WrapperController;
+import sumo.sim.objects.TrafficLightPhase;
+import sumo.sim.objects.VehicleList;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.

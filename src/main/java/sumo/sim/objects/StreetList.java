@@ -1,6 +1,8 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.objects.SumoGeometry;

@@ -1,10 +1,13 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Route;
 import de.tudresden.sumo.cmd.Simulation;
 import de.tudresden.sumo.objects.SumoStage;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
+import sumo.sim.util.Util;
 
 import java.util.*;
 
@@ -16,7 +19,7 @@ import java.util.*;
 public class RouteList {
 
     private final Map<String, List<String>> allRoutes;
-    private  XML xmlReader;
+    private XML xmlReader;
     private final SumoTraciConnection con;
     private final WrapperController controller;
 
@@ -174,6 +177,9 @@ public class RouteList {
         }
 
         // adding in Sumo
+        // check if routeID duplicate
+        routeID = Util.checkRouteDuplicate(allRoutes, routeID);
+
         try {
             System.out.println(con.do_job_get(Route.getIDCount()));
             con.do_job_set(Route.add(routeID, route));
@@ -181,6 +187,7 @@ public class RouteList {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         allRoutes.put(routeID, route);
         controller.updateRoutes();
     }

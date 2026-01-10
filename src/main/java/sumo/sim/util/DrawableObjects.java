@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.util;
 
 import javafx.scene.canvas.GraphicsContext;
 

@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.data;
 
 import org.jdom2.Document;
 import org.jdom2.Element;

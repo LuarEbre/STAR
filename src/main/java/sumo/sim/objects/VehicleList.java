@@ -1,9 +1,11 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
+import sumo.sim.data.CSV;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;

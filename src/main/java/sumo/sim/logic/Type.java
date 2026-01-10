@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 public class Type {
 

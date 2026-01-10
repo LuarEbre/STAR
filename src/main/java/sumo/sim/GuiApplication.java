@@ -8,8 +8,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
 import javafx.stage.StageStyle;
+import sumo.sim.logic.SumoMapManager;
+import sumo.sim.logic.WrapperController;
 
 import java.io.IOException;
 import java.util.Objects;

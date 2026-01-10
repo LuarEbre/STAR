@@ -9,8 +9,9 @@ import javafx.geometry.VPos;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
+import sumo.sim.objects.*;
+
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 import java.util.List;
 
 /**

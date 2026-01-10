@@ -1,12 +1,13 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Trafficlight;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 

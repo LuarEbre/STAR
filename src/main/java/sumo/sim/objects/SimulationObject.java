@@ -1,4 +1,6 @@
-package sumo.sim;
+package sumo.sim.objects;
+
+import sumo.sim.util.DrawableObjects;
 
 public abstract class SimulationObject implements DrawableObjects {
     protected final String id;

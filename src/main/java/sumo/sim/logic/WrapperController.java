@@ -1,12 +1,13 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import sumo.sim.*;
+import sumo.sim.objects.*;
+import sumo.sim.util.Util;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
