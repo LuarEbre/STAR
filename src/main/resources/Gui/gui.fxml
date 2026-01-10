@@ -2,6 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -194,6 +197,36 @@
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                            </content>
                         </Tab>
+                        <Tab styleClass="Tab" text="Graphs">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <LineChart id="activeVehicleGraph" fx:id="activeVehiclesChart" createSymbols="false" horizontalZeroLineVisible="false" layoutX="14.0" layoutY="23.0" prefHeight="92.0" prefWidth="259.0" title="Active Vehicles" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                       <padding>
+                                          <Insets left="3.0" right="3.0" />
+                                       </padding>
+                                    </LineChart>
+                                    <LineChart id="percentStoppedGraph" fx:id="percentStoppedChart" createSymbols="false" horizontalZeroLineVisible="false" layoutY="160.0" prefHeight="92.0" prefWidth="259.0" title="Vehicles Stopped (in %)" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                       <xAxis>
+                                          <CategoryAxis side="BOTTOM" />
+                                       </xAxis>
+                                       <yAxis>
+                                          <NumberAxis fx:id = "percentStoppedYAxis" side="LEFT" />
+                                       </yAxis>
+                                       <padding>
+                                          <Insets left="3.0" right="3.0" />
+                                       </padding>
+                                    </LineChart>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
                     </tabs>
                   </TabPane>
                </children>
@@ -273,7 +306,6 @@
        <!-- Menu button top right close -->  <!-- -->
 
          </children>
-
 
       </AnchorPane>
        <!-- Main Buttons menu -->

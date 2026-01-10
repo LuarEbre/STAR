@@ -2,8 +2,11 @@ package sumo.sim.objects;
 
 import sumo.sim.util.DrawableObjects;
 
+import java.util.logging.Logger;
+
 public abstract class SimulationObject implements DrawableObjects {
     protected final String id;
+
 
     // for checking if visible
     protected double minX = Double.MAX_VALUE;
