@@ -27,8 +27,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import sumo.sim.logic.SumoMapManager;
 import sumo.sim.logic.WrapperController;
-import sumo.sim.objects.TrafficLightPhase;
-import sumo.sim.objects.VehicleList;
+import sumo.sim.objects.*;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -899,8 +898,8 @@ public class GuiController {
                     // TO DO: Make Traffic Light Object show up in Traffic Light Menu Dropdown Menu, display Traffic Light Stats in a new GridPane with similar structure
                 }
             }
-        } else if (currentTab.equals("Graphs")){
-
+        } else if (currentTab.equals("Graphs")){ 
+        
            } else {
             // EXPERIMENTAL - this.highlightToggleButton(filterMenuButton);
             // set visible and managed true, only after checking whether filter has been applied
@@ -1274,10 +1273,6 @@ public class GuiController {
         map1select.setDisable(true);
         map2select.setDisable(true);
         if (mapName != null) {
-            //Reset Graphs
-            activeVehiclesSeries.getData().clear();
-            percentStoppedSeries.getData().clear();
-
             wrapperController.mapSwitch(mapName);
         }
         importMapSelector.getSelectionModel().clearSelection(); // resets previous selection
