@@ -405,11 +405,13 @@ public class GuiController {
             menu.setVisible(false);
             if(menu == trafficLightMenu) {
                 tlVisualizerPane.setVisible(false);
+                stateText.getSelectionModel().clearSelection();
             }
             return;
         }
         menu.setVisible(true);
 
+        closeAllMenus(); // closes all top menus when opening bottom menu
         Bounds buttonBounds = button.localToScene(button.getBoundsInLocal()); // position of buttons bound to screen
         double buttonCenterX = buttonBounds.getMinX() + (buttonBounds.getWidth() / 2); // middle position of button
         double menuX = buttonCenterX - (menu.getWidth() / 2);
@@ -421,10 +423,19 @@ public class GuiController {
 
         if (menu == trafficLightMenu) {
             if (!tlVisualizerPane.isVisible()) {
+
                 tlVisualizerPane.setLayoutY(menu.getLayoutY() + 50 + menu.getLayoutY() / 2);
+                tlVisualizerPane.applyCss();
+                tlVisualizerPane.layout();
+
                 double gap = 5.0;
-                double visualizerX = menu.getLayoutX() - tlVisualizerPane.getPrefWidth() - gap;
+                double visualizerX = menu.getLayoutX() - tlVisualizerPane.getWidth() - gap;
+
+                if (visualizerX < 0) {
+                    visualizerX = menu.getLayoutX() + menu.getWidth() + gap;
+                }
                 tlVisualizerPane.setLayoutX(visualizerX);
+                tlVisualizerPane.setLayoutY(menu.getLayoutY()+menu.getHeight()/1.5);
             }
         }
     }

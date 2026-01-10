@@ -274,11 +274,6 @@
 
          </children>
 
-           <AnchorPane fx:id="tlVisualizerPane" prefHeight="100.0" prefWidth="150.0" styleClass="mainButtonMenu" visible="" >
-               <children>
-                   <Canvas fx:id="tlCanvas" height="90.0" width="150.0" layoutX="10.0" layoutY="10.0" />
-               </children>
-           </AnchorPane>
 
       </AnchorPane>
        <!-- Main Buttons menu -->
@@ -366,6 +361,12 @@
             </TabPane>
             <Button fx:id="applyButton" layoutX="151.0" layoutY="233.0" mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="10.0" prefWidth="79.0" text="Apply" />
             <ListView fx:id="stateText" layoutX="5.0" layoutY="265.0" prefHeight="102.0" prefWidth="250.0" />
+           </children>
+       </AnchorPane>
+
+       <AnchorPane fx:id="tlVisualizerPane" prefHeight="100.0" prefWidth="150.0" styleClass="mainButtonMenu" visible="" >
+           <children>
+               <Canvas fx:id="tlCanvas" height="90.0" width="150.0" layoutX="10.0" layoutY="10.0" />
            </children>
        </AnchorPane>
 
