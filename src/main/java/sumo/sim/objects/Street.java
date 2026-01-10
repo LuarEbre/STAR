@@ -6,6 +6,9 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import sumo.sim.data.XML;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
@@ -23,6 +26,9 @@ public class Street {
     //private double noise;
     private double minX,minY,maxX,maxY; // for rendering optimization
     private XML xml;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(Street.class.getName());
 
     /**
      * @param id Edge ID
@@ -49,6 +55,7 @@ public class Street {
             }
             updateStreet();
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to initialize street Data", e);
             throw new RuntimeException("Failed to initialize Street " + id, e);
         }
 
@@ -74,6 +81,7 @@ public class Street {
             this.density = num / (length / 1000.0);
         }
         catch (Exception e){
+            logger.log(Level.FINE, "Failed to calculate Street Density", e);
             throw new RuntimeException(e);
         }
     }
@@ -86,6 +94,7 @@ public class Street {
             calcDensity();
             //this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to update Street Data", e);
             this.density = 0;
             //this.noise = 0;
         }

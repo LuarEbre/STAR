@@ -10,6 +10,8 @@ import sumo.sim.logic.WrapperController;
 import sumo.sim.util.Util;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class for all Routes of the Simulation
@@ -22,6 +24,9 @@ public class RouteList {
     private XML xmlReader;
     private final SumoTraciConnection con;
     private final WrapperController controller;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(RouteList.class.getName());
 
     /**
      * Constructor for RouteList
@@ -185,6 +190,7 @@ public class RouteList {
             con.do_job_set(Route.add(routeID, route));
             System.out.println(con.do_job_get(Route.getIDCount()));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to add route", e);
             throw new RuntimeException(e);
         }
 
