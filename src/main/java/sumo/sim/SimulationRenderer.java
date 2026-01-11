@@ -184,13 +184,14 @@ public class SimulationRenderer {
     }
 
     private void renderSelectableObjects() {
+        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
         gc.setFill(Color.rgb(66,245,245,0.5));
         for(VehicleWrap v: vl.getVehicles()) {
-            float width = v.getSelectRadius()*2;
-            gc.fillRect(v.getPosition().x-width/2, v.getPosition().y-width/2, width, width);
+            if(v.exists()) {
+                gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+            }
         }
         for(TrafficLightWrap tl : tls.getTrafficlights()) {
-            float width = tl.getSelectRadius()*2;
             gc.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
         }
     }

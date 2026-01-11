@@ -253,7 +253,7 @@ public class GuiController {
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
 
-        //Setup Graphs of Stats Section
+        // setup for DataPane
         setupCharts();
 
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
@@ -574,12 +574,10 @@ public class GuiController {
             this.playButton.setSelected(false);
             this.stepButton.setDisable(true);
             wrapperController.stopSim();
-            System.out.println("Select Mode enabled");
         } else {
             sr.setSelectMode(false);
             this.playButton.setDisable(false);
             this.stepButton.setDisable(false);
-            System.out.println("Select Mode disabled");
         }
     }
 
@@ -826,17 +824,12 @@ public class GuiController {
         VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
 
-        //Graphs Updates
-        //must be outside of if, else it would only update if on graph tab
+        // Graphs Updates
 
-        //Get Graph Data
-        int activeCount = vehicles.getActiveCount();
+        // Data needed for both Graphs and Overall
         int simTime = (int)wrapperController.getTime();
-        int overallVehicleCount = wrapperController.getAllVehicleCount();
-        int queuedCount = vehicles.getQueuedCount();
-        int exitedCount = overallVehicleCount - activeCount - queuedCount;
+        int activeCount = vehicles.getActiveCount();
         int currentlyStopped = vehicles.getStoppedCount();
-        int stoppedTime = vehicles.getStoppedTime();
 
         float stoppedPercentage = 0f;
         if (activeCount > 0) {
@@ -847,7 +840,18 @@ public class GuiController {
         activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
         percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
 
+        if(activeVehiclesSeries.getData().size()>300) {
+            activeVehiclesSeries.getData().removeFirst();
+            percentStoppedSeries.getData().removeFirst();
+        }
+
         if (currentTab.equals("Overall")) {
+
+            int stoppedTime = vehicles.getStoppedTime();
+            int overallVehicleCount = wrapperController.getAllVehicleCount();
+            int queuedCount = vehicles.getQueuedCount();
+            int exitedCount = overallVehicleCount - activeCount - queuedCount;
+
             this.activeVehicles.setText(Integer.toString(activeCount));
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
@@ -1179,7 +1183,8 @@ public class GuiController {
      * {@link WrapperController#addVehicle(int, String, String, Color)}
      */
     @FXML
-    public void addVehicle(){
+    public void addVehicle() {
+        boolean wasRunning = !wrapperController.isPaused();
         // parameters from addMenu components
         // static test
         int amount = Integer.parseInt(amountField.getText());
@@ -1191,7 +1196,9 @@ public class GuiController {
             route = "r0"; // if route count == 0 -> disable add button, disable stress test start
         }
 
+        if(wasRunning) wrapperController.stopSim();
         wrapperController.addVehicle(amount, type, route, color);
+        if(wasRunning) wrapperController.startSim();
     }
 
     /**
