@@ -1,15 +1,19 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
+import sumo.sim.data.CSV;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages a {@link CopyOnWriteArrayList} of {@link VehicleWrap} objects.
@@ -24,6 +28,9 @@ public class VehicleList {
     private int count; // vehicles in list, latest car number: "v"+ count
     private int activeCount; // vehicles currently on the road network
     // needs possible routes maybe? for car creation
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(VehicleList.class.getName());
 
     /**
      * Initializes our VehicleList with a count of 0 vehicles
@@ -58,6 +65,7 @@ public class VehicleList {
                 count++; // increment to prevent identical car ids
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to add vehicle", e);
             throw new RuntimeException(e);
         }
         vehicles.addAll(newVehicles); // thread save list is really slow
@@ -93,6 +101,7 @@ public class VehicleList {
                         // if vehicle is present in activeIDs it is no longer queued, and assuredly is on the road network
                         v.setQueued(false);
                     } catch (Exception e) {
+                        logger.log(Level.FINE, "Failed to update all vehicles", e);
                         v.setExists(false); // if vehicle despawns
                     }
                 } else {
@@ -100,6 +109,7 @@ public class VehicleList {
                 }
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to update all vehicles", e);
             throw new RuntimeException(e);
         }
     }
@@ -117,64 +127,6 @@ public class VehicleList {
         return positions;
     }
 
-    /**
-     * <b>Outdated method for debugging purposes</b>
-     * <p>Prints various data for all vehicles currently on the road network</p>
-     */
-    public void printVehicles() {
-        for (VehicleWrap v : vehicles) {
-            if(v.exists()) {
-                Point2D.Double pos = v.getPosition();
-
-                System.out.printf(
-                        // forces US locale, making double values be separated via period, rather than comma
-                        Locale.US,
-                        // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
-                        "             %s: type =  %s, speed = %f, position = (%06.2f | %06.2f), angle = %06.2f, avgSpeed = %f, accel = %f%n               waited %.0fs, active for %ds, stopped %d times, alive for %ds%n",
-                        v.getID(),
-                        v.getType(),
-                        v.getSpeed(),
-                        pos.x,
-                        pos.y,
-                        v.getAngle(),
-                        v.getAvgSpeed(),
-                        v.getAccel(),
-                        v.getWaitingTime(),
-                        v.getActiveTime(),
-                        v.getNumberOfStops(),
-                        v.getTotalLifetime()
-                );
-            }
-        }
-    }
-
-    /**
-     * Returns all valuable data of each vehicle, separated by commas for {@link CSV} output
-     * @return Array of {@link String}
-     */
-    public String[] getVehiclesData() {
-        String[] vehiclesData = new String[this.count];
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < this.count; i++) {
-            VehicleWrap currVehicle = this.getVehicle("v" + i);
-            Point2D.Double pos = currVehicle.getPosition();
-
-            sb.append(currVehicle.getID()).append(",");
-            //sb.append(currVehicle.getSpeed()).append(",");
-            sb.append(currVehicle.getType()).append(",");
-            sb.append(currVehicle.getNumberOfStops()).append(",");
-            sb.append(currVehicle.getWaitingTime()).append(",");
-            sb.append(currVehicle.getMaxSpeed()).append(",");
-            //sb.append(pos.x).append(",").append(pos.y).append(",");
-            //sb.append(currVehicle.getAngle()).append("\n");
-            sb.append("\n");
-
-            vehiclesData[i] = sb.toString();
-
-        }
-        return vehiclesData;
-    }
 
     /**
      * @return int - number of vehicles on the road network

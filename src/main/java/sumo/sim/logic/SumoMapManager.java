@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -10,20 +10,20 @@ import java.util.List;
 import java.util.Map;
 
 // XML parser
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import sumo.sim.data.XML;
+import sumo.sim.util.Util;
 
-import java.io.IOException;
+// Logger
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SumoMapManager {
 
     private final Map<String, SumoMapConfig> maps = new HashMap<>(); // hashmap of configs
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(SumoMapManager.class.getName());
 
     public SumoMapManager(){
         loadDefaultMaps();
@@ -72,15 +72,16 @@ public class SumoMapManager {
             xml = new XML(file.toString());
         } catch (Exception e) {
             // fail to create XML reader
+            logger.log(Level.WARNING, "Failed to create XML reader", e);
             throw new RuntimeException(e);
         }
 
         Map<String, String> inputs = xml.getConfigInputs(); // all inputs in sumoconfig
-        // only get net and route files
+        // filter only get net and route files (problem if multiple?)
         String netFileString = inputs.get("net-file");
         String rouFileString = inputs.get("route-files");
 
-        if (netFileString !=null || rouFileString !=null) {
+        if (netFileString !=null && rouFileString !=null) {
 
             File netFile = new File(file.getParent(), netFileString);
             File rouFile = new File(file.getParent(), rouFileString);
@@ -88,8 +89,7 @@ public class SumoMapManager {
             if (netFile.exists() && rouFile.exists()) {
 
                 String mapName = file.getName().replace(".sumocfg", ""); // name from sumo config
-
-                //String mapName = "test"; // needs name input and check if already exists
+                mapName = Util.checkDuplicate(maps, mapName); // check and changes Name if there is a duplicate
                 SumoMapConfig newConfig = new SumoMapConfig(mapName, netFile, rouFile, file);
                 maps.put(mapName, newConfig); // put in list
                 System.out.println(maps.get(mapName));
