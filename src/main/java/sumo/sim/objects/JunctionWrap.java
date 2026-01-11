@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.objects.SumoGeometry;
@@ -9,6 +9,8 @@ import javafx.scene.paint.Color;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.lang.Math.abs;
 
@@ -31,6 +33,9 @@ public class JunctionWrap extends SimulationObject {
 
     private double distance = Integer.MAX_VALUE; //Used for Dijkstra Initialization
     private String predecessor = null; //Used for Dijkstra
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(JunctionWrap.class.getName());
 
     /**
      * Constructor for JunctionWrap.
@@ -59,6 +64,7 @@ public class JunctionWrap extends SimulationObject {
                 this.shapeY[i] = point.y;
             }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to load Junction Geometry", e);
             throw new RuntimeException(e);
         }
         calculateBounds(shapeX, shapeY);

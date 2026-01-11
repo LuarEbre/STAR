@@ -9,6 +9,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -17,8 +20,14 @@ import javafx.scene.layout.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import sumo.sim.logic.SumoMapManager;
+import sumo.sim.logic.WrapperController;
+import sumo.sim.objects.*;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -80,6 +89,10 @@ public class GuiController {
     private GridPane FilteredGrid, SelectedGrid;
     @FXML
     private HBox mainButtonBox;
+    @FXML
+    private LineChart<String, Number> activeVehiclesChart, percentStoppedChart;
+    @FXML
+    private NumberAxis percentStoppedYAxis;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
@@ -102,6 +115,13 @@ public class GuiController {
     private final int maxDelay;
     private SumoMapManager mapManager;
     private int opacity;
+
+    //Charts
+    private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
+    private XYChart.Series<String, Number> percentStoppedSeries = new XYChart.Series<>();
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(GuiController.class.getName());
 
     /**
      * <p>
@@ -231,6 +251,9 @@ public class GuiController {
         setupSelectionHandler(); // setup SelectMode MouseEvent
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
+
+        //Setup Graphs of Stats Section
+        setupCharts();
 
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
@@ -390,8 +413,10 @@ public class GuiController {
             editor.setText(String.valueOf(val));
 
         } catch (NumberFormatException e) { // catches exception
+            logger.log(Level.WARNING, "Invalid input", e);
             delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
             editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
+            throw new RuntimeException(e);
         }
     }
 
@@ -411,11 +436,13 @@ public class GuiController {
             menu.setVisible(false);
             if(menu == trafficLightMenu) {
                 tlVisualizerPane.setVisible(false);
+                stateText.getSelectionModel().clearSelection();
             }
             return;
         }
         menu.setVisible(true);
 
+        closeAllMenus(); // closes all top menus when opening bottom menu
         Bounds buttonBounds = button.localToScene(button.getBoundsInLocal()); // position of buttons bound to screen
         double buttonCenterX = buttonBounds.getMinX() + (buttonBounds.getWidth() / 2); // middle position of button
         double menuX = buttonCenterX - (menu.getWidth() / 2);
@@ -428,9 +455,17 @@ public class GuiController {
         if (menu == trafficLightMenu) {
             if (!tlVisualizerPane.isVisible()) {
                 tlVisualizerPane.setLayoutY(menu.getLayoutY() + 50 + menu.getLayoutY() / 2);
+                tlVisualizerPane.applyCss();
+                tlVisualizerPane.layout();
+
                 double gap = 5.0;
-                double visualizerX = menu.getLayoutX() - tlVisualizerPane.getPrefWidth() - gap;
+                double visualizerX = menu.getLayoutX() - tlVisualizerPane.getWidth() - gap;
+
+                if (visualizerX < 0) {
+                    visualizerX = menu.getLayoutX() + menu.getWidth() + gap;
+                }
                 tlVisualizerPane.setLayoutX(visualizerX);
+                tlVisualizerPane.setLayoutY(menu.getLayoutY()+menu.getHeight()/1.5);
             }
         }
     }
@@ -788,19 +823,29 @@ public class GuiController {
         VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
 
+        //Graphs Updates
+        //must be outside of if, else it would only update if on graph tab
+
+        //Get Graph Data
+        int activeCount = vehicles.getActiveCount();
+        int simTime = (int)wrapperController.getTime();
+        int overallVehicleCount = wrapperController.getAllVehicleCount();
+        int queuedCount = vehicles.getQueuedCount();
+        int exitedCount = overallVehicleCount - activeCount - queuedCount;
+        int currentlyStopped = vehicles.getStoppedCount();
+        int stoppedTime = vehicles.getStoppedTime();
+
+        float stoppedPercentage = 0f;
+        if (activeCount > 0) {
+            stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
+        }
+
+        //Setup new Axis Data
+        activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
+        percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+
+
         if (currentTab.equals("Overall")) {
-
-            int overallVehicleCount = wrapperController.getAllVehicleCount();
-            int activeCount = vehicles.getActiveCount();
-            int queuedCount = vehicles.getQueuedCount();
-            int exitedCount = overallVehicleCount - activeCount - queuedCount;
-            int currentlyStopped = vehicles.getStoppedCount();
-            int stoppedTime = vehicles.getStoppedTime();
-            float stoppedPercentage = 0f;
-            if (activeCount > 0) {
-                stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
-            }
-
             this.activeVehicles.setText(Integer.toString(activeCount));
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
@@ -853,7 +898,9 @@ public class GuiController {
                     // TO DO: Make Traffic Light Object show up in Traffic Light Menu Dropdown Menu, display Traffic Light Stats in a new GridPane with similar structure
                 }
             }
-        } else {
+        } else if (currentTab.equals("Graphs")){ 
+        
+           } else {
             // EXPERIMENTAL - this.highlightToggleButton(filterMenuButton);
             // set visible and managed true, only after checking whether filter has been applied
             // FilteredGrid.setVisible(true);
@@ -1079,6 +1126,35 @@ public class GuiController {
         //closeAllMenus();
     }
 
+    public void setupCharts(){
+        //activeVehicles
+        activeVehiclesChart.getXAxis().setTickLabelsVisible(false);
+
+        activeVehiclesSeries.setName("ActiveVehicles");
+
+        activeVehiclesChart.getData().clear();
+        activeVehiclesChart.getData().add(activeVehiclesSeries);
+
+        activeVehiclesChart.setAnimated(false);
+
+        //percentageStopped
+
+        percentStoppedYAxis.setAutoRanging(false);
+        percentStoppedYAxis.setLowerBound(0);
+        percentStoppedYAxis.setUpperBound(100);
+        percentStoppedYAxis.setTickUnit(10); // 0,10,20,...100
+
+        percentStoppedChart.getXAxis().setTickLabelsVisible(false);
+
+        percentStoppedSeries.setName("PercentStopped");
+
+        percentStoppedChart.getData().clear();
+        percentStoppedChart.getData().add(percentStoppedSeries);
+
+        percentStoppedChart.setAnimated(false);
+
+    }
+
     /**
      * Initializes the {@link SimulationRenderer}.
      * <p>
@@ -1098,7 +1174,12 @@ public class GuiController {
      * Called by {@link #startRenderer()} to update {@link SimulationRenderer#initRender()} ~60 times per frame
      */
     public void renderUpdate(){
-        sr.initRender();
+        try{
+            sr.initRender();
+        } catch (RenderingException e) {
+            logger.log(Level.SEVERE, "Error while initializing render", e);
+            throw new RenderingException("Error while initializing render");
+        }
     }
 
     /**
