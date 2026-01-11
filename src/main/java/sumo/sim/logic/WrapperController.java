@@ -372,6 +372,9 @@ public class WrapperController {
         return null;
     }
 
+    public double getTLDuration(String tlID) {return tl.getTL(tlID).getDuration(); }
+    public double getTLNextSwitch(String tlID) { return tl.getTL(tlID).getNextSwitch(); }
+    public String getTLStateString(String tlID) {return tl.getTL(tlID).getCurretStateString(); }
     public String[] getTLCurrentState(String id) {return tl.getTL(id).getCurrentState();}
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }

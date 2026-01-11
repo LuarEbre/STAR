@@ -751,12 +751,10 @@ public class GuiController {
     @FXML
     protected void startStressTest(){
         String mode = stressTestMode.getValue();
-        if (mode.equals("Light Test")) {
-            wrapperController.StressTest(1000, Color.GREEN, null);
-        } else if (mode.equals("Medium Test")) {
-            wrapperController.StressTest(2500, Color.YELLOW, null);
-        } else if (mode.equals("Heavy Test")) {
-            wrapperController.StressTest(5000, Color.RED, null);
+        switch (mode) {
+            case "Light Test" -> wrapperController.StressTest(1000, Color.GREEN, null);
+            case "Medium Test" -> wrapperController.StressTest(2500, Color.YELLOW, null);
+            case "Heavy Test" -> wrapperController.StressTest(5000, Color.RED, null);
         }
     }
 
@@ -1028,40 +1026,38 @@ public class GuiController {
      * </p>
      */
     private void updateTLPhaseText() {
-
+        String id = tlSelector.getValue();
         // update possible phases
-        List<TrafficLightPhase> phasesC;
+        List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(id);
         String[] count;
-        phasesC =  wrapperController.getTrafficLightPhases(tlSelector.getValue()); // for displaying phases
-        count = new String[phasesC.size()];
-        for (int i = 0; i < phasesC.size(); i++) {
+        count = new String[phases.size()];
+        for (int i = 0; i < phases.size(); i++) {
             count[i] = ""+i;
         }
         phaseIndexSelector.setItems(FXCollections.observableArrayList(count));
         phaseSetSelector.setItems(FXCollections.observableArrayList(count));
 
+        // List view: All phases
         stateText.getItems().clear(); // clears old content
-        String[] stateDur = wrapperController.getTlStateDuration(tlSelector.getValue());
-        List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(tlSelector.getValue());
         String[] output = new String[phases.size()+1]; // size of phases + additional line
         int j = 0;
+        // builds string like: phases... current phase at the end
         for  (TrafficLightPhase phase : phases) {
             output[j] = "Phase: "+phase.getIndex() +", " + phase.getState() +", dur:"+ phase.getDuration();
             j++;
         }
 
-        String phaseIndex = String.valueOf(wrapperController.getCurrentTLPhaseIndex(tlSelector.getValue()));
+        // List view: Current phase
+        String phaseIndex = String.valueOf(wrapperController.getCurrentTLPhaseIndex(id)); // index of active phase
         String text ="";
-        double nextSwitchAbsolute = Double.parseDouble(stateDur[stateDur.length-1]); // returns time when tl is switched
+        double nextSwitchAbsolute = wrapperController.getTLNextSwitch(id); // returns time when tl is switched
         double currentTime = wrapperController.getTime(); // current time of sim
         double remaining = nextSwitchAbsolute - currentTime; // remaining time
-        for (int i=0; i<stateDur.length-2; i++) {
-            text = text + stateDur[i];
-        }
-        text = "Curr Phase "+phaseIndex+": " +text + ", dur: "+ remaining +"/"+ stateDur[stateDur.length-2];
+        String stringPhase = wrapperController.getTLStateString(id);
+
+        text = "Curr Phase "+phaseIndex+": " +stringPhase + ", dur: "+ remaining +"/"+ wrapperController.getTLDuration(id);
         output[output.length-1] = text;
         stateText.setItems(FXCollections.observableArrayList(output));
-        //stateText.setText(text);
     }
 
 
