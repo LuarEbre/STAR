@@ -376,6 +376,7 @@ public class WrapperController {
     public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
     public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
     public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
+    public boolean isPaused() { return paused; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -385,5 +386,6 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
+
     
 }

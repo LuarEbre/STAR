@@ -84,7 +84,7 @@ public class GuiController {
     private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD,
                         vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops;
     @FXML
-    private TabPane tabPane, trafficLightTabPane;
+    private TabPane tabPane, trafficLightTabPane, createTabPane;
     @FXML
     private GridPane FilteredGrid, SelectedGrid;
     @FXML
@@ -249,6 +249,7 @@ public class GuiController {
         rescale(); // rescales menu based on width and height
         setUpInputs(); // Spinner factory etc. initializing
         setupSelectionHandler(); // setup SelectMode MouseEvent
+
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
 
@@ -717,7 +718,9 @@ public class GuiController {
     // main buttons menu methods
 
     @FXML
-    protected void startStressTest(){
+    protected void startStressTest() {
+        boolean wasRunning = !wrapperController.isPaused();
+        if(wasRunning) wrapperController.stopSim();
         String mode = stressTestMode.getValue();
         if (mode.equals("Light Test")) {
             wrapperController.StressTest(1000, Color.GREEN, null);
@@ -726,6 +729,7 @@ public class GuiController {
         } else if (mode.equals("Heavy Test")) {
             wrapperController.StressTest(5000, Color.RED, null);
         }
+        if(wasRunning) wrapperController.startSim();
     }
 
 
@@ -752,7 +756,6 @@ public class GuiController {
 
 
     }
-
 
     // functionality
 
@@ -844,7 +847,6 @@ public class GuiController {
         activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
         percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
 
-
         if (currentTab.equals("Overall")) {
             this.activeVehicles.setText(Integer.toString(activeCount));
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
@@ -853,14 +855,10 @@ public class GuiController {
             this.TotalTimeSpentStopped.setText(this.rawSecondsToHMS(stoppedTime));
             this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
-
         } else if (currentTab.equals("Selected")) {
-
             SelectableObject selectedObject = wrapperController.getSelectedObject();
             if(selectedObject != null) {
-                // if selected object is a Vehicle, the GridPane for Traffic Lights needs to be set !visible & !managed and vice versa (SelectedGridTL does not exist yet)
                 if (selectedObject instanceof VehicleWrap v) {
-
                     SelectedGrid.setVisible(true);
                     SelectedGrid.setManaged(true);
                     // SelectedGridTL.setVisible(false);
@@ -887,20 +885,14 @@ public class GuiController {
                     this.totalLifetime.setText(this.rawSecondsToHMS(v.getTotalLifetime()));
                     this.timeSpentStopped.setText(this.rawSecondsToHMS(v.getWaitingTime()));
                     this.Stops.setText(Integer.toString(v.getNumberOfStops()));
-
                 } else if (selectedObject instanceof TrafficLightWrap tl) {
-
                     // SelectedGridTL.setVisible(true);
                     // SelectedGridTL.setManaged(true);
                     SelectedGrid.setVisible(false);
                     SelectedGrid.setManaged(false);
-
-                    // TO DO: Make Traffic Light Object show up in Traffic Light Menu Dropdown Menu, display Traffic Light Stats in a new GridPane with similar structure
                 }
             }
-        } else if (currentTab.equals("Graphs")){ 
-        
-           } else {
+        } else {
             // EXPERIMENTAL - this.highlightToggleButton(filterMenuButton);
             // set visible and managed true, only after checking whether filter has been applied
             // FilteredGrid.setVisible(true);
