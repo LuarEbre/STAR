@@ -245,7 +245,6 @@ public class SimulationRenderer {
             if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
                     || s.getMaxY() < viewMinY || s.getMinY() > viewMaxY) continue;
             int countLanes = s.getLanes().size();
-            int laneIndex = 0;
             double[] meanLaneX = null;
             double[] meanLaneY = null;
 
@@ -264,11 +263,12 @@ public class SimulationRenderer {
 
                 int limit = Math.min(meanLaneX.length, rawX.length); // out of bounce check -> if not the same size
 
+                /* // should be calculated in street
                 for (int i = 0; i < limit; i++) {
                     meanLaneX[i] += rawX[i];
                     meanLaneY[i] += rawY[i];
                     // sums up all point for mean calculation later
-                }
+                } */
 
                 // Draws Lanes
                 if (rawX.length >= 2) {
@@ -280,6 +280,7 @@ public class SimulationRenderer {
                 }
             }
 
+            /*
             // test, only works if lanesCount == 2 , if odd -> cant place line in the middle, if even: needs offset
             // Draws lane lines
             if (meanLaneX != null) {
@@ -301,7 +302,7 @@ public class SimulationRenderer {
                 } else if (countLanes % 2 == 1) {
 
                 }
-            }
+            } */
         }
 
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list

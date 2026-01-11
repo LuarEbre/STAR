@@ -222,6 +222,14 @@ public class GuiController {
         tlSelector.setItems(FXCollections.observableArrayList(wrapperController.getTLids()));
         tlSelector.setValue(wrapperController.getTLids()[0]);
 
+        if(wrapperController.isRouteListEmpty()) {
+            addVehicleButton.setDisable(true);
+            startTestButton.setDisable(true);
+        } else {
+            addVehicleButton.setDisable(false);
+            startTestButton.setDisable(false);
+        }
+
         // slow
        // startStreetSelector.setItems(FXCollections.observableArrayList(wrapperController.getSelectableStreets()));
        // endStreetSelector.setItems(FXCollections.observableArrayList(wrapperController.getSelectableStreets()));
@@ -253,7 +261,7 @@ public class GuiController {
         colorSelector.setValue(Color.MAGENTA);
 
         //Setup Graphs of Stats Section
-        setupCharts();
+        //setupCharts();
 
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
@@ -338,11 +346,23 @@ public class GuiController {
             }
         });
 
+
+        addMenu.visibleProperty().addListener((observable, oldValue, isVisible) -> {
+            if (isVisible) { // activates if menu is visible
+                String currentRoute = routeSelector.getValue();
+                if (currentRoute != null && !currentRoute.isEmpty()) {
+                    sr.setPickedRouteID(currentRoute);
+                }
+            }
+        });
+
+
         // initializes tl duration spinner
         SpinnerValueFactory<Integer> duration =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 20); //min, max, start
         durationTL.setValueFactory(duration);
     }
+
 
     @FXML
     private void mouseClicked(MouseEvent event) {
@@ -683,6 +703,18 @@ public class GuiController {
     }
 
     @FXML
+    private void onShowDataView() {
+        if (!dataView.isSelected()) {
+            staticMap.widthProperty().bind(middlePane.widthProperty().multiply(1.25));
+            staticMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+            dataPane.setVisible(false);
+        } else {
+            dataPane.setVisible(true);
+            rescale();
+        }
+    }
+
+    @FXML
     protected void onDensityAnchorToggle() {
         sr.setShowDensityAnchor(showDensityAnchor.isSelected());
     }
@@ -841,8 +873,8 @@ public class GuiController {
         }
 
         //Setup new Axis Data
-        activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
-        percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+        //activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
+        //percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
 
 
         if (currentTab.equals("Overall")) {
@@ -1047,36 +1079,11 @@ public class GuiController {
             @Override
             public void handle(long timestamp) {
                 renderUpdate();
-                checkPerFrame();
             }
         };
         renderLoop.start(); // runs 60 frames per second
     }
 
-    private void checkPerFrame(){
-        // Only allow injection if there are routes
-        if(wrapperController.isRouteListEmpty()) {
-            addVehicleButton.setDisable(true);
-            startTestButton.setDisable(true);
-        } else {
-            addVehicleButton.setDisable(false);
-            startTestButton.setDisable(false);
-        }
-        
-        if(addMenu.isVisible() && !(routeSelector.getValue().isEmpty())){
-                    String Route = routeSelector.getValue();
-                    sr.setPickedRouteID(Route);
-        }
-        
-        if (!dataView.isSelected()) {
-            staticMap.widthProperty().bind(middlePane.widthProperty());
-            staticMap.heightProperty().bind(middlePane.heightProperty());
-            dataPane.setVisible(false);
-        } else {
-            dataPane.setVisible(true);
-            rescale();
-        }
-    }
 
     private void stopRenderer() {
         if (renderLoop != null) {

@@ -503,7 +503,7 @@
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <CheckBox fx:id="dataView" selected="true" styleClass="viewLabel" text="Data" />
+                        <CheckBox fx:id="dataView" onAction="#onShowDataView" selected="true" styleClass="viewLabel" text="Data" />
                         <CheckBox fx:id="showButtons" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onButtonToggle" selected="true" styleClass="viewLabel" text="Buttons" />
                         <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="false" styleClass="viewLabel" text="Density Anchor" />
                         <CheckBox fx:id="showRouteHighlighting" layoutX="10.0" layoutY="45.0" mnemonicParsing="false" onAction="#onRouteHighlightingToggle" selected="true" styleClass="viewLabel" text="Route Highlighting" wrapText="true" />

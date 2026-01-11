@@ -5,6 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Trafficlight;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
+import sumo.sim.util.GenericList;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
  * Class for managing all TrafficLights
  * @author simonr
  */
-public class TrafficLightList {
+public class TrafficLightList implements GenericList {
     private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final StreetList streetList;
