@@ -329,6 +329,14 @@ public class GuiController {
 
         tlSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
+                List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(tlSelector.getValue());
+                String[] count;
+                count = new String[phases.size()];
+                for (int i = 0; i < phases.size(); i++) {
+                    count[i] = ""+i;
+                }
+                phaseIndexSelector.setItems(FXCollections.observableArrayList(count));
+                phaseSetSelector.setItems(FXCollections.observableArrayList(count));
                 updateTLPhaseText(); // displays new text if tl is changed
             }
         });
@@ -1025,13 +1033,6 @@ public class GuiController {
         String id = tlSelector.getValue();
         // update possible phases
         List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(id);
-        String[] count;
-        count = new String[phases.size()];
-        for (int i = 0; i < phases.size(); i++) {
-            count[i] = ""+i;
-        }
-        phaseIndexSelector.setItems(FXCollections.observableArrayList(count));
-        phaseSetSelector.setItems(FXCollections.observableArrayList(count));
 
         // List view: All phases
         stateText.getItems().clear(); // clears old content
