@@ -82,12 +82,16 @@
 }
 
 .tab-pane .tab .tab-label {
-    -fx-text-fill: white;
+    -fx-text-fill: -fx-color-white;
 }
 
 .tab-pane .control-buttons-tab .arrow {
     -fx-background-color: -fx-color-grey-dark;
     -fx-padding: 0.2em;
+}
+
+#diffTabPane .tab-header-background {
+    -fx-background-color: -fx-color-grey-dark;
 }
 
 .text-field {

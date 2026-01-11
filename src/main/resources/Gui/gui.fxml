@@ -567,7 +567,7 @@
                </children>
                </HBox>
             <Label layoutX="14.0" layoutY="237.0" styleClass="addMenu-labels" text="Current Phase" />
-            <TabPane fx:id="trafficLightTabPane" layoutY="87.0" prefHeight="130.0" prefWidth="259.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <TabPane fx:id="trafficLightTabPane" styleClass="diffTabPane" layoutY="87.0" prefHeight="130.0" prefWidth="259.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
               <tabs>
                 <Tab text="Duration">
                   <content>
@@ -640,7 +640,7 @@
 
        <AnchorPane fx:id="createMenu" layoutX="600.0" layoutY="50.0" prefHeight="443.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false">
          <children>
-            <TabPane layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+            <TabPane fx:id="createTabpane" styleClass="diffTabPane" layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
               <tabs>
                 <Tab text="Create Type">
                   <content>
