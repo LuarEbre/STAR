@@ -333,14 +333,15 @@ public class WrapperController {
      * @return e.g.: [g,r,y,80] -> state , last element is duration
      */
     public String[] getTlStateDuration(String tlID) {
-        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
+        TrafficLightWrap trafLight = tl.getTL(tlID);
+        String [] ret = new String[trafLight.getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
         int j = 0;
         for (int i=0; i<ret.length-2; i++) {
-            ret[i] = tl.getTL(tlID).getCurrentState()[j];
+            ret[i] = trafLight.getCurrentState()[j];
             j += 2; // 0,2,4,8
         }
-        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
-        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
+        ret[ret.length-2] = ""+trafLight.getDuration();
+        ret[ret.length-1] = ""+trafLight.getNextSwitch();
 
         return ret; // [g,r,y,80] -> state , last element is duration
     }
