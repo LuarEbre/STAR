@@ -41,6 +41,7 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private long stepCounter = 0;
     //private XML netXml;
 
     // config
@@ -214,8 +215,8 @@ public class WrapperController {
             vl.updateAllVehicles();
             tl.updateAllCurrentState();
             sl.updateStreets();
-            //vl.printVehicles();
-            simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
+
+            simTime = (double) connection.do_job_get(Simulation.getTime());
             if (!terminated) {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
@@ -279,8 +280,15 @@ public class WrapperController {
      * @param color Color based on Hex code
      */
     public void addVehicle(int amount, String type, String route, Color color) {
-        // used by guiController, executes addVehicle from WrapperVehicle
-        vl.addVehicle(amount, type, route, color);
+        if (executor != null && !executor.isShutdown()) {
+            executor.execute(() -> {
+                // execution queue
+                vl.addVehicle(amount, type, route, color);
+                logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
+            });
+        } else {
+            //new Thread(() -> vl.addVehicle(amount, type, route, color)).start();
+        }
     }
 
     public void addRoute(String start, String end, String id) {

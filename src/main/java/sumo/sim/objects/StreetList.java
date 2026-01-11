@@ -3,6 +3,7 @@ package sumo.sim.objects;
 import it.polito.appeal.traci.SumoTraciConnection;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
+import sumo.sim.util.GenericList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  * Manages an {@link ArrayList} of {@link Street} objects.
  */
 
-public class StreetList {
+public class StreetList implements GenericList {
     // List of streets (like TL_List)
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
