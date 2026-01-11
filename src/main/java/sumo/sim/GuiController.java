@@ -84,7 +84,7 @@ public class GuiController {
     private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD,
                         vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops;
     @FXML
-    private TabPane tabPane, trafficLightTabPane;
+    private TabPane tabPane, trafficLightTabPane, createTabPane;
     @FXML
     private GridPane FilteredGrid, SelectedGrid;
     @FXML
@@ -257,6 +257,7 @@ public class GuiController {
         rescale(); // rescales menu based on width and height
         setUpInputs(); // Spinner factory etc. initializing
         setupSelectionHandler(); // setup SelectMode MouseEvent
+
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
 
@@ -593,12 +594,10 @@ public class GuiController {
             this.playButton.setSelected(false);
             this.stepButton.setDisable(true);
             wrapperController.stopSim();
-            System.out.println("Select Mode enabled");
         } else {
             sr.setSelectMode(false);
             this.playButton.setDisable(false);
             this.stepButton.setDisable(false);
-            System.out.println("Select Mode disabled");
         }
     }
 
@@ -750,12 +749,15 @@ public class GuiController {
 
     @FXML
     protected void startStressTest(){
+        boolean wasRunning = !wrapperController.isPaused();
+        if(wasRunning) wrapperController.stopSim();
         String mode = stressTestMode.getValue();
         switch (mode) {
             case "Light Test" -> wrapperController.StressTest(1000, Color.GREEN, null);
             case "Medium Test" -> wrapperController.StressTest(2500, Color.YELLOW, null);
             case "Heavy Test" -> wrapperController.StressTest(5000, Color.RED, null);
         }
+        if(wasRunning) wrapperController.startSim();
     }
 
 
@@ -782,7 +784,6 @@ public class GuiController {
 
 
     }
-
 
     // functionality
 
@@ -853,17 +854,12 @@ public class GuiController {
         VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
 
-        //Graphs Updates
-        //must be outside of if, else it would only update if on graph tab
+        // Graphs Updates
 
-        //Get Graph Data
-        int activeCount = vehicles.getActiveCount();
+        // Data needed for both Graphs and Overall
         int simTime = (int)wrapperController.getTime();
-        int overallVehicleCount = wrapperController.getAllVehicleCount();
-        int queuedCount = vehicles.getQueuedCount();
-        int exitedCount = overallVehicleCount - activeCount - queuedCount;
+        int activeCount = vehicles.getActiveCount();
         int currentlyStopped = vehicles.getStoppedCount();
-        int stoppedTime = vehicles.getStoppedTime();
 
         float stoppedPercentage = 0f;
         if (activeCount > 0) {
@@ -874,8 +870,18 @@ public class GuiController {
         //activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
         //percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
 
+        if(activeVehiclesSeries.getData().size()>300) {
+            activeVehiclesSeries.getData().removeFirst();
+            percentStoppedSeries.getData().removeFirst();
+        }
 
         if (currentTab.equals("Overall")) {
+
+            int stoppedTime = vehicles.getStoppedTime();
+            int overallVehicleCount = wrapperController.getAllVehicleCount();
+            int queuedCount = vehicles.getQueuedCount();
+            int exitedCount = overallVehicleCount - activeCount - queuedCount;
+
             this.activeVehicles.setText(Integer.toString(activeCount));
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
@@ -883,14 +889,10 @@ public class GuiController {
             this.TotalTimeSpentStopped.setText(this.rawSecondsToHMS(stoppedTime));
             this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
-
         } else if (currentTab.equals("Selected")) {
-
             SelectableObject selectedObject = wrapperController.getSelectedObject();
             if(selectedObject != null) {
-                // if selected object is a Vehicle, the GridPane for Traffic Lights needs to be set !visible & !managed and vice versa (SelectedGridTL does not exist yet)
                 if (selectedObject instanceof VehicleWrap v) {
-
                     SelectedGrid.setVisible(true);
                     SelectedGrid.setManaged(true);
                     // SelectedGridTL.setVisible(false);
@@ -917,20 +919,14 @@ public class GuiController {
                     this.totalLifetime.setText(this.rawSecondsToHMS(v.getTotalLifetime()));
                     this.timeSpentStopped.setText(this.rawSecondsToHMS(v.getWaitingTime()));
                     this.Stops.setText(Integer.toString(v.getNumberOfStops()));
-
                 } else if (selectedObject instanceof TrafficLightWrap tl) {
-
                     // SelectedGridTL.setVisible(true);
                     // SelectedGridTL.setManaged(true);
                     SelectedGrid.setVisible(false);
                     SelectedGrid.setManaged(false);
-
-                    // TO DO: Make Traffic Light Object show up in Traffic Light Menu Dropdown Menu, display Traffic Light Stats in a new GridPane with similar structure
                 }
             }
-        } else if (currentTab.equals("Graphs")){ 
-        
-           } else {
+        } else {
             // EXPERIMENTAL - this.highlightToggleButton(filterMenuButton);
             // set visible and managed true, only after checking whether filter has been applied
             // FilteredGrid.setVisible(true);
