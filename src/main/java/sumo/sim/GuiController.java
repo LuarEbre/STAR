@@ -69,7 +69,7 @@ public class GuiController {
     @FXML
     private Canvas staticMap, dynamicMap, tlCanvas;
     @FXML
-    private Label timeLabel, vehicleCount, notSelectedLabel1, notSelectedLabel2;
+    private Label timeLabel, vehicleCount, notSelectedLabel1;
     @FXML
     private Slider playSlider;
     @FXML
@@ -82,11 +82,11 @@ public class GuiController {
             showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently;
     @FXML
     private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD,
-                        vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops;
+                        vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops, trafficLightID, TLposition, currPhase, remainingDur;
     @FXML
     private TabPane tabPane, trafficLightTabPane, createTabPane;
     @FXML
-    private GridPane FilteredGrid, SelectedGrid;
+    private GridPane FilteredGrid, SelectedGrid, SelectedGridTL;
     @FXML
     private HBox mainButtonBox;
     @FXML
@@ -261,6 +261,8 @@ public class GuiController {
         addVehicleButton.setDisable(true);
         SelectedGrid.setVisible(false);
         SelectedGrid.setManaged(false);
+        SelectedGridTL.setVisible(false);
+        SelectedGridTL.setManaged(false);
         FilteredGrid.setVisible(false);
         FilteredGrid.setManaged(false);
 
@@ -846,7 +848,6 @@ public class GuiController {
         }
 
         if (currentTab.equals("Overall")) {
-
             int stoppedTime = vehicles.getStoppedTime();
             int overallVehicleCount = wrapperController.getAllVehicleCount();
             int queuedCount = vehicles.getQueuedCount();
@@ -863,10 +864,12 @@ public class GuiController {
             SelectableObject selectedObject = wrapperController.getSelectedObject();
             if(selectedObject != null) {
                 if (selectedObject instanceof VehicleWrap v) {
-                    SelectedGrid.setVisible(true);
-                    SelectedGrid.setManaged(true);
-                    // SelectedGridTL.setVisible(false);
-                    // SelectedGridTL.setManaged(false);
+                    if(!SelectedGrid.isVisible()) {
+                        SelectedGridTL.setVisible(false);
+                        SelectedGridTL.setManaged(false);
+                        SelectedGrid.setVisible(true);
+                        SelectedGrid.setManaged(true);
+                    }
 
                     this.vehicleID.setText(v.getID());
                     this.vehicleType.setText(v.getType());
@@ -890,10 +893,25 @@ public class GuiController {
                     this.timeSpentStopped.setText(this.rawSecondsToHMS(v.getWaitingTime()));
                     this.Stops.setText(Integer.toString(v.getNumberOfStops()));
                 } else if (selectedObject instanceof TrafficLightWrap tl) {
-                    // SelectedGridTL.setVisible(true);
-                    // SelectedGridTL.setManaged(true);
-                    SelectedGrid.setVisible(false);
-                    SelectedGrid.setManaged(false);
+                    if (!SelectedGridTL.isVisible()) {
+                        SelectedGrid.setVisible(false);
+                        SelectedGrid.setManaged(false);
+                        SelectedGridTL.setVisible(true);
+                        SelectedGridTL.setManaged(true);
+                    }
+                    this.trafficLightID.setText(tl.getId());
+                    this.TLposition.setText(String.format("%.2f | %.2f",tl.getPosition().x, tl.getPosition().y));
+
+                    String[] stateDur = wrapperController.getTlStateDuration(tl.getId());
+                    int phaseIndex = wrapperController.getCurrentTLPhaseIndex(tl.getId());
+                    double currentTime = wrapperController.getTime();
+
+                    this.currPhase.setText("Phase " + phaseIndex);
+
+                    double nextSwitchAbsolute = Double.parseDouble(stateDur[stateDur.length - 1]);
+                    double remaining = nextSwitchAbsolute - currentTime;
+
+                    this.remainingDur.setText(String.format("%d / %d ", (int)remaining, (int)tl.getDuration()));
                 }
             }
         } else {
@@ -961,7 +979,6 @@ public class GuiController {
                         // select Object returned by findClickableObject
                         so.select();
                         notSelectedLabel1.setVisible(false);
-                        notSelectedLabel2.setVisible(false);
                         // switch over to "Selected" Tab
                         tabPane.getSelectionModel().select(1);
                         // switch off Select Mode button

@@ -51,13 +51,20 @@
     -fx-border-width: 0 6 0 0;
 }
 
+.diffTabPane .tab-header-background {
+    -fx-background-color: -fx-color-grey-dark;
+}
+
+.dataTabPane .tab-header-background {
+    -fx-background-color: -fx-color-grey-middle;
+}
+
 .tab-pane, .tab-pane .tab {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
 }
 
 .tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: -fx-color-grey-middle;
     -fx-border-color: -fx-color-grey-darkest;
     -fx-border-width: 0 0 4 0;
 }
@@ -88,10 +95,6 @@
 .tab-pane .control-buttons-tab .arrow {
     -fx-background-color: -fx-color-grey-dark;
     -fx-padding: 0.2em;
-}
-
-#diffTabPane .tab-header-background {
-    -fx-background-color: -fx-color-grey-dark;
 }
 
 .text-field {
@@ -366,12 +369,6 @@
     -fx-alignment: center;
 }
 
-#addVehicleButton:pressed {
-    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
-    -fx-background-insets: 0, 2;
-    -fx-text-fill: -fx-color-magenta;
-}
-
 #colorSelector {
     -fx-background-color: -fx-color-grey-light;
     -fx-font-family:"Arial Black";
@@ -419,9 +416,15 @@
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
 }
 
-#addVehicleButton {
+.menuButton {
     -fx-background-color: -fx-color-grey-light;
     -fx-text-fill: -fx-color-white;
+}
+
+.menuButton:pressed {
+    -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange), -fx-color-grey-dark;
+    -fx-background-insets: 0, 2;
+    -fx-text-fill: -fx-color-magenta;
 }
 
 #generateRoute {
@@ -606,3 +609,40 @@
     -fx-background-radius: 5em;
 }
 
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-plot-background {
+    -fx-background-color: -fx-color-grey-middle;
+}
+
+.starLineChart .axis {
+    -fx-tick-label-fill: -fx-color-white;
+}
+
+.starLineChart .axis-label {
+    -fx-text-fill: -fx-color-white;
+}
+
+.starLineChart .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+.starLineChart .chart-horizontal-grid-lines {
+    -fx-stroke: -fx-color-grey-darkest;
+    -fx-stroke-width: 0.5;
+}
+
+.starLineChart .label {
+    -fx-text-fill: -fx-color-white;
+}
+
+.chart-series-line {
+    -fx-stroke: linear-gradient(to right, -fx-color-magenta-dark, -fx-color-orange);
+    -fx-stroke-width: 3px;
+}
+
+.chart-line-symbol {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+}
