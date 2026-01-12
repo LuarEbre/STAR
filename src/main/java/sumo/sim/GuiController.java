@@ -785,7 +785,7 @@ public class GuiController {
     // main buttons menu methods
 
     @FXML
-    protected void startStressTest(){
+    protected void startStressTest() {
         boolean wasRunning = !wrapperController.isPaused();
         if(wasRunning) wrapperController.stopSim();
         String mode = stressTestMode.getValue();
@@ -821,7 +821,6 @@ public class GuiController {
 
 
     }
-
 
     // functionality
 
