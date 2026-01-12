@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
@@ -27,7 +28,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
@@ -448,17 +449,25 @@
                                           <Insets left="3.0" right="3.0" />
                                        </padding>
                                     </LineChart>
-                                    <LineChart id="percentStoppedGraph" fx:id="percentStoppedChart" createSymbols="false" horizontalZeroLineVisible="false" layoutY="160.0" prefHeight="92.0" prefWidth="259.0" title="Vehicles Stopped (in %)" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <LineChart id="percentStoppedGraph" fx:id="percentStoppedChart" createSymbols="false" horizontalZeroLineVisible="false" layoutY="144.0" prefHeight="92.0" prefWidth="259.0" title="Vehicles Stopped (in %)" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                        <xAxis>
                                           <CategoryAxis side="BOTTOM" />
                                        </xAxis>
                                        <yAxis>
-                                          <NumberAxis fx:id = "percentStoppedYAxis" side="LEFT" />
+                                          <NumberAxis fx:id="percentStoppedYAxis" side="LEFT" />
                                        </yAxis>
                                        <padding>
                                           <Insets left="3.0" right="3.0" />
                                        </padding>
                                     </LineChart>
+                                    <BarChart id="currentGYR" fx:id="currentGYR" layoutY="281.0" prefHeight="111.0" prefWidth="259.0" title="Current Traffic Light Phases" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis fx:id="currentGYRYAxis" side="LEFT" />
+                                      </yAxis>
+                                    </BarChart>
                                  </children>
                               </AnchorPane>
                            </content>
@@ -488,14 +497,14 @@
                <children>
                   <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap1" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
                   <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap2" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button fx:id="importMapButton" styleClass="std-btn" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" onAction="#importMap" prefHeight="34.0" prefWidth="114.0" text="Import Map" />
+                  <Button fx:id="importMapButton" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" onAction="#importMap" prefHeight="34.0" prefWidth="114.0" styleClass="std-btn" text="Import Map" />
                   <Label layoutX="122.0" layoutY="11.0" styleClass="topMenuLabel" text="Choose a Map" textFill="VIOLET">
                      <font>
                         <Font name="Arial Black" size="23.0" />
                      </font>
                   </Label>
                   <ChoiceBox fx:id="importMapSelector" layoutX="32.0" layoutY="235.0" prefHeight="26.0" prefWidth="206.0" />
-                  <Label styleClass="magentaLabel" layoutX="33.0" layoutY="215.0" prefHeight="18.0" prefWidth="150.0" text="Imported Maps" />
+                  <Label layoutX="33.0" layoutY="215.0" prefHeight="18.0" prefWidth="150.0" styleClass="magentaLabel" text="Imported Maps" />
                </children>
             </AnchorPane>
 
@@ -527,7 +536,7 @@
                         <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="fileButtonReset" onAction="#onResetButton" layoutX="15.0" layoutY="20.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Reset" />
+                  <Button fx:id="fileButtonReset" layoutX="15.0" layoutY="20.0" mnemonicParsing="false" onAction="#onResetButton" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Reset" />
                   <Button fx:id="fileButtonSettings" layoutX="15.0" layoutY="52.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Settings" />
                   <Button fx:id="fileButtonReturn" layoutX="15.0" layoutY="83.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Return" />
                </children>
@@ -567,7 +576,7 @@
                </children>
                </HBox>
             <Label layoutX="14.0" layoutY="237.0" styleClass="addMenu-labels" text="Current Phase" />
-            <TabPane fx:id="trafficLightTabPane" styleClass="diffTabPane" layoutY="87.0" prefHeight="130.0" prefWidth="259.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <TabPane fx:id="trafficLightTabPane" layoutY="87.0" prefHeight="130.0" prefWidth="259.0" styleClass="diffTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
               <tabs>
                 <Tab text="Duration">
                   <content>
@@ -632,15 +641,15 @@
            </children>
        </AnchorPane>
 
-       <AnchorPane fx:id="tlVisualizerPane" prefHeight="100.0" prefWidth="150.0" styleClass="mainButtonMenu" visible="" >
+       <AnchorPane fx:id="tlVisualizerPane" prefHeight="100.0" prefWidth="150.0" styleClass="mainButtonMenu" visible="">
            <children>
-               <Canvas fx:id="tlCanvas" height="90.0" width="150.0" layoutX="10.0" layoutY="10.0" />
+               <Canvas fx:id="tlCanvas" height="90.0" layoutX="10.0" layoutY="10.0" width="150.0" />
            </children>
        </AnchorPane>
 
        <AnchorPane fx:id="createMenu" layoutX="600.0" layoutY="50.0" prefHeight="443.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false">
          <children>
-            <TabPane fx:id="createTabpane" styleClass="diffTabPane" layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+            <TabPane fx:id="createTabpane" layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" styleClass="diffTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
               <tabs>
                 <Tab text="Create Type">
                   <content>
