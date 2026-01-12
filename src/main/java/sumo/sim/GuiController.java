@@ -9,6 +9,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -17,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.UnaryOperator;
@@ -60,7 +62,7 @@ public class GuiController {
 
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton,
-            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton, map1select, map2select, importMapButton;
+            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton, map1select, map2select, importMapButton, fileButtonReset;
 
     private ButtonBase[] allButtons;
 
@@ -92,7 +94,9 @@ public class GuiController {
     @FXML
     private LineChart<String, Number> activeVehiclesChart, percentStoppedChart;
     @FXML
-    private NumberAxis percentStoppedYAxis;
+    private BarChart<String, Number> currentGYR;
+    @FXML
+    private NumberAxis percentStoppedYAxis, currentGYRYAxis;
 
     private GraphicsContext gc;
     private SimulationRenderer sr;
@@ -119,6 +123,7 @@ public class GuiController {
     //Charts
     private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
     private XYChart.Series<String, Number> percentStoppedSeries = new XYChart.Series<>();
+    private XYChart.Series<String, Number> currentGYRSeries = new XYChart.Series<>();
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(GuiController.class.getName());
@@ -164,6 +169,9 @@ public class GuiController {
      */
     public void initializeCon(WrapperController wrapperController) {
         this.wrapperController = wrapperController;
+
+        //Setup Graphs of Stats Section
+        setupCharts();
 
         // allows map switching
         map1select.setDisable(false);
@@ -260,9 +268,6 @@ public class GuiController {
 
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
-
-        //Setup Graphs of Stats Section
-        //setupCharts();
 
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
@@ -664,6 +669,12 @@ public class GuiController {
         wrapperController.doStepUpdate();
     }
 
+    @FXML
+    protected void onResetButton(){
+        reset();
+        changeMap(wrapperController.getCurrentMap());
+    }
+
     // top right menu buttons hovered
 
     private void topMenuButtonToggle(Node menu) {
@@ -811,6 +822,7 @@ public class GuiController {
 
     }
 
+
     // functionality
 
     /**
@@ -892,10 +904,7 @@ public class GuiController {
             stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
         }
 
-        //Setup new Axis Data
-        //activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
-        //percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
-
+        // Setup new Axis Data
         if(activeVehiclesSeries.getData().size()>300) {
             activeVehiclesSeries.getData().removeFirst();
             percentStoppedSeries.getData().removeFirst();
@@ -929,20 +938,20 @@ public class GuiController {
                     this.vehicleType.setText(v.getType());
                     this.route.setText(v.getRouteID());
                     String hex = String.format("#%02X%02X%02X",
-                            (int)(v.getColor().getRed() * 255),
-                            (int)(v.getColor().getGreen() * 255),
-                            (int)(v.getColor().getBlue() * 255));
+                            (int) (v.getColor().getRed() * 255),
+                            (int) (v.getColor().getGreen() * 255),
+                            (int) (v.getColor().getBlue() * 255));
                     this.color.setStyle("-fx-background-color: " + hex + ";");
-                    this.currentSpeed.setText(String.format("%.2f m/s",v.getSpeed()));
-                    this.averageSpeed.setText(String.format("%.2f m/s",v.getAvgSpeed()));
-                    this.peakSpeed.setText(String.format("%.2f m/s",v.getMaxSpeed()));
+                    this.currentSpeed.setText(String.format("%.2f m/s", v.getSpeed()));
+                    this.averageSpeed.setText(String.format("%.2f m/s", v.getAvgSpeed()));
+                    this.peakSpeed.setText(String.format("%.2f m/s", v.getMaxSpeed()));
                     double accel = v.getAccel();
-                    if(accel < 0) hex = "#C14E4E";
+                    if (accel < 0) hex = "#C14E4E";
                     else hex = "#089622";
                     this.acceleration.setStyle("-fx-text-fill: " + hex + ";");
-                    this.acceleration.setText(String.format("%.2f m/s²",v.getAccel()));
-                    this.position.setText(String.format("%.2f | %.2f",v.getPosition().x, v.getPosition().y));
-                    this.angle.setText(String.format("%.2f°",v.getAngle()));
+                    this.acceleration.setText(String.format("%.2f m/s²", v.getAccel()));
+                    this.position.setText(String.format("%.2f | %.2f", v.getPosition().x, v.getPosition().y));
+                    this.angle.setText(String.format("%.2f°", v.getAngle()));
                     this.totalLifetime.setText(this.rawSecondsToHMS(v.getTotalLifetime()));
                     this.timeSpentStopped.setText(this.rawSecondsToHMS(v.getWaitingTime()));
                     this.Stops.setText(Integer.toString(v.getNumberOfStops()));
@@ -968,6 +977,14 @@ public class GuiController {
                     this.remainingDur.setText(String.format("%d / %d ", (int)remaining, (int)tl.getDuration()));
                 }
             }
+        } else if (currentTab.equals("Graphs")) {
+
+            HashMap<String, Integer> gyr = wrapperController.getTrafficLights().getCurrentGYR();
+
+            currentGYRSeries.getData().get(0).setYValue(gyr.get("G"));
+            currentGYRSeries.getData().get(1).setYValue(gyr.get("Y"));
+            currentGYRSeries.getData().get(2).setYValue(gyr.get("R"));
+
         } else {
             // EXPERIMENTAL - this.highlightToggleButton(filterMenuButton);
             // set visible and managed true, only after checking whether filter has been applied
@@ -1088,6 +1105,7 @@ public class GuiController {
         text = "Curr Phase "+phaseIndex+": " +stringPhase + ", dur: "+ remaining +"/"+ wrapperController.getTLDuration(id);
         output[output.length-1] = text;
         stateText.setItems(FXCollections.observableArrayList(output));
+        //stateText.setText(text);
     }
 
 
@@ -1185,6 +1203,29 @@ public class GuiController {
         percentStoppedChart.getData().add(percentStoppedSeries);
 
         percentStoppedChart.setAnimated(false);
+
+        //currentGYR
+        int amountTLs = wrapperController.getTrafficLights().getCount();
+        logger.log(Level.INFO, "Total TL Count: "+amountTLs);
+
+        currentGYRYAxis.setAutoRanging(false);
+        currentGYRYAxis.setLowerBound(0);
+        currentGYRYAxis.setUpperBound(amountTLs);
+        currentGYRYAxis.setTickUnit(10);
+
+        percentStoppedChart.getXAxis().setTickLabelsVisible(false);
+
+        currentGYRSeries.setName("CurrentGYR");
+
+        currentGYRSeries.getData().clear();
+        currentGYRSeries.getData().add(new XYChart.Data<>("Green", 0));
+        currentGYRSeries.getData().add(new XYChart.Data<>("Yellow", 0));
+        currentGYRSeries.getData().add(new XYChart.Data<>("Red", 0));
+
+        currentGYR.getData().clear();
+        currentGYR.getData().add(currentGYRSeries);
+
+        currentGYR.setAnimated(false);
 
     }
 
@@ -1306,6 +1347,10 @@ public class GuiController {
         map1select.setDisable(true);
         map2select.setDisable(true);
         if (mapName != null) {
+
+            activeVehiclesSeries.getData().clear();
+            percentStoppedSeries.getData().clear();
+
             wrapperController.mapSwitch(mapName);
         }
         importMapSelector.getSelectionModel().clearSelection(); // resets previous selection

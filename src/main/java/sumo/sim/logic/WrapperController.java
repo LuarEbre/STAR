@@ -42,6 +42,7 @@ public class WrapperController {
     private boolean paused;
     private double simTime;
     private long stepCounter = 0;
+    private String currentMap = "Frankfurt";
     //private XML netXml;
 
     // config
@@ -88,7 +89,7 @@ public class WrapperController {
 
         try {
             connection.runServer(8813); // preventing random port
-            System.out.println("Connected to Sumo.");
+            logger.log(Level.INFO, "Connected to Sumo");
 
             vl = new VehicleList(connection);
             sl = new StreetList(this.connection);
@@ -229,7 +230,7 @@ public class WrapperController {
     }
 
     public void mapSwitch(String mapName) {
-        System.out.println("Map Switch to: " + mapName);
+        logger.log(Level.INFO, "Map switching to " + mapName);
         paused = true;
         terminated = true; // stops executor
 
@@ -248,6 +249,8 @@ public class WrapperController {
                 currentNet = mapConfig.getNetPath().toString();
                 currentRou = mapConfig.getRouPath().toString();
 
+                this.currentMap = mapName;
+
                 this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath().toString()); // new connection
                 simTime = 0;
 
@@ -265,7 +268,6 @@ public class WrapperController {
 
             } catch (Exception e) {
                 logger.log(Level.FINE, "Failed to switch maps", e);
-                System.err.println("Error switching maps: " + e.getMessage());
             }
         }).start();
     }
@@ -308,6 +310,9 @@ public class WrapperController {
         Map<String, List<String>> Routes = rl.getAllRoutes();
         int amount_per = amount/Routes.size();
         type = (type == null) ? "DEFAULT_VEHTYPE" : type;
+
+        logger.log(Level.INFO, "Stress testing for " + amount);
+
         for(String key : Routes.keySet()) {
             addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
         }
@@ -389,6 +394,8 @@ public class WrapperController {
     public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
     public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
     public boolean isPaused() { return paused; }
+    public String getCurrentMap() { return currentMap; }
+    public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -399,5 +406,5 @@ public class WrapperController {
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
 
-    
+
 }

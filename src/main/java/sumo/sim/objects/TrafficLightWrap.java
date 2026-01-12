@@ -387,6 +387,7 @@ public class TrafficLightWrap extends SelectableObject {
         try {
             state = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(id));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to get current state of Traffic Light", e);
             return state;
         }
         return state;
