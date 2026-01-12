@@ -20,6 +20,8 @@ import java.util.function.UnaryOperator;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import static sumo.sim.Main.LOG;
+
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
  *
@@ -338,6 +340,7 @@ public class GuiController {
             editor.setText(String.valueOf(val));
 
         } catch (NumberFormatException e) { // catches exception
+            LOG.warn("Invalid delay input has been selected.");
             delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
             editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
         }
