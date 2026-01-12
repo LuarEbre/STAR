@@ -60,7 +60,7 @@ public class GuiController {
 
     @FXML
     private Button stepButton, addVehicleButton, amountMinus, amountPlus, startTestButton,
-            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton, map1select, map2select, importMapButton;
+            fileMenuButton, mapsMenuButton, filterMenuButton, viewMenuButton, map1select, map2select, importMapButton, fileButtonReset;
 
     private ButtonBase[] allButtons;
 
@@ -620,6 +620,12 @@ public class GuiController {
         wrapperController.doStepUpdate();
     }
 
+    @FXML
+    protected void onResetButton(){
+        reset();
+        changeMap(wrapperController.getCurrentMap());
+    }
+
     // top right menu buttons hovered
 
     private void topMenuButtonToggle(Node menu) {
@@ -832,9 +838,6 @@ public class GuiController {
         //Get Graph Data
         int activeCount = vehicles.getActiveCount();
         int simTime = (int)wrapperController.getTime();
-        int overallVehicleCount = wrapperController.getAllVehicleCount();
-        int queuedCount = vehicles.getQueuedCount();
-        int exitedCount = overallVehicleCount - activeCount - queuedCount;
         int currentlyStopped = vehicles.getStoppedCount();
         int stoppedTime = vehicles.getStoppedTime();
 
@@ -848,6 +851,10 @@ public class GuiController {
         percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
 
         if (currentTab.equals("Overall")) {
+            int overallVehicleCount = wrapperController.getAllVehicleCount();
+            int queuedCount = vehicles.getQueuedCount();
+            int exitedCount = overallVehicleCount - activeCount - queuedCount;
+
             this.activeVehicles.setText(Integer.toString(activeCount));
             this.VehiclesNotOnScreen.setText(Integer.toString(queuedCount));
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
@@ -1265,6 +1272,10 @@ public class GuiController {
         map1select.setDisable(true);
         map2select.setDisable(true);
         if (mapName != null) {
+
+            activeVehiclesSeries.getData().clear();
+            percentStoppedSeries.getData().clear();
+
             wrapperController.mapSwitch(mapName);
         }
         importMapSelector.getSelectionModel().clearSelection(); // resets previous selection
