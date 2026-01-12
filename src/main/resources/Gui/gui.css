@@ -97,6 +97,10 @@
     -fx-padding: 0.2em;
 }
 
+#diffTabPane .tab-header-background {
+    -fx-background-color: -fx-color-grey-dark;
+}
+
 .text-field {
     -fx-cursor: inherit;
     -fx-border-width: 1.5;
