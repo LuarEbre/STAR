@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+
+import static sumo.sim.Main.LOG;
 
 
 /**
@@ -77,8 +80,9 @@ public class WrapperController {
     private void initializeSimulationStart() {
         connection.addOption("start", "true");
         try {
+            LOG.info("Connecting to Sumo...");
             connection.runServer(8813); // preventing random port
-            System.out.println("Connected to Sumo.");
+            LOG.info("Connection success.");
 
             vl = new VehicleList(connection);
             sl = new StreetList(this.connection);
@@ -91,6 +95,7 @@ public class WrapperController {
             start();
 
         } catch (Exception e) {
+            LOG.error("Connection failed.");
             throw new RuntimeException(e);
         }
     }
@@ -103,17 +108,27 @@ public class WrapperController {
         if (executor != null && !executor.isShutdown()) {
             return;
         }
+        LOG.info("Starting Simulation...");
         executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly
         executor.scheduleAtFixedRate(() -> {
-            if (paused || terminated) return;
+            if (paused) {
+                LOG.info("Connection is paused. Start aborted.");
+                return;
+            }
+            if (terminated) {
+                LOG.info("Connection is terminated. Start aborted.");
+                return;
+            }
 
             if (connection.isClosed()) {
+                LOG.info("Connection is closed. Terminating.");
                 terminate(); // if connection is closed terminate instantly
                 return;
             }
             try {
                 doStepUpdate(); // sim step
             } catch (IllegalStateException e) {
+                LOG.error("Simulation Crashed.");
                 terminate();
             }
 
@@ -127,6 +142,8 @@ public class WrapperController {
         paused = false; // else executor would not terminate
         terminated = true; // Flag to stop new logic
 
+        LOG.info("Terminating Simulation.");
+
         if (executor != null) {
             // no longer allow new tasks to be scheduled
             executor.shutdown();
@@ -138,15 +155,17 @@ public class WrapperController {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
+                LOG.warn("Normal Termination interrupted. Shutting down immediately.");
                 executor.shutdownNow();
             }
         }
         // Close Sumo connection
+        LOG.info("Closing Connection.");
         if (connection != null && !connection.isClosed()) {
             try {
                 connection.close();
             } catch (Exception e) {
-                System.err.println("Error while closing connection: " + e.getMessage());
+                LOG.error("Error while closing connection: " + e.getMessage());
             }
         }
     }
@@ -164,6 +183,7 @@ public class WrapperController {
         }
         terminated = false;
         paused = false;
+        LOG.info("Changing Delay to: " + this.delay +" ms.");
         start();
     }
 
@@ -171,6 +191,7 @@ public class WrapperController {
      * Sets the paused parameter to false, so that the simulation can continue.
      */
     public void startSim() {
+        LOG.info("Setting 'paused' parameter to: 'false'");
         paused = false;
     }
 
@@ -178,6 +199,7 @@ public class WrapperController {
      * Sets the paused parameter to true. The simulation will be halted.
      */
     public void stopSim() {
+        LOG.info("Setting 'paused' parameter to: 'true'");
         paused = true;
     }
 
@@ -198,6 +220,7 @@ public class WrapperController {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
         } catch (Exception e) {
+            LOG.error("Simulation Crashed.");
             terminate();
             throw new RuntimeException(e);
         }
@@ -205,7 +228,7 @@ public class WrapperController {
     }
 
     public void mapSwitch(String mapName) {
-        System.out.println("Map Switch to: " + mapName);
+        LOG.info("Switching Map to:" + mapName);
         paused = true;
         terminated = true; // stops executor
 
@@ -214,16 +237,20 @@ public class WrapperController {
             terminate(); // instantly forces termination of current thread
 
             // time to close and open old port
-            try { Thread.sleep(500); } catch (InterruptedException e) {
-                // should have something here
+            try {
+                Thread.sleep(500); }
+            catch (InterruptedException e) {
+                LOG.error(e.getMessage() +
+                        "\n While Stopping Thread.");
             }
 
             // load new config
             try {
+                LOG.info("Loading " + mapName + " config.");
                 mapConfig= mapManager.getConfig(mapName);
                 currentNet = mapConfig.getNetPath();
                 currentRou = mapConfig.getRouPath();
-
+                LOG.info("Creating new Sumo Traci Connection.");
                 this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath()); // new connection
                 simTime = 0;
 
@@ -240,7 +267,7 @@ public class WrapperController {
                 Platform.runLater(() -> guiController.initializeCon(this));
 
             } catch (Exception e) {
-                System.err.println("Error switching maps: " + e.getMessage());
+                LOG.error("Error while switching map to " + mapName + ": " + e.getMessage());
             }
         }).start();
     }
@@ -256,6 +283,8 @@ public class WrapperController {
      */
     public void addVehicle(int amount, String type, String route, Color color) {
         // used by guiController, executes addVehicle from WrapperVehicle
+        LOG.info("Adding vehicles to the simulation (amount, type, route, color): ("
+                + amount +", " + type, ", " + route + ", " + color + ")");
         vl.addVehicle(amount, type, route, color);
     }
 
@@ -266,6 +295,7 @@ public class WrapperController {
      * @param type Type ID (defaults to "DEFAULT_VEHTYPE" if null)
      */
     public void StressTest(int amount, Color color, String type) {
+        LOG.info("Initiating Stress Test. Good luck.");
         Map<String, List<String>> Routes = rl.getAllRoutes();
         int amount_per = amount/Routes.size();
         type = (type == null) ? "DEFAULT_VEHTYPE" : type;
@@ -281,6 +311,7 @@ public class WrapperController {
      * @return e.g.: [g,r,y,80] -> state , last element is duration
      */
     public String[] getTlStateDuration(String tlID) {
+
         String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
         int j = 0;
         for (int i=0; i<ret.length-2; i++) {
@@ -301,7 +332,7 @@ public class WrapperController {
     public void setTlSettings(String tlid, int duration) {
         tl.getTL(tlid).setPhaseDuration(duration);
         double check = tl.getTL(tlid).getDuration();
-        System.out.println("Duration: " + check);
+        LOG.info("Setting duration of traffic light (" + tlid + ") to: " + check);
 
     }
 
