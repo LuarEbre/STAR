@@ -7,6 +7,8 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.ArrayList;
 import java.util.*;
 
+import static sumo.sim.Main.LOG;
+
 /**
  * Holds every JunctionWrap Object
  * @author simonr
@@ -34,6 +36,7 @@ public class JunctionList {
             updateAdjacency();
 
         } catch (Exception e) {
+            LOG.error("Failed to initialize JunctionList. " + e);
             throw new RuntimeException(e);
         }
     }

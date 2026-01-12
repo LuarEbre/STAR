@@ -7,6 +7,8 @@ import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.LinkedList;
 
+import static sumo.sim.Main.LOG;
+
 /**
  * A wrapper of {@link Lane} allowing for instancing of individual Lanes within a Street
  */
@@ -48,6 +50,7 @@ public class LaneWrap {
 
             width = (double) connection.do_job_get(Lane.getWidth(laneID));
         } catch (Exception e) {
+            LOG.error("Failed to initialize LaneWrap. " + e);
             throw new RuntimeException(e);
         }
     }

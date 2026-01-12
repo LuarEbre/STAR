@@ -10,6 +10,8 @@ import java.util.LinkedList;
 
 import static java.lang.Math.abs;
 
+import static sumo.sim.Main.LOG;
+
 /**
  * Class for the Junctions
  *
@@ -56,6 +58,7 @@ public class JunctionWrap {
                 this.shapeY[i] = point.y;
             }
         } catch (Exception e) {
+            LOG.error("Failed to initialize JunctionWrap. " + e);
             throw new RuntimeException(e);
         }
     }

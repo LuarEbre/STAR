@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import static sumo.sim.Main.LOG;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -35,6 +37,7 @@ public class GuiTitleController {
             stage.setFullScreen(true);
             stage.show();
         } catch (IOException e) {
+            LOG.error("Gui Title Controller couldnt succefully start. " + e);
             throw new RuntimeException(e);
         }
     }

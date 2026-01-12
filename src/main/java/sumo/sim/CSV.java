@@ -2,6 +2,7 @@ package sumo.sim;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import static sumo.sim.Main.LOG;
 
 public class CSV {
 
@@ -23,7 +24,7 @@ public class CSV {
             }
 
         } catch (IOException i) {
-            System.out.println("Could not write Data to CSV File" + i);
+            LOG.error("Could not write Data to CSV File" + i);
         }
     }
 

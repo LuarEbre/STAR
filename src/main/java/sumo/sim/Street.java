@@ -9,6 +9,8 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import static sumo.sim.Main.LOG;
+
 /**
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link Street#density}
@@ -51,6 +53,7 @@ public class Street {
             }
             updateStreet();
         } catch (Exception e) {
+            LOG.error("Failed to initialize Street " + id, e);
             throw new RuntimeException("Failed to initialize Street " + id, e);
         }
 
@@ -79,6 +82,7 @@ public class Street {
             this.density = num_val/length_val/1000;
         }
         catch (Exception e){
+            LOG.error("Failed to fetch data for 'calcDensity()'. " + e);
             throw new RuntimeException(e);
         }
     }
@@ -91,6 +95,7 @@ public class Street {
             calcDensity();
             this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
         } catch (Exception e) {
+            LOG.warn("Failed to fetch data for 'updateStreet()'. " + e);
             this.density = 0;
             this.noise = 0;
         }

@@ -2,9 +2,12 @@ package sumo.sim;
 
 import it.polito.appeal.traci.SumoTraciConnection;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static sumo.sim.Main.LOG;
 
 /**
  * Manages an {@link ArrayList} of {@link Street} objects.
@@ -35,10 +38,11 @@ public class StreetList {
                     Street s = new Street(id, from, to, con);
                     streets.add(s);
                 } catch (RuntimeException e) {
-                    // System.out.println("Info: Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
+                    LOG.info("Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
                 }
             }
         } catch (Exception e) {
+            LOG.error("Failed to Create StreetList. " + e);
             throw new RuntimeException(e);
         }
     }
