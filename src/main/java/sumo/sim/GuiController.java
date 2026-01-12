@@ -905,6 +905,9 @@ public class GuiController {
         }
 
         // Setup new Axis Data
+        activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
+        percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+
         if(activeVehiclesSeries.getData().size()>300) {
             activeVehiclesSeries.getData().removeFirst();
             percentStoppedSeries.getData().removeFirst();
