@@ -261,8 +261,8 @@ public class GuiController {
         // set initial colorSelector color to magenta to match our UI
         colorSelector.setValue(Color.MAGENTA);
 
-        //Setup Graphs of Stats Section
-        //setupCharts();
+        // setup for DataPane
+        setupCharts();
 
         // if no routes exist in .rou files -> cant add vehicles, checked each frame in startrenderer
         startTestButton.setDisable(true);
@@ -774,7 +774,7 @@ public class GuiController {
     // main buttons menu methods
 
     @FXML
-    protected void startStressTest(){
+    protected void startStressTest() {
         boolean wasRunning = !wrapperController.isPaused();
         if(wasRunning) wrapperController.stopSim();
         String mode = stressTestMode.getValue();
@@ -1220,7 +1220,8 @@ public class GuiController {
      * {@link WrapperController#addVehicle(int, String, String, Color)}
      */
     @FXML
-    public void addVehicle(){
+    public void addVehicle() {
+        boolean wasRunning = !wrapperController.isPaused();
         // parameters from addMenu components
         // static test
         int amount = Integer.parseInt(amountField.getText());
@@ -1232,7 +1233,9 @@ public class GuiController {
             route = "r0"; // if route count == 0 -> disable add button, disable stress test start
         }
 
+        if(wasRunning) wrapperController.stopSim();
         wrapperController.addVehicle(amount, type, route, color);
+        if(wasRunning) wrapperController.startSim();
     }
 
     /**
