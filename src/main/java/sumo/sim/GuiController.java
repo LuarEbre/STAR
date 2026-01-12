@@ -222,6 +222,14 @@ public class GuiController {
         tlSelector.setItems(FXCollections.observableArrayList(wrapperController.getTLids()));
         tlSelector.setValue(wrapperController.getTLids()[0]);
 
+        if(wrapperController.isRouteListEmpty()) {
+            addVehicleButton.setDisable(true);
+            startTestButton.setDisable(true);
+        } else {
+            addVehicleButton.setDisable(false);
+            startTestButton.setDisable(false);
+        }
+
         // slow
        // startStreetSelector.setItems(FXCollections.observableArrayList(wrapperController.getSelectableStreets()));
        // endStreetSelector.setItems(FXCollections.observableArrayList(wrapperController.getSelectableStreets()));
@@ -323,6 +331,14 @@ public class GuiController {
 
         tlSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
+                List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(tlSelector.getValue());
+                String[] count;
+                count = new String[phases.size()];
+                for (int i = 0; i < phases.size(); i++) {
+                    count[i] = ""+i;
+                }
+                phaseIndexSelector.setItems(FXCollections.observableArrayList(count));
+                phaseSetSelector.setItems(FXCollections.observableArrayList(count));
                 updateTLPhaseText(); // displays new text if tl is changed
             }
         });
@@ -341,11 +357,23 @@ public class GuiController {
             }
         });
 
+
+        addMenu.visibleProperty().addListener((observable, oldValue, isVisible) -> {
+            if (isVisible) { // activates if menu is visible
+                String currentRoute = routeSelector.getValue();
+                if (currentRoute != null && !currentRoute.isEmpty()) {
+                    sr.setPickedRouteID(currentRoute);
+                }
+            }
+        });
+
+
         // initializes tl duration spinner
         SpinnerValueFactory<Integer> duration =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 20); //min, max, start
         durationTL.setValueFactory(duration);
     }
+
 
     @FXML
     private void mouseClicked(MouseEvent event) {
@@ -485,6 +513,16 @@ public class GuiController {
         // still needs fix for small gap between buttons and menus at the top
     }
 
+    /**
+     * Closes specific menu and un-selects button
+     * @param button
+     * @param menu
+     */
+    private void closeSpecificMenu(ToggleButton button, AnchorPane menu) {
+        button.setSelected(false);
+        menu.setVisible(false);
+    }
+
     private void disableAllTopMenuButtons() {
 
     }
@@ -549,6 +587,8 @@ public class GuiController {
     protected void onTrafficLight() {
         sr.setSeeTrafficLightIDs(!sr.getSeeTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
+        closeSpecificMenu(stressTestButton, stressTestMenu);
+        closeSpecificMenu(createButton, createMenu);
 
         phaseIndexSelector.setDisable(!toggleTrafficLightPermanently.isSelected()); // disable if not selected
 
@@ -602,11 +642,15 @@ public class GuiController {
     @FXML
     protected void onStressTest(){
         toggleMenuAtButton(stressTestMenu, stressTestButton);
+        closeSpecificMenu(trafficLightButton, trafficLightMenu);
+        //closeSpecificMenu(createButton, createMenu);
     }
 
     @FXML
     private void onCreate() {
         toggleMenuAtButton(createMenu, createButton);
+        closeSpecificMenu(trafficLightButton, trafficLightMenu);
+        //closeSpecificMenu(stressTestButton, stressTestMenu);
     }
 
     /**
@@ -684,6 +728,18 @@ public class GuiController {
     }
 
     @FXML
+    private void onShowDataView() {
+        if (!dataView.isSelected()) {
+            staticMap.widthProperty().bind(middlePane.widthProperty().multiply(1.25));
+            staticMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+            dataPane.setVisible(false);
+        } else {
+            dataPane.setVisible(true);
+            rescale();
+        }
+    }
+
+    @FXML
     protected void onDensityAnchorToggle() {
         sr.setShowDensityAnchor(showDensityAnchor.isSelected());
     }
@@ -722,12 +778,10 @@ public class GuiController {
         boolean wasRunning = !wrapperController.isPaused();
         if(wasRunning) wrapperController.stopSim();
         String mode = stressTestMode.getValue();
-        if (mode.equals("Light Test")) {
-            wrapperController.StressTest(1000, Color.GREEN, null);
-        } else if (mode.equals("Medium Test")) {
-            wrapperController.StressTest(2500, Color.YELLOW, null);
-        } else if (mode.equals("Heavy Test")) {
-            wrapperController.StressTest(5000, Color.RED, null);
+        switch (mode) {
+            case "Light Test" -> wrapperController.StressTest(1000, Color.GREEN, null);
+            case "Medium Test" -> wrapperController.StressTest(2500, Color.YELLOW, null);
+            case "Heavy Test" -> wrapperController.StressTest(5000, Color.RED, null);
         }
         if(wasRunning) wrapperController.startSim();
     }
@@ -839,8 +893,8 @@ public class GuiController {
         }
 
         //Setup new Axis Data
-        activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
-        percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+        //activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
+        //percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
 
         if(activeVehiclesSeries.getData().size()>300) {
             activeVehiclesSeries.getData().removeFirst();
@@ -1009,40 +1063,31 @@ public class GuiController {
      * </p>
      */
     private void updateTLPhaseText() {
-
+        String id = tlSelector.getValue();
         // update possible phases
-        List<TrafficLightPhase> phasesC;
-        String[] count;
-        phasesC =  wrapperController.getTrafficLightPhases(tlSelector.getValue()); // for displaying phases
-        count = new String[phasesC.size()];
-        for (int i = 0; i < phasesC.size(); i++) {
-            count[i] = ""+i;
-        }
-        phaseIndexSelector.setItems(FXCollections.observableArrayList(count));
-        phaseSetSelector.setItems(FXCollections.observableArrayList(count));
+        List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(id);
 
+        // List view: All phases
         stateText.getItems().clear(); // clears old content
-        String[] stateDur = wrapperController.getTlStateDuration(tlSelector.getValue());
-        List<TrafficLightPhase> phases = wrapperController.getTrafficLightPhases(tlSelector.getValue());
         String[] output = new String[phases.size()+1]; // size of phases + additional line
         int j = 0;
+        // builds string like: phases... current phase at the end
         for  (TrafficLightPhase phase : phases) {
             output[j] = "Phase: "+phase.getIndex() +", " + phase.getState() +", dur:"+ phase.getDuration();
             j++;
         }
 
-        String phaseIndex = String.valueOf(wrapperController.getCurrentTLPhaseIndex(tlSelector.getValue()));
+        // List view: Current phase
+        String phaseIndex = String.valueOf(wrapperController.getCurrentTLPhaseIndex(id)); // index of active phase
         String text ="";
-        double nextSwitchAbsolute = Double.parseDouble(stateDur[stateDur.length-1]); // returns time when tl is switched
+        double nextSwitchAbsolute = wrapperController.getTLNextSwitch(id); // returns time when tl is switched
         double currentTime = wrapperController.getTime(); // current time of sim
         double remaining = nextSwitchAbsolute - currentTime; // remaining time
-        for (int i=0; i<stateDur.length-2; i++) {
-            text = text + stateDur[i];
-        }
-        text = "Curr Phase "+phaseIndex+": " +text + ", dur: "+ remaining +"/"+ stateDur[stateDur.length-2];
+        String stringPhase = wrapperController.getTLStateString(id);
+
+        text = "Curr Phase "+phaseIndex+": " +stringPhase + ", dur: "+ remaining +"/"+ wrapperController.getTLDuration(id);
         output[output.length-1] = text;
         stateText.setItems(FXCollections.observableArrayList(output));
-        //stateText.setText(text);
     }
 
 
@@ -1060,36 +1105,11 @@ public class GuiController {
             @Override
             public void handle(long timestamp) {
                 renderUpdate();
-                checkPerFrame();
             }
         };
         renderLoop.start(); // runs 60 frames per second
     }
 
-    private void checkPerFrame(){
-        // Only allow injection if there are routes
-        if(wrapperController.isRouteListEmpty()) {
-            addVehicleButton.setDisable(true);
-            startTestButton.setDisable(true);
-        } else {
-            addVehicleButton.setDisable(false);
-            startTestButton.setDisable(false);
-        }
-        
-        if(addMenu.isVisible() && !(routeSelector.getValue().isEmpty())){
-                    String Route = routeSelector.getValue();
-                    sr.setPickedRouteID(Route);
-        }
-        
-        if (!dataView.isSelected()) {
-            staticMap.widthProperty().bind(middlePane.widthProperty());
-            staticMap.heightProperty().bind(middlePane.heightProperty());
-            dataPane.setVisible(false);
-        } else {
-            dataPane.setVisible(true);
-            rescale();
-        }
-    }
 
     private void stopRenderer() {
         if (renderLoop != null) {

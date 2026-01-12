@@ -382,6 +382,16 @@ public class TrafficLightWrap extends SelectableObject {
         return stateArray;
     }
 
+    public String getCurretStateString() {
+        String state ="";
+        try {
+            state = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(id));
+        } catch (Exception e) {
+            return state;
+        }
+        return state;
+    }
+
 
     // other
 
