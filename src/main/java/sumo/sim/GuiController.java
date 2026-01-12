@@ -1331,12 +1331,12 @@ public class GuiController {
 
     @FXML
     protected void changeToMap1() {
-        changeMap("Frankfurt");
+        changeMap("Frankfurt1");
     }
 
     @FXML
     protected void changeToMap2() {
-        changeMap("RugMap");
+        changeMap("Frankfurt2");
     }
 
     @FXML
