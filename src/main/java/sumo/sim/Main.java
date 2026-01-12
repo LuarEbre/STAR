@@ -14,5 +14,4 @@ public class Main {
         // Main program to run the entire simulation
         Application.launch(GuiApplication.class);
     }
-
 }

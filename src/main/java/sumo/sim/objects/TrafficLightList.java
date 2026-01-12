@@ -8,6 +8,7 @@ import sumo.sim.logic.WrapperController;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -194,4 +195,17 @@ public class TrafficLightList {
             tl.deselect();
         }
     }
+
+    /*
+    public HashMap<String, Integer> getCurrentGYR() {
+        HashMap<String, Integer> gyr = new HashMap<>();
+
+        for (TrafficLightWrap tl : trafficlights) {
+            tl.get
+        }
+
+        return gyr;
+    }
+
+     */
 }
