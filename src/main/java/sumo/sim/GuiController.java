@@ -513,6 +513,16 @@ public class GuiController {
         // still needs fix for small gap between buttons and menus at the top
     }
 
+    /**
+     * Closes specific menu and un-selects button
+     * @param button
+     * @param menu
+     */
+    private void closeSpecificMenu(ToggleButton button, AnchorPane menu) {
+        button.setSelected(false);
+        menu.setVisible(false);
+    }
+
     private void disableAllTopMenuButtons() {
 
     }
@@ -577,6 +587,8 @@ public class GuiController {
     protected void onTrafficLight() {
         sr.setSeeTrafficLightIDs(!sr.getSeeTrafficLightIDs());
         toggleMenuAtButton(trafficLightMenu, trafficLightButton);
+        closeSpecificMenu(stressTestButton, stressTestMenu);
+        closeSpecificMenu(createButton, createMenu);
 
         phaseIndexSelector.setDisable(!toggleTrafficLightPermanently.isSelected()); // disable if not selected
 
@@ -630,11 +642,15 @@ public class GuiController {
     @FXML
     protected void onStressTest(){
         toggleMenuAtButton(stressTestMenu, stressTestButton);
+        closeSpecificMenu(trafficLightButton, trafficLightMenu);
+        //closeSpecificMenu(createButton, createMenu);
     }
 
     @FXML
     private void onCreate() {
         toggleMenuAtButton(createMenu, createButton);
+        closeSpecificMenu(trafficLightButton, trafficLightMenu);
+        //closeSpecificMenu(stressTestButton, stressTestMenu);
     }
 
     /**
