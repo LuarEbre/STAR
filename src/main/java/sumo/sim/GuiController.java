@@ -840,6 +840,7 @@ public class GuiController {
         updateDelay();
         updateCountVeh();
         if (trafficLightMenu.isVisible()) { updateTLPhaseText(); }
+
         this.updateDataPane();
     }
 
@@ -888,15 +889,12 @@ public class GuiController {
     public void updateDataPane() {
 
         Locale.setDefault(Locale.US);
-        VehicleList vehicles = wrapperController.getVehicles();
         String currentTab = tabPane.getSelectionModel().getSelectedItem().getText();
 
-        // Graphs Updates
-
         // Data needed for both Graphs and Overall
+        int activeCount = wrapperController.getVehicles().getActiveCount();
         int simTime = (int)wrapperController.getTime();
-        int activeCount = vehicles.getActiveCount();
-        int currentlyStopped = vehicles.getStoppedCount();
+        int currentlyStopped = wrapperController.getVehicles().getStoppedCount();
 
         float stoppedPercentage = 0f;
         if (activeCount > 0) {
@@ -904,8 +902,10 @@ public class GuiController {
         }
 
         // Setup new Axis Data
-        activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
-        percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+        if ((int) wrapperController.getTime() % 4 == 0) {
+            activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
+            percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+        }
 
         if(activeVehiclesSeries.getData().size()>300) {
             activeVehiclesSeries.getData().removeFirst();
@@ -913,9 +913,9 @@ public class GuiController {
         }
 
         if (currentTab.equals("Overall")) {
-            int stoppedTime = vehicles.getStoppedTime();
+            int stoppedTime = wrapperController.getVehicles().getStoppedTime();
             int overallVehicleCount = wrapperController.getAllVehicleCount();
-            int queuedCount = vehicles.getQueuedCount();
+            int queuedCount = wrapperController.getVehicles().getQueuedCount();
             int exitedCount = overallVehicleCount - activeCount - queuedCount;
 
             this.activeVehicles.setText(Integer.toString(activeCount));
@@ -923,8 +923,8 @@ public class GuiController {
             this.DepartedVehicles.setText(Integer.toString(exitedCount));
             this.VehiclesCurrentlyStopped.setText(String.format("%d (%.2f%%)", currentlyStopped, stoppedPercentage));
             this.TotalTimeSpentStopped.setText(this.rawSecondsToHMS(stoppedTime));
-            this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
-            this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
+            this.MeanSpeed.setText(String.format("%.2f m/s", wrapperController.getVehicles().getMeanSpeed()));
+            this.SpeedSD.setText(String.format("%.2f m/s", wrapperController.getVehicles().getSpeedStdDev()));
         } else if (currentTab.equals("Selected")) {
             SelectableObject selectedObject = wrapperController.getSelectedObject();
             if(selectedObject != null) {
@@ -979,7 +979,7 @@ public class GuiController {
                     this.remainingDur.setText(String.format("%d / %d ", (int)remaining, (int)tl.getDuration()));
                 }
             }
-        } else if (currentTab.equals("Graphs")) {
+        } else if (currentTab.equals("Graphs") && (int) wrapperController.getTime() % 2 == 0) {
 
             HashMap<String, Integer> gyr = wrapperController.getTrafficLights().getCurrentGYR();
 
