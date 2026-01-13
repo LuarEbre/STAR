@@ -117,7 +117,7 @@ public class WrapperController {
      * Starts/Continues the simulation.
      * If the connection is closed it will terminate immediate.
      */
-    public void start() { // maybe with connection as argument? closing connection opened prior
+    private void start() { // maybe with connection as argument? closing connection opened prior
         if (executor != null && !executor.isShutdown()) {
             return;
         }
