@@ -3,6 +3,7 @@ package sumo.sim.objects;
 import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.util.GenericList;
 
 import java.util.ArrayList;
 import java.util.*;
@@ -13,7 +14,7 @@ import java.util.logging.Logger;
  * Holds every JunctionWrap Object
  * @author simonr
  */
-public class JunctionList {
+public class JunctionList implements GenericList {
     //private final Set<JunctionWrap> junctions = new HashSet<>();
     private final ArrayList<JunctionWrap> junctions = new ArrayList<>(); // List of TrafficLights
     private int count;

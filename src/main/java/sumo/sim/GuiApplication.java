@@ -1,6 +1,7 @@
 package sumo.sim;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
@@ -11,6 +12,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import sumo.sim.logic.SumoMapManager;
 import sumo.sim.logic.WrapperController;
+
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.io.IOException;
@@ -51,8 +54,15 @@ public class GuiApplication extends Application {
 
         Scene scene = new Scene(fxmlLoader.load());
 
-        Image appIcon = new Image(getClass().getResourceAsStream("/Gui/Icons/STAR.png"));
-        stage.getIcons().add(appIcon);
+        Platform.runLater(() -> {
+            var iconStream = getClass().getResourceAsStream("/Gui/Icons/STAR.png");
+            if (iconStream != null) {
+                Image appIcon = new Image(iconStream);
+                stage.getIcons().add(appIcon);
+            } else {
+                logger.log(Level.FINE, "Error while initializing icon");
+            }
+        });
 
         // link to css file
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());

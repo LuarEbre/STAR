@@ -5,6 +5,7 @@ import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
 import sumo.sim.data.CSV;
+import sumo.sim.util.GenericList;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
  * to iterate over vehicles while another thread tries to add or remove vehicles.
  * </p>
  */
-public class VehicleList {
+public class VehicleList implements GenericList {
     private final CopyOnWriteArrayList<VehicleWrap> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count

@@ -43,6 +43,7 @@ public class WrapperController {
     private double simTime;
 
     private String currentMap = "Frankfurt";
+    private long stepCounter = 0;
     //private XML netXml;
 
     // config
@@ -217,8 +218,8 @@ public class WrapperController {
             vl.updateAllVehicles();
             tl.updateAllCurrentState();
             sl.updateStreets();
-            //vl.printVehicles();
-            simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
+
+            simTime = (double) connection.do_job_get(Simulation.getTime());
             if (!terminated) {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
@@ -284,9 +285,15 @@ public class WrapperController {
      * @param color Color based on Hex code
      */
     public void addVehicle(int amount, String type, String route, Color color) {
-        // used by guiController, executes addVehicle from WrapperVehicle
-        vl.addVehicle(amount, type, route, color);
-        logger.log(Level.INFO, amount + " Vehicles added on Route: " + route);
+        if (executor != null && !executor.isShutdown()) {
+            executor.execute(() -> {
+                // execution queue
+                vl.addVehicle(amount, type, route, color);
+                logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
+            });
+        } else {
+            //new Thread(() -> vl.addVehicle(amount, type, route, color)).start();
+        }
     }
 
     public void addRoute(String start, String end, String id) {
@@ -342,14 +349,15 @@ public class WrapperController {
      * @return e.g.: [g,r,y,80] -> state , last element is duration
      */
     public String[] getTlStateDuration(String tlID) {
-        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
+        TrafficLightWrap trafLight = tl.getTL(tlID);
+        String [] ret = new String[trafLight.getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
         int j = 0;
         for (int i=0; i<ret.length-2; i++) {
-            ret[i] = tl.getTL(tlID).getCurrentState()[j];
+            ret[i] = trafLight.getCurrentState()[j];
             j += 2; // 0,2,4,8
         }
-        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
-        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
+        ret[ret.length-2] = ""+trafLight.getDuration();
+        ret[ret.length-1] = ""+trafLight.getNextSwitch();
 
         return ret; // [g,r,y,80] -> state , last element is duration
     }
@@ -373,6 +381,9 @@ public class WrapperController {
         return null;
     }
 
+    public double getTLDuration(String tlID) {return tl.getTL(tlID).getDuration(); }
+    public double getTLNextSwitch(String tlID) { return tl.getTL(tlID).getNextSwitch(); }
+    public String getTLStateString(String tlID) {return tl.getTL(tlID).getCurretStateString(); }
     public String[] getTLCurrentState(String id) {return tl.getTL(id).getCurrentState();}
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }
