@@ -184,13 +184,14 @@ public class SimulationRenderer {
     }
 
     private void renderSelectableObjects() {
+        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
         gc.setFill(Color.rgb(66,245,245,0.5));
         for(VehicleWrap v: vl.getVehicles()) {
-            float width = v.getSelectRadius()*2;
-            gc.fillRect(v.getPosition().x-width/2, v.getPosition().y-width/2, width, width);
+            if(v.exists()) {
+                gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+            }
         }
         for(TrafficLightWrap tl : tls.getTrafficlights()) {
-            float width = tl.getSelectRadius()*2;
             gc.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
         }
     }
@@ -245,7 +246,6 @@ public class SimulationRenderer {
             if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
                     || s.getMaxY() < viewMinY || s.getMinY() > viewMaxY) continue;
             int countLanes = s.getLanes().size();
-            int laneIndex = 0;
             double[] meanLaneX = null;
             double[] meanLaneY = null;
 
@@ -264,11 +264,12 @@ public class SimulationRenderer {
 
                 int limit = Math.min(meanLaneX.length, rawX.length); // out of bounce check -> if not the same size
 
+                /* // should be calculated in street
                 for (int i = 0; i < limit; i++) {
                     meanLaneX[i] += rawX[i];
                     meanLaneY[i] += rawY[i];
                     // sums up all point for mean calculation later
-                }
+                } */
 
                 // Draws Lanes
                 if (rawX.length >= 2) {
@@ -280,6 +281,7 @@ public class SimulationRenderer {
                 }
             }
 
+            /*
             // test, only works if lanesCount == 2 , if odd -> cant place line in the middle, if even: needs offset
             // Draws lane lines
             if (meanLaneX != null) {
@@ -301,7 +303,7 @@ public class SimulationRenderer {
                 } else if (countLanes % 2 == 1) {
 
                 }
-            }
+            } */
         }
 
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
