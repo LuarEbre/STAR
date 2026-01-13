@@ -9,6 +9,7 @@ import sumo.sim.util.GenericList;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -22,7 +23,6 @@ public class TrafficLightList implements GenericList {
     private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final StreetList streetList;
-    private int count;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLightList.class.getName());
@@ -87,7 +87,7 @@ public class TrafficLightList implements GenericList {
      * Get amount of TrafficLights in TrafficLightList
      * @return amount of TrafficLights
      */
-    public int getCount() { return count; }
+    public int getCount() { return trafficlights.size(); }
 
     /**
      * Get all IDs of TrafficLights in TrafficLightList
@@ -194,5 +194,30 @@ public class TrafficLightList implements GenericList {
         for(TrafficLightWrap tl : trafficlights) {
             tl.deselect();
         }
+    }
+
+    public HashMap<String, Integer> getCurrentGYR() {
+        HashMap<String, Integer> gyr = new HashMap<>();
+        gyr.put("G", 0);
+        gyr.put("Y", 0);
+        gyr.put("R", 0);
+
+        for (TrafficLightWrap tl : trafficlights) {
+            String temp = tl.getCurrentStateString();
+
+            if(temp.contains("g") || temp.contains("G")) {
+                gyr.put("G", gyr.get("G") + 1);
+            }
+
+            if(temp.contains("y") || temp.contains("Y")) {
+                gyr.put("Y", gyr.get("Y") + 1);
+            }
+
+            if(temp.contains("r") || temp.contains("R")) {
+                gyr.put("R", gyr.get("R") + 1);
+            }
+        }
+
+        return gyr;
     }
 }
