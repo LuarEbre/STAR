@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Real-Time-Traffic-Simulation-with-Java:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Real_Time_Traffic_Simulation_with_Java_jar</output-path>
+    <root id="archive" name="Real-Time-Traffic-Simulation-with-Java.jar">
+      <element id="module-output" name="Real-Time-Traffic-Simulation-with-Java" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/25.0.1/javafx-graphics-25.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/25.0.1/javafx-graphics-25.0.1-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/25.0.1/javafx-base-25.0.1-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/25.0.1/javafx-fxml-25.0.1-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/25.0.1/javafx-controls-25.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/25.0.1/javafx-fxml-25.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/main/resources/JARs/jdom-2.0.6.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/25.0.1/javafx-controls-25.0.1-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/25.0.1/javafx-base-25.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/main/resources/JARs/TraaS.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

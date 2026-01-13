@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
@@ -6,12 +6,17 @@ import de.tudresden.sumo.objects.SumoTLSController;
 import de.tudresden.sumo.objects.SumoTLSPhase;
 import de.tudresden.sumo.objects.SumoTLSProgram;
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.SimulationRenderer;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
 
 import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper class representing a single Traffic Light, gets created by {@link TrafficLightList}
@@ -22,11 +27,14 @@ import java.util.*;
  * </p>
  *
  */
-public class TrafficLightWrap {
+public class TrafficLightWrap extends SelectableObject {
 
     private final SumoTraciConnection con;
     private final String id;
     private final Set<Street> controlledStreets;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLightWrap.class.getName());
 
     private String type; // types: static, actuated, delay based, offline, special, rail signal
     // program :
@@ -58,6 +66,7 @@ public class TrafficLightWrap {
      * @throws RuntimeException if there is an error parsing data or communicating with TraCI.
      */
     public TrafficLightWrap(String id, Map<String,String> Data, SumoTraciConnection con) {
+        super();
         this.id = id;
         this.con = con;
         this.controlledStreets = new HashSet<>();
@@ -76,6 +85,7 @@ public class TrafficLightWrap {
             loadPhases();
 
         } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to parse XML", e);
             throw new RuntimeException(e);
         }
     }
@@ -147,6 +157,7 @@ public class TrafficLightWrap {
         try {
             currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
             throw new RuntimeException(e);
         }
         stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
@@ -170,6 +181,7 @@ public class TrafficLightWrap {
         try {
             con.do_job_set(Trafficlight.setPhase(id,index));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set phase number of Traffic Light", e);
             throw new RuntimeException(e);
         }
     }
@@ -184,6 +196,7 @@ public class TrafficLightWrap {
         try {
             con.do_job_set(Trafficlight.setPhaseName(id, tlPhaseName));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set phase name of Traffic Light", e);
             throw new RuntimeException(e);
         }
     }
@@ -199,6 +212,7 @@ public class TrafficLightWrap {
         try {
             con.do_job_set(Trafficlight.setPhaseDuration(id, phaseDuration));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set phase duration of Traffic Light", e);
             throw new RuntimeException(e);
         }
     }
@@ -230,6 +244,7 @@ public class TrafficLightWrap {
                 phases.get(phaseIndex).setDuration(newDuration);
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set phase duration of Traffic Light", e);
             return;
         }
     }
@@ -239,6 +254,7 @@ public class TrafficLightWrap {
         try {
             con.do_job_set(Trafficlight.setProgram(id, programID));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set program of Traffic Light", e);
             throw new RuntimeException(e);
         }
     }
@@ -247,6 +263,7 @@ public class TrafficLightWrap {
         try {
             con.do_job_set(Trafficlight.setRedYellowGreenState(id, state));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set red yellow green state of Traffic Light", e);
             throw new RuntimeException(e);
         }
     }
@@ -268,6 +285,7 @@ public class TrafficLightWrap {
         try {
             ret = (int) con.do_job_get(Trafficlight.getPhase(id)); // gets phase of tl = 1, 2, 3
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to get phase number of Traffic Light", e);
             throw new RuntimeException(e);
         }
         return ret;
@@ -286,6 +304,7 @@ public class TrafficLightWrap {
         try {
             return (String) con.do_job_get(Trafficlight.getPhaseName(id));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to get phase name of Traffic Light", e);
             throw new RuntimeException(e);
         }
     }
@@ -313,6 +332,7 @@ public class TrafficLightWrap {
         try {
             duration =  (double) con.do_job_get(Trafficlight.getPhaseDuration(id)); // gets phase of tl = 1, 2, 3
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to get phase duration of Traffic Light", e);
             throw new RuntimeException(e);
         }
         return duration;
@@ -324,6 +344,7 @@ public class TrafficLightWrap {
         try {
             duration =  (double) con.do_job_get(Trafficlight.getNextSwitch(id)); // gets phase of tl = 1, 2, 3
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to get next switch of Traffic Light", e);
             throw new RuntimeException(e);
         }
         return duration;
@@ -341,6 +362,7 @@ public class TrafficLightWrap {
         try {
             return (String) con.do_job_get(Trafficlight.getProgram(id));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to get program of Traffic Light", e);
             throw new RuntimeException(e);
         }
     }
@@ -358,6 +380,16 @@ public class TrafficLightWrap {
 
     public String[] getCurrentState() {
         return stateArray;
+    }
+
+    public String getCurretStateString() {
+        String state ="";
+        try {
+            state = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(id));
+        } catch (Exception e) {
+            return state;
+        }
+        return state;
     }
 
 
@@ -379,6 +411,7 @@ public class TrafficLightWrap {
         try {
             //this.phase = (int) con.do_job_get(Trafficlight.getPhase(this.id));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to update phase of Traffic Light", e);
             throw new RuntimeException(e);
         }
 

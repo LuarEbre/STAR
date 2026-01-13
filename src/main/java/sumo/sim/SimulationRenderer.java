@@ -1,5 +1,6 @@
 package sumo.sim;
 
+import de.tudresden.sumo.cmd.Vehicle;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ScrollEvent;
@@ -9,9 +10,11 @@ import javafx.geometry.VPos;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
+import sumo.sim.objects.*;
+
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Handles the graphical rendering of the SUMO simulation onto a JavaFX {@link Canvas}.
@@ -27,7 +30,9 @@ public class SimulationRenderer {
     boolean showDensityAnchor;
     boolean showRouteHighlighting;
     boolean seeTrafficLightIDs;
+    boolean selectMode;
 
+    private Affine currentTransform = new Affine();
     private final GraphicsContext gc;
     private final Canvas map;
     private boolean showSelectablePoints;
@@ -50,6 +55,9 @@ public class SimulationRenderer {
     private double viewMaxX;
     private double viewMinY;
     private double viewMaxY;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(SimulationRenderer.class.getName());
 
     /**
      * Constructs a new SimulationRenderer called by {@link GuiController}
@@ -113,7 +121,8 @@ public class SimulationRenderer {
      * This method is called by {@link GuiController#renderUpdate()} method ~60 times per second
      * </p>
      */
-    public void initRender() {
+    public void initRender() throws RenderingException {
+
         updateViewportBounds();
         // area the size of canvas : frame -> canvas cords.
         // -> network: only do the following rendering with objects inside this restricting area;
@@ -124,8 +133,10 @@ public class SimulationRenderer {
 
         transform();
         renderMap();
+        if(this.selectMode) {
+            this.renderSelectableObjects();
+        }
     }
-
     // [ mxx , mxy , tx ]
     // [ myx , myy , ty ]
     // [  0  ,  0  ,  1 ]
@@ -149,19 +160,40 @@ public class SimulationRenderer {
      * </p>
      */
     private void transform() {
-        Affine transform = new Affine();
-        transform.appendTranslation(map.getWidth() / 2, map.getHeight() / 2); // moves 0,0 to map middle : add/sub
+        this.currentTransform.setToIdentity();
+        this.currentTransform.appendTranslation(map.getWidth() / 2, map.getHeight() / 2); // moves 0,0 to map middle : add/sub
         // [ 1 , 0 , width ]        [ x + w ] <-- this is our point x -> + is to the right on x
         // [ 0 , 1 , height ]  *    [ y+h ]  <-- this is our point y
         // [ 0 , 0 , 1 ]            [ 1 ] <-- homogeneuos (added 1 row )
-        transform.appendRotation(rotation);
-        transform.appendScale(zoom, -zoom); // - y because sumo y coords are reversed : mul / div
+        this.currentTransform.appendRotation(rotation);
+        this.currentTransform.appendScale(zoom, -zoom); // - y because sumo y coords are reversed : mul / div
         // [ xSc , 0 , 0 ]        [ x * xSc ]  Scales our point with xSc and ySc
         // [ 0 , ySC , 0 ]  *    [ y * ySc ]
         // [ 0 , 0 , 1 ]            [ 1 ]
-        transform.appendTranslation(-camX, -camY); // centralizes our view
-        gc.setTransform(transform); // applies new matrix to gc matrix
+        this.currentTransform.appendTranslation(-camX, -camY); // centralizes our view
+        gc.setTransform(currentTransform); // applies new matrix to gc matrix
+    }
 
+    public Point2D.Double screenToWorld(double x, double y) {
+        try {
+            javafx.geometry.Point2D worldPos = currentTransform.inverseTransform(x, y);
+            return new java.awt.geom.Point2D.Double(worldPos.getX(), worldPos.getY());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void renderSelectableObjects() {
+        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
+        gc.setFill(Color.rgb(66,245,245,0.5));
+        for(VehicleWrap v: vl.getVehicles()) {
+            if(v.exists()) {
+                gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+            }
+        }
+        for(TrafficLightWrap tl : tls.getTrafficlights()) {
+            gc.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
+        }
     }
 
     /**
@@ -172,7 +204,7 @@ public class SimulationRenderer {
      *     Performs rendering by parsing raw shapes of objects onto gc via the given lists
      * </p>
      */
-    private void renderMap() {
+    private void renderMap() throws RenderingException {
         // map color
         gc.setFill(Color.BLACK);
         gc.setStroke(Color.BLACK);
@@ -214,7 +246,6 @@ public class SimulationRenderer {
             if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
                     || s.getMaxY() < viewMinY || s.getMinY() > viewMaxY) continue;
             int countLanes = s.getLanes().size();
-            int laneIndex = 0;
             double[] meanLaneX = null;
             double[] meanLaneY = null;
 
@@ -233,11 +264,12 @@ public class SimulationRenderer {
 
                 int limit = Math.min(meanLaneX.length, rawX.length); // out of bounce check -> if not the same size
 
+                /* // should be calculated in street
                 for (int i = 0; i < limit; i++) {
                     meanLaneX[i] += rawX[i];
                     meanLaneY[i] += rawY[i];
                     // sums up all point for mean calculation later
-                }
+                } */
 
                 // Draws Lanes
                 if (rawX.length >= 2) {
@@ -249,6 +281,7 @@ public class SimulationRenderer {
                 }
             }
 
+            /*
             // test, only works if lanesCount == 2 , if odd -> cant place line in the middle, if even: needs offset
             // Draws lane lines
             if (meanLaneX != null) {
@@ -270,7 +303,7 @@ public class SimulationRenderer {
                 } else if (countLanes % 2 == 1) {
 
                 }
-            }
+            } */
         }
 
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
@@ -364,7 +397,7 @@ public class SimulationRenderer {
     /**
      * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(VehicleWrap, double, double)} for every vehicle (still on the map)
      */
-    private void renderVehicle() {
+    private void renderVehicle() throws RenderingException {
         for (VehicleWrap v : vl.getVehicles()) {
             if (!v.exists() && v.getPosition() == null) continue;
             // no need to translate coordinates since translation is already applied to graphics context
@@ -629,6 +662,8 @@ public class SimulationRenderer {
     protected void setPickedRouteID(String routeID) { this.RouteID = routeID; }
     protected boolean getPickedARoute() { return pickedARoute; }
     protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
+    protected boolean getSelectMode() { return selectMode; }
+    protected void setSelectMode(boolean selectMode) { this.selectMode = selectMode; }
 }
 
 
