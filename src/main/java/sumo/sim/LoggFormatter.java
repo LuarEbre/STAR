@@ -14,7 +14,6 @@ public class LoggFormatter extends Formatter {
     @Override
     public String format(LogRecord record) {
         return  "["+ new Date(record.getMillis())+ "]" + "::"
-                +record.getLongThreadID() + "::"
                 +record.getSourceClassName() + "::"
                 +record.getSourceMethodName() + "::"
                 +record.getMessage()+"\n";
