@@ -324,8 +324,8 @@ public class WrapperController {
         }
     }
 
-    public void addRoute(String start, String end, String id) {
-        rl.addRoute(start,end,id);
+    public boolean addRoute(String start, String end, String id) {
+        return rl.addRoute(start,end,id);
     }
 
     public void updateRoutes() {

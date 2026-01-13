@@ -3,10 +3,8 @@ package sumo.sim.objects;
 import de.tudresden.sumo.cmd.Edge;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
-import sumo.sim.data.XML;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,21 +12,35 @@ import java.util.logging.Logger;
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link Street#density}
  */
-public class Street {
-    private double maxSpeed; // same attributes as in .net
+public class Street extends SelectableObject {
+    // connection
     private final SumoTraciConnection con;
     private final String id;
+
     // List of <Lane> objects
     private final ArrayList<LaneWrap> lanes = new ArrayList<>();
     private String fromJunction;
     private String toJunction;
+
+    // attributes
+    private double maxSpeed; // same attributes as in .net
     private double density;
-    //private double noise;
     private double minX,minY,maxX,maxY; // for rendering optimization
-    private XML xml;
+    private double meanPositionX;
+    private double meanPositionY;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(Street.class.getName());
+
+    /**
+     * @param id Edge ID
+     * @param con an instance of {@link SumoTraciConnection}
+     */
+    public Street(String id, SumoTraciConnection con) {
+        this.id = id;
+        this.con = con;
+        calcMeanPosition();
+    }
 
     /**
      * @param id Edge ID
@@ -42,6 +54,7 @@ public class Street {
         this.fromJunction = from;
         this.toJunction = to;
         initializeStreet();
+        calcMeanPosition();
     }
 
     /**
@@ -62,15 +75,6 @@ public class Street {
     }
 
     /**
-     * @param id Edge ID
-     * @param con an instance of {@link SumoTraciConnection}
-     */
-    public Street(String id, SumoTraciConnection con) {
-        this.id = id;
-        this.con = con;
-    }
-
-    /**
      * Calculates the Street's density based on its length and the amount of vehicles currently on the Street
      */
     public void calcDensity(){
@@ -87,6 +91,30 @@ public class Street {
     }
 
     /**
+     *
+     */
+    private void calcMeanPosition() {
+        if (lanes.isEmpty()) return;
+        LaneWrap middleLane = lanes.get(lanes.size() / 2); // middle index
+
+        double[] rawX = middleLane.getShapeX();
+        double[] rawY = middleLane.getShapeY();
+
+        if (rawX == null || rawX.length < 2) return;
+        // Normal Line
+        if (rawX.length == 2) {
+            this.meanPositionX = (rawX[0] + rawX[1]) / 2.0;
+            this.meanPositionY = (rawY[0] + rawY[1]) / 2.0;
+        }
+
+        // Polyline
+        else {
+            this.meanPositionX = rawX[rawX.length / 2];
+            this.meanPositionY = rawY[rawX.length / 2];
+        }
+    }
+
+    /**
      * Calculates the Street's density each tick via {@link Street#calcDensity()} and sets the noise emission via {@link SumoTraciConnection#do_job_get(SumoCommand)}
      */
     public void updateStreet() {
@@ -99,36 +127,6 @@ public class Street {
             //this.noise = 0;
         }
     }
-
-    /**
-     * @return The {@link ArrayList} of {@link LaneWrap} objects contained in this street.
-     */
-    public ArrayList<LaneWrap> getLanes() { return lanes; }
-    /**
-     * @return This street's ID.
-     */
-    public String getId() { return id; }
-    /**
-     * @return ID of the junction where this street begins.
-     */
-    public String getFromJunction() { return fromJunction; }
-    /**
-     * @return ID of the junction where this street ends.
-     */
-    public String getToJunction() { return toJunction; }
-    /**
-     * @return {@link Street} itself.
-     */
-    public Street getStreet() { return this; }
-    /**
-     * Sets the current traffic density on this street.
-     * @param den The new density value
-     */
-    public void setDensity(double den) { this.density = den; }
-    /**
-     * @return Current traffic density on this street.
-     */
-    public double getDensity() { return density; }
 
     public void calculateBounds() {
         minX = Double.MAX_VALUE;
@@ -152,8 +150,19 @@ public class Street {
 
     }
 
+    // setter
+    public void setDensity(double den) { this.density = den; }
+    // getter
     public double getMinX() { return minX; }
     public double getMaxX() { return maxX; }
     public double getMinY() { return minY; }
     public double getMaxY() { return maxY; }
+    public double getMeanPositionX() { return meanPositionX; }
+    public double getMeanPositionY() { return meanPositionY; }
+    public ArrayList<LaneWrap> getLanes() { return lanes; }
+    public String getId() { return id; }
+    public String getFromJunction() { return fromJunction; }
+    public String getToJunction() { return toJunction; }
+    public Street getStreet() { return this; }
+    public double getDensity() { return density; }
 }

@@ -32,6 +32,7 @@ public class SimulationRenderer {
     boolean showRouteHighlighting;
     boolean seeTrafficLightIDs;
     boolean selectMode;
+    boolean createRouteMode;
     private boolean showSelectablePoints;
     private boolean pickedARoute;
     private boolean viewDensityOn;
@@ -156,9 +157,6 @@ public class SimulationRenderer {
         // render dynamic Objects always
         renderDynamicMap();
 
-        if(this.selectMode) {
-            this.renderSelectableObjects();
-        }
     }
     // [ mxx , mxy , tx ]
     // [ myx , myy , ty ]
@@ -223,11 +221,6 @@ public class SimulationRenderer {
         gcStatic.fillRect(0, 0, mapStatic.getWidth(), mapStatic.getHeight()); // covers whole screen (edge detection)
         gcStatic.setTransform(currentTransform);
 
-        // map color
-        gcStatic.setFill(Color.BLACK);
-        gcStatic.setStroke(Color.BLACK);
-        gcStatic.setLineWidth(scale);
-
         List<String> currentRoute = (pickedARoute && RouteID != null) ? rl.getAllRoutes().get(RouteID) : null;
 
         for (Street s : sl.getStreets()) {
@@ -235,7 +228,20 @@ public class SimulationRenderer {
             if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
                     || s.getMaxY() < viewMinY || s.getMinY() > viewMaxY) continue;
 
+            // Route mode
+            if (createRouteMode) {
+                double radius = 5.0;
+                double sidelength = radius * 2;
+
+                gcStatic.setFill(Color.RED);
+                gcStatic.fillRect(s.getMeanPositionX() - radius, s.getMeanPositionY() - radius, sidelength, sidelength);
+            }
             String streetId = s.getId();
+
+            // map color
+            gcStatic.setFill(Color.BLACK);
+            gcStatic.setStroke(Color.BLACK);
+            gcStatic.setLineWidth(scale);
 
             // Route highlighting
             if (currentRoute != null && !currentRoute.isEmpty() && showRouteHighlighting) {
@@ -668,6 +674,7 @@ public class SimulationRenderer {
     protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
     protected boolean getSelectMode() { return selectMode; }
     protected void setSelectMode(boolean selectMode) { this.selectMode = selectMode; }
+    protected void setRouteCreateMode(boolean mode) {this.createRouteMode = mode;}
 }
 
 
