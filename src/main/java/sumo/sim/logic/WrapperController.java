@@ -42,6 +42,7 @@ public class WrapperController {
     private boolean paused;
     private double simTime;
     private long stepCounter = 0;
+    private String currentMap = "Frankfurt";
     //private XML netXml;
 
     // config
@@ -50,6 +51,11 @@ public class WrapperController {
     public static String currentRou = null;
     public String sumoBinary;
 
+    // data export
+    /*private final List<VehicleWrap> allTimeVehicles = new ArrayList<>();
+    private int stepCounter = 0;
+    private final int exportSamplingRate = 100;
+    */
     //Logger
     private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
@@ -66,7 +72,7 @@ public class WrapperController {
                 : "src/main/resources/Binaries/sumo";
 
         // config knows both .rou and .net XMLs
-        mapConfig = mapManager.getConfig("Frankfurt"); // Frankfurt, TestMap
+        mapConfig = mapManager.getConfig("Frankfurt1"); // Frankfurt, TestMap
         String configFile = mapConfig.getConfigPath().toString();
         currentNet = mapConfig.getNetPath().toString();
         currentRou = mapConfig.getRouPath().toString();
@@ -88,7 +94,7 @@ public class WrapperController {
 
         try {
             connection.runServer(8813); // preventing random port
-            System.out.println("Connected to Sumo.");
+            logger.log(Level.INFO, "Connected to Sumo");
 
             vl = new VehicleList(connection);
             sl = new StreetList(this.connection);
@@ -202,6 +208,26 @@ public class WrapperController {
      */
     public void stopSim() {
         paused = true;
+
+        /*try {
+
+            String desktopPath = System.getProperty("user.home") + "/Schreibtisch/";
+
+            // testfiles
+            File pdfFile = new File(desktopPath + "SUMO_Test_Report.pdf");
+            File csvFile = new File(desktopPath + "SUMO_Test_Data.csv");
+
+            System.out.println(">>> TEST: Start export zo desktop...");
+
+            this.generateExport(pdfFile);
+            this.generateExport(csvFile);
+
+            System.out.println(">>> TEST: export done!");
+        } catch (Exception e) {
+            System.err.println(">>> TEST: error: " + e.getMessage());
+            e.printStackTrace();
+        }*/
+
     }
 
     /**
@@ -213,6 +239,12 @@ public class WrapperController {
         try {
             connection.do_timestep();
             vl.updateAllVehicles();
+            // safes disappeared vehicles for data export
+            /*for (VehicleWrap v : vl.getVehicles()) {
+                if (!v.exists() && !allTimeVehicles.contains(v)) {
+                    allTimeVehicles.add(v);
+                }
+            }*/
             tl.updateAllCurrentState();
             sl.updateStreets();
 
@@ -229,7 +261,7 @@ public class WrapperController {
     }
 
     public void mapSwitch(String mapName) {
-        System.out.println("Map Switch to: " + mapName);
+        logger.log(Level.INFO, "Map switching to " + mapName);
         paused = true;
         terminated = true; // stops executor
 
@@ -248,6 +280,8 @@ public class WrapperController {
                 currentNet = mapConfig.getNetPath().toString();
                 currentRou = mapConfig.getRouPath().toString();
 
+                this.currentMap = mapName;
+
                 this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath().toString()); // new connection
                 simTime = 0;
 
@@ -265,7 +299,6 @@ public class WrapperController {
 
             } catch (Exception e) {
                 logger.log(Level.FINE, "Failed to switch maps", e);
-                System.err.println("Error switching maps: " + e.getMessage());
             }
         }).start();
     }
@@ -308,10 +341,30 @@ public class WrapperController {
         Map<String, List<String>> Routes = rl.getAllRoutes();
         int amount_per = amount/Routes.size();
         type = (type == null) ? "DEFAULT_VEHTYPE" : type;
+
+        logger.log(Level.INFO, "Stress testing for " + amount);
+
         for(String key : Routes.keySet()) {
             addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
         }
     }
+    /*public void generateExport(File file) {
+        // collect archieved and acitve vehicles
+        List<VehicleWrap> exportVehicles = new ArrayList<>(allTimeVehicles);
+        if (vl != null && vl.getVehicles() != null) {
+            exportVehicles.addAll(vl.getVehicles());
+        }
+
+        try {
+            if (file.getName().endsWith(".pdf")) {
+                DataExport.exportAsPDF(file, exportVehicles, sl.getStreets(), tl.getTrafficlights());
+            } else {
+                DataExport.exportAsCSV(file, exportVehicles, sl.getStreets(), tl.getTrafficlights(), this.simTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
 
 
     /**
@@ -362,8 +415,8 @@ public class WrapperController {
            }
         }
         // if no map is selected (error) automatically choose Map1
-        mapSwitch("Frankfurt");
-        return "Frankfurt";
+        mapSwitch("Frankfurt1");
+        return "Frankfurt1";
     }
 
     public SelectableObject getSelectedObject() {
@@ -375,7 +428,7 @@ public class WrapperController {
 
     public double getTLDuration(String tlID) {return tl.getTL(tlID).getDuration(); }
     public double getTLNextSwitch(String tlID) { return tl.getTL(tlID).getNextSwitch(); }
-    public String getTLStateString(String tlID) {return tl.getTL(tlID).getCurretStateString(); }
+    public String getTLStateString(String tlID) {return tl.getTL(tlID).getCurrentStateString(); }
     public String[] getTLCurrentState(String id) {return tl.getTL(id).getCurrentState();}
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }
@@ -389,6 +442,8 @@ public class WrapperController {
     public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
     public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
     public boolean isPaused() { return paused; }
+    public String getCurrentMap() { return currentMap; }
+    public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -399,5 +454,5 @@ public class WrapperController {
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
 
-    
+
 }
