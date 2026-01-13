@@ -1,12 +1,16 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import sumo.sim.*;
+import sumo.sim.objects.*;
+import sumo.sim.util.Util;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -37,6 +41,7 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private long stepCounter = 0;
     //private XML netXml;
 
     // config
@@ -44,6 +49,9 @@ public class WrapperController {
     public static String currentNet = null;
     public static String currentRou = null;
     public String sumoBinary;
+
+    //Logger
+    private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
     // data export
     /*private final List<VehicleWrap> allTimeVehicles = new ArrayList<>();
@@ -82,6 +90,7 @@ public class WrapperController {
 
     private void initializeSimulationStart() {
         connection.addOption("start", "true");
+
         try {
             connection.runServer(8813); // preventing random port
             System.out.println("Connected to Sumo.");
@@ -97,6 +106,8 @@ public class WrapperController {
             start();
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to start Sumo Simulation", e);
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -120,6 +131,7 @@ public class WrapperController {
             try {
                 doStepUpdate(); // sim step
             } catch (IllegalStateException e) {
+                logger.log(Level.WARNING, "Failed to do a Simulation Step", e);
                 terminate();
             }
 
@@ -144,6 +156,7 @@ public class WrapperController {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "Failed to shutdown executor", e);
                 executor.shutdownNow();
             }
         }
@@ -152,7 +165,9 @@ public class WrapperController {
             try {
                 connection.close();
             } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to close connection", e);
                 System.err.println("Error while closing connection: " + e.getMessage());
+                throw new RuntimeException();
             }
         }
     }
@@ -166,7 +181,14 @@ public class WrapperController {
     public void changeDelay(int delay) {
         this.delay = delay;
         if (!executor.isShutdown() && executor!= null) {
-            executor.shutdownNow();
+            try {
+                executor.shutdown();
+                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         terminated = false;
         paused = false;
@@ -224,6 +246,8 @@ public class WrapperController {
             }*/
             tl.updateAllCurrentState();
             sl.updateStreets();
+
+            simTime = (double) connection.do_job_get(Simulation.getTime());
             //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
             //stepCounter++;
@@ -231,6 +255,7 @@ public class WrapperController {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to update Sim Step", e);
             terminate();
             throw new RuntimeException(e);
         }
@@ -273,6 +298,7 @@ public class WrapperController {
                 Platform.runLater(() -> guiController.initializeCon(this));
 
             } catch (Exception e) {
+                logger.log(Level.FINE, "Failed to switch maps", e);
                 System.err.println("Error switching maps: " + e.getMessage());
             }
         }).start();
@@ -281,15 +307,22 @@ public class WrapperController {
     // Main Button features
 
     /**
-     * Used by {@link GuiController} to add Vehicles
+     * Used by {@link GuiController} to add Vechicles
      * @param amount How many Vehicles will spawn
      * @param type Sets type based on existing types in .rou XML
      * @param route Sets route
      * @param color Color based on Hex code
      */
     public void addVehicle(int amount, String type, String route, Color color) {
-        // used by guiController, executes addVehicle from WrapperVehicle
-        vl.addVehicle(amount, type, route, color);
+        if (executor != null && !executor.isShutdown()) {
+            executor.execute(() -> {
+                // execution queue
+                vl.addVehicle(amount, type, route, color);
+                logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
+            });
+        } else {
+            //new Thread(() -> vl.addVehicle(amount, type, route, color)).start();
+        }
     }
 
     public void addRoute(String start, String end, String id) {
@@ -359,14 +392,15 @@ public class WrapperController {
      * @return e.g.: [g,r,y,80] -> state , last element is duration
      */
     public String[] getTlStateDuration(String tlID) {
-        String [] ret = new String[tl.getTL(tlID).getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
+        TrafficLightWrap trafLight = tl.getTL(tlID);
+        String [] ret = new String[trafLight.getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
         int j = 0;
         for (int i=0; i<ret.length-2; i++) {
-            ret[i] = tl.getTL(tlID).getCurrentState()[j];
+            ret[i] = trafLight.getCurrentState()[j];
             j += 2; // 0,2,4,8
         }
-        ret[ret.length-2] = ""+(tl.getTL(tlID).getDuration());
-        ret[ret.length-1] = ""+(tl.getTL(tlID).getNextSwitch());
+        ret[ret.length-2] = ""+trafLight.getDuration();
+        ret[ret.length-1] = ""+trafLight.getNextSwitch();
 
         return ret; // [g,r,y,80] -> state , last element is duration
     }
@@ -383,6 +417,16 @@ public class WrapperController {
         return "Frankfurt1";
     }
 
+    public SelectableObject getSelectedObject() {
+        // works because only one object can be selected at a time
+        for(VehicleWrap v : vl.getVehicles()) if (v.isSelected()) return v;
+        for(TrafficLightWrap tl : tl.getTrafficlights()) if (tl.isSelected()) return tl;
+        return null;
+    }
+
+    public double getTLDuration(String tlID) {return tl.getTL(tlID).getDuration(); }
+    public double getTLNextSwitch(String tlID) { return tl.getTL(tlID).getNextSwitch(); }
+    public String getTLStateString(String tlID) {return tl.getTL(tlID).getCurretStateString(); }
     public String[] getTLCurrentState(String id) {return tl.getTL(id).getCurrentState();}
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }
@@ -395,6 +439,7 @@ public class WrapperController {
     public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
     public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
     public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
+    public boolean isPaused() { return paused; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -404,5 +449,6 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
-    
+
+
 }

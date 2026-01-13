@@ -1,12 +1,17 @@
-package sumo.sim;
+package sumo.sim.data;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CSV {
 
     private final String File;
     private final FileWriter fw;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(CSV.class.getName());
 
     public CSV(String csvFile) throws IOException {
         this.File = csvFile;
@@ -23,7 +28,7 @@ public class CSV {
             }
 
         } catch (IOException i) {
-            System.out.println("Could not write Data to CSV File" + i);
+            logger.log(Level.SEVERE, "Error while writing to CSV", i);
         }
     }
 

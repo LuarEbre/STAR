@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.util;
 
 public class Logger {
 }

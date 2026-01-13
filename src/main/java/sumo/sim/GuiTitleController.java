@@ -10,11 +10,16 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GuiTitleController {
     private static GuiController guiController;
     @FXML
     private Button startButton;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(GuiTitleController.class.getName());
 
     @FXML
     protected void start() {
@@ -35,6 +40,7 @@ public class GuiTitleController {
             stage.setFullScreen(true);
             stage.show();
         } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to load FXML", e);
             throw new RuntimeException(e);
         }
     }

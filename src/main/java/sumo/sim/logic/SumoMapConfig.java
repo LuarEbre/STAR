@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.logic;
 
 import java.io.File;
 

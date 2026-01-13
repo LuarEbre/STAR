@@ -8,7 +8,11 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
+        //Set up Logger
+        StarLogger.setupLogger();
+
         // Main program to run the entire simulation
         Application.launch(GuiApplication.class);
     }
+
 }
