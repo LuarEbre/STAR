@@ -50,7 +50,7 @@ public class GuiController {
     // all FXML objects
     @FXML
     private AnchorPane dataPane, root, middlePane, addMenu, tlVisualizerPane,
-            filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu, createMenu;
+            filtersMenuSelect, mapMenuSelect, viewMenuSelect, stressTestMenu, trafficLightMenu, createMenu, exportPane;
     @FXML
     private ColorPicker colorSelector;
     @FXML
@@ -111,6 +111,7 @@ public class GuiController {
 
     // sim
     private WrapperController wrapperController;
+    private SelectableObject selectedObject;
     private final int defaultDelay;
     private final int maxDelay;
     private SumoMapManager mapManager;
@@ -508,7 +509,8 @@ public class GuiController {
         if (filtersMenuSelect != null) filtersMenuSelect.setVisible(false);
         if (mapMenuSelect != null) mapMenuSelect.setVisible(false);
         if (viewMenuSelect != null) viewMenuSelect.setVisible(false);
-        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);;
+        if (fileMenuSelect != null) fileMenuSelect.setVisible(false);
+        if (exportPane != null) exportPane.setVisible(false);
 
         // still needs fix for small gap between buttons and menus at the top
     }
@@ -713,6 +715,8 @@ public class GuiController {
         topMenuButtonToggle(fileMenuSelect);
     }
 
+    @FXML
+    protected void onExportPressed() { topMenuButtonToggle(exportPane); }
 
     @FXML void onDataOutputToggle() {
 
@@ -915,9 +919,9 @@ public class GuiController {
             this.MeanSpeed.setText(String.format("%.2f m/s", vehicles.getMeanSpeed()));
             this.SpeedSD.setText(String.format("%.2f m/s", vehicles.getSpeedStdDev()));
         } else if (currentTab.equals("Selected")) {
-            SelectableObject selectedObject = wrapperController.getSelectedObject();
-            if(selectedObject != null) {
-                if (selectedObject instanceof VehicleWrap v) {
+            if(this.selectedObject != null) {
+                if (this.selectedObject instanceof VehicleWrap v) {
+
                     if(!SelectedGrid.isVisible()) {
                         SelectedGridTL.setVisible(false);
                         SelectedGridTL.setManaged(false);
@@ -947,12 +951,14 @@ public class GuiController {
                     this.timeSpentStopped.setText(this.rawSecondsToHMS(v.getWaitingTime()));
                     this.Stops.setText(Integer.toString(v.getNumberOfStops()));
                 } else if (selectedObject instanceof TrafficLightWrap tl) {
+
                     if (!SelectedGridTL.isVisible()) {
                         SelectedGrid.setVisible(false);
                         SelectedGrid.setManaged(false);
                         SelectedGridTL.setVisible(true);
                         SelectedGridTL.setManaged(true);
                     }
+
                     this.trafficLightID.setText(tl.getId());
                     this.TLposition.setText(String.format("%.2f | %.2f",tl.getPosition().x, tl.getPosition().y));
 
@@ -1044,6 +1050,7 @@ public class GuiController {
                             trafficLightButton.setSelected(true);
                             tlSelector.setValue(tl.getId());
                         }
+                        this.selectedObject = so;
                     }
                 } catch (NullPointerException e) {
                    System.err.println(e);
