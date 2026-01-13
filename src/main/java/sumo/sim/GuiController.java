@@ -98,7 +98,8 @@ public class GuiController {
     @FXML
     private NumberAxis percentStoppedYAxis, currentGYRYAxis;
 
-    private GraphicsContext gc;
+    private GraphicsContext gcStatic;
+    private GraphicsContext gcDynamic;
     private SimulationRenderer sr;
     private AnimationTimer renderLoop;
     private Stage stage;
@@ -119,6 +120,11 @@ public class GuiController {
     private final int maxDelay;
     private SumoMapManager mapManager;
     private int opacity;
+    private boolean wasRunningADD;
+    private boolean wasRunningST;
+
+    // Rendering
+    private int uiUpdateSkipper;
 
     //Charts
     private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
@@ -139,12 +145,13 @@ public class GuiController {
     public GuiController() {
         this.defaultDelay = 50;
         this.maxDelay = 999;
-        panSen = 2;
+        this.panSen = 2;
+        this.uiUpdateSkipper = 0;
         this.opacity = 0;
     }
 
     public void setStageAndManager(Stage s , SumoMapManager mapManager) {
-        stage = s;
+        this.stage = s;
         this.mapManager = mapManager;
     }
 
@@ -168,7 +175,7 @@ public class GuiController {
      * @param wrapperController the simulation wrapper used for backend communication with the simulation
      */
     public void initializeCon(WrapperController wrapperController) {
-        this.wrapperController = wrapperController;
+        this.wrapperController = wrapperController; // establish connection
 
         //Setup Graphs of Stats Section
         setupCharts();
@@ -197,7 +204,7 @@ public class GuiController {
     public void initializeDropDowns() {
         if (wrapperController==null) return;
 
-        // displays all available types found in xml
+        // displays all available types found in xml, filtered and choosing default value
         String[] arr = wrapperController.getTypeList();
         typeSelector.setItems(FXCollections.observableArrayList(arr));
         int i = 0;
@@ -411,8 +418,9 @@ public class GuiController {
         // scales map based on pane width and height
         staticMap.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
         staticMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
-       // dynamicMap.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
-       // dynamicMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+
+        dynamicMap.widthProperty().bind(middlePane.widthProperty().multiply(0.795));
+        dynamicMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
         mainButtonBox.prefWidthProperty().bind(middlePane.widthProperty().multiply(0.8));
 
        // stressTestMenu.translateXProperty().bind(middlePane.widthProperty().multiply(0.15));
@@ -506,6 +514,15 @@ public class GuiController {
         }
     }
 
+    private void topMenuButtonToggle(Node menu) {
+        boolean wasVisible = menu.isVisible(); // saves state
+        closeAllMenus();
+
+        if (!wasVisible) {
+            menu.setVisible(true); // if it was closed-> open
+        }
+    }
+
     /**
      * This method closes all menus (invisible).
      */
@@ -526,6 +543,18 @@ public class GuiController {
     private void closeSpecificMenu(ToggleButton button, AnchorPane menu) {
         button.setSelected(false);
         menu.setVisible(false);
+    }
+
+    private void startSim() {
+        wrapperController.startSim();
+        playButton.setSelected(true);
+        stepButton.setDisable(true);
+    }
+
+    private void stopSim() {
+        wrapperController.stopSim();
+        playButton.setSelected(false);
+        stepButton.setDisable(false);
     }
 
     private void disableAllTopMenuButtons() {
@@ -568,15 +597,11 @@ public class GuiController {
     @FXML
     protected void onPlayStart() {
         tlVisualizerPane.setVisible(false);
-        stepButton.setDisable(true);
         playButton.setDisable(false);
         if (playButton.isSelected()) { // toggled
-            wrapperController.startSim();
-            //playSlider.setVisible(true);
+            startSim();
         } else {
-            wrapperController.stopSim();
-            //playSlider.setVisible(false);
-            stepButton.setDisable(false);
+            stopSim();
         }
     }
 
@@ -638,6 +663,21 @@ public class GuiController {
         toggleMenuAtButton(addMenu, addButton);
         String Route = routeSelector.getValue();
         sr.setPickedRouteID(Route);
+        sr.updateStaticMap();
+
+        // preventing lag/delay -> stops sim while opened
+        if (addButton.isSelected()) {
+            wasRunningADD = playButton.isSelected();
+            playButton.setDisable(true);
+            stopSim();
+        } else {
+            if(!stressTestButton.isSelected()) {
+                playButton.setDisable(false);
+                if (wasRunningADD) {
+                    startSim();
+                }
+            }
+        }
     }
 
     /**
@@ -648,7 +688,20 @@ public class GuiController {
     protected void onStressTest(){
         toggleMenuAtButton(stressTestMenu, stressTestButton);
         closeSpecificMenu(trafficLightButton, trafficLightMenu);
-        //closeSpecificMenu(createButton, createMenu);
+
+        // preventing lag/delay
+        if (stressTestButton.isSelected()) {
+            wasRunningST = playButton.isSelected();
+            playButton.setDisable(true);
+            stopSim();
+        } else {
+            if (!addButton.isSelected()) {
+                playButton.setDisable(false);
+                if (wasRunningST) {
+                    startSim();
+                }
+            }
+        }
     }
 
     @FXML
@@ -677,14 +730,6 @@ public class GuiController {
 
     // top right menu buttons hovered
 
-    private void topMenuButtonToggle(Node menu) {
-        boolean wasVisible = menu.isVisible(); // saves state
-        closeAllMenus();
-
-        if (!wasVisible) {
-            menu.setVisible(true); // if it was closed-> open
-        }
-    }
 
     /**
      * Is triggered when user hovers over "filter" button
@@ -743,6 +788,8 @@ public class GuiController {
         if (!dataView.isSelected()) {
             staticMap.widthProperty().bind(middlePane.widthProperty().multiply(1.25));
             staticMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
+            dynamicMap.widthProperty().bind(middlePane.widthProperty().multiply(1.25));
+            dynamicMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
             dataPane.setVisible(false);
         } else {
             dataPane.setVisible(true);
@@ -837,10 +884,9 @@ public class GuiController {
     public void doSimStep() {
         // updates UI elements
         updateTime();
+        if (trafficLightMenu.isVisible()) { updateTLPhaseText(); }
         updateDelay();
         updateCountVeh();
-        if (trafficLightMenu.isVisible()) { updateTLPhaseText(); }
-
         this.updateDataPane();
     }
 
@@ -1038,7 +1084,7 @@ public class GuiController {
     }
 
     public void setupSelectionHandler() {
-        staticMap.setOnMouseClicked(event -> {
+        dynamicMap.setOnMouseClicked(event -> {
             if (sr.getSelectMode()) {
                 double mouseX = event.getX();
                 double mouseY = event.getY();
@@ -1239,9 +1285,10 @@ public class GuiController {
      * </p>
      */
     public void initializeRender(){
-        gc = staticMap.getGraphicsContext2D();
+        gcStatic = staticMap.getGraphicsContext2D();
+        gcDynamic = dynamicMap.getGraphicsContext2D();
 
-        sr = new SimulationRenderer(staticMap,gc,wrapperController.getJunctions(),wrapperController.getStreets(),
+        sr = new SimulationRenderer(staticMap,gcStatic, dynamicMap, gcDynamic, wrapperController.getJunctions(),wrapperController.getStreets(),
                 wrapperController.getVehicles(), wrapperController.getTrafficLights(), wrapperController.getRoutes());
         renderUpdate();
     }
@@ -1305,7 +1352,7 @@ public class GuiController {
      */
     public void mapPan() {
 
-        staticMap.setOnMousePressed(event -> {
+        dynamicMap.setOnMousePressed(event -> {
             closeAllMenus(); // closes all top menus when panning
             //closeAllMainButtonMenus();
             mousePressedXOld = event.getX(); // old
@@ -1313,7 +1360,7 @@ public class GuiController {
             //System.out.println("old"+mousePressedXOld + " " + mousePressedYOld);
         });
         // drag start with pressed -> then this follows
-        staticMap.setOnMouseDragged(e->{
+        dynamicMap.setOnMouseDragged(e->{
             mousePressedXNew = e.getX();
             mousePressedYNew = e.getY();
             //System.out.println("NewX"+mousePressedXNew + " NewY " + mousePressedYNew);
