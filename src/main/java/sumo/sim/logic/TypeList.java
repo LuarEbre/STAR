@@ -1,7 +1,9 @@
 package sumo.sim.logic;
 
 import de.tudresden.sumo.cmd.Vehicletype;
+import de.tudresden.sumo.objects.SumoColor;
 import de.tudresden.sumo.objects.SumoStringList;
+import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 import java.util.HashMap;

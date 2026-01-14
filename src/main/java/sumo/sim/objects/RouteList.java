@@ -87,7 +87,14 @@ public class RouteList {
         try {
             routeResult = (SumoStage) con.do_job_get(Simulation.findRoute(start,end,"", 0 , 0));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.err.println("Critical error in findRoute!");
+            e.printStackTrace();
+            return false;
+        }
+
+        if (routeResult == null || routeResult.edges == null || routeResult.edges.isEmpty()) {
+            logger.log(Level.WARNING, "Route Creation failed!");
+            return false;
         }
         route.addAll(routeResult.edges);
         for (String s : route) {
@@ -99,11 +106,10 @@ public class RouteList {
         routeID = Util.checkRouteDuplicate(allRoutes, routeID);
 
         try {
-            System.out.println(con.do_job_get(Route.getIDCount()));
             con.do_job_set(Route.add(routeID, route));
-            System.out.println(con.do_job_get(Route.getIDCount()));
+            logger.log(Level.INFO, "Route added: " + routeID);
         } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to add route", e);
+            logger.log(Level.SEVERE, "Failed to add route", e);
             return false;
         }
 
