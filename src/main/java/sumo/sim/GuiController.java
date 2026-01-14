@@ -220,7 +220,8 @@ public class GuiController {
                 addButton,
                 stressTestButton,
                 trafficLightButton,
-                stepButton
+                stepButton,
+                createButton
         };
 
         String[] modes = { "Light Test" , "Medium Test" , "Heavy Test" };
