@@ -1081,8 +1081,8 @@ public class GuiController {
                 this.VehiclesCurrentlyStoppedFiltered.setText(String.format(Locale.US, "%d (%.2f%%)", currentlyStoppedFiltered, stoppedPercentageFiltered));
                 this.TotalTimeSpentStoppedFiltered.setText(this.rawSecondsToHMS(stoppedTime));
 
-                this.MeanSpeedFiltered.setText(String.format(Locale.US, "%.2f m/s", wrapperController.getFilteredVehicles().getMeanSpeed()));
-                this.SpeedSDFiltered.setText(String.format(Locale.US, "%.2f m/s", wrapperController.getFilteredVehicles().getSpeedStdDev()));
+                this.MeanSpeedFiltered.setText(String.format(Locale.US, "%.2f m/s", wrapperController.getFilteredVehicles().getMeanSpeedFiltered()));
+                this.SpeedSDFiltered.setText(String.format(Locale.US, "%.2f m/s", wrapperController.getFilteredVehicles().getSpeedStdDevFiltered()));
             } else {
                 if(!notFilteredLabel.isVisible()) {
                     notFilteredLabel.setVisible(true);
