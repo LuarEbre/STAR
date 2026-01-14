@@ -185,7 +185,7 @@ public class WrapperController {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
-                //TODO: logger
+                logger.log(Level.SEVERE, "Failed to terminate executor, while changing Delay.");
                 throw new RuntimeException(e);
             }
         }
