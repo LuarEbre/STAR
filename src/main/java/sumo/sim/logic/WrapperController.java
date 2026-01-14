@@ -365,18 +365,6 @@ public class WrapperController {
         return ret; // [g,r,y,80] -> state , last element is duration
     }
 
-    /**
-     * Sets the duration of the phase the traffic light is currently on.
-     * @param tlid
-     * @param duration
-     */
-    public void setTlSettings(String tlid, int duration) {
-        tl.getTL(tlid).setPhaseDuration(duration);
-        double check = tl.getTL(tlid).getDuration();
-        LOG.info("Setting duration of traffic light (" + tlid + ") to: " + check);
-
-    }
-
     // getter
 
     public String getChosenMap(){

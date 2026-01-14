@@ -1381,10 +1381,10 @@ public class GuiController {
         wrapperController.addRoute("E0", "E4", "testID");
     }
 
-    private void trafficLightPreview (int index) {
+    private void trafficLightPreview(int index) {
         String id = tlSelector.getValue();
         if (id == null) return;
-        String phase = wrapperController.getPhaseAtIndex(id,index);
+        String phase = wrapperController.getPhaseAtIndex(id, index);
         //List<String> controlledStreets = wrapperController.getControlledLanesAtIndex(tlSelector.getValue(), Integer.parseInt(phaseIndexSelector.getValue()));
         String[] controlledStreets = wrapperController.getTLCurrentState(id);
         GraphicsContext gcTL = tlCanvas.getGraphicsContext2D();

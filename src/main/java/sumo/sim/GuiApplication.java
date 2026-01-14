@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.logging.Level;
 
-import static sumo.sim.Main.LOG;
 
 /**
  * Class for loading FXML and CSS files. Extends JavaFX Application and therefor must override {@link #start(Stage)}
@@ -52,7 +51,6 @@ public class GuiApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // link to gui.fxml (more than one possible)
-        LOG.info("Loading GUI config...");
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/gui.fxml"));
         //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/Title/title.fxml")); // experimental
 
@@ -90,12 +88,10 @@ public class GuiApplication extends Application {
         stage.fullScreenExitHintProperty().setValue("Press Esc to exit");
         stage.initStyle(StageStyle.UNDECORATED); // removes frame and title
         stage.setScene(scene);
-        LOG.info("Launching GUI...");
         stage.show(); // display gui
 
         // Establishing connection between WrappCon and GuiCon
 
-        LOG.info("Loading Maps...");
         SumoMapManager mapManager = new SumoMapManager(); // initializes Maps
         wrapper = new WrapperController(guiController, mapManager);
         guiController.initializeCon(wrapper);
@@ -108,7 +104,6 @@ public class GuiApplication extends Application {
             this.wrapper.terminate();
         }
         // JavaFx stop
-        LOG.info("Stopping Application");
         super.stop();
         // Forces termination of all threads
         System.exit(0);

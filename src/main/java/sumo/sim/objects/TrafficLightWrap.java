@@ -448,7 +448,5 @@ public class TrafficLightWrap extends SelectableObject {
         }
 
     }
-    public String getId() {
-        return this.id;
-    }
+
 }
