@@ -33,18 +33,18 @@ public class SumoMapManager {
      * Loads all Default Maps with hardcoded paths
      */
     private void loadDefaultMaps(){
-        maps.put("Frankfurt", new SumoMapConfig(
-                "Frankfurt",
-                new File("src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.net.xml"),
-                new File("src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.rou.xml"),
-                new File("src/main/resources/SumoConfig/Frankfurt_Map/frankfurt.sumocfg")
+        maps.put("Frankfurt1", new SumoMapConfig(
+                "Frankfurt1",
+                new File("src/main/resources/SumoConfig/Frankfurt1/frankfurt1_fixed.net.xml"),
+                new File("src/main/resources/SumoConfig/Frankfurt1/frankfurt1_fixed.rou.xml"),
+                new File("src/main/resources/SumoConfig/Frankfurt1/frankfurt1_fixed.sumocfg")
         ));
 
-        maps.put("RugMap", new SumoMapConfig(
-                "RugMap",
-                new File ("src/main/resources/SumoConfig/RugMap/rugmap.net.xml"),
-                new File ("src/main/resources/SumoConfig/RugMap/rugmap.rou.xml"),
-                new File ("src/main/resources/SumoConfig/RugMap/rugmap.sumocfg")
+        maps.put("Frankfurt2", new SumoMapConfig(
+                "Frankfurt2",
+                new File ("src/main/resources/SumoConfig/Frankfurt2/frankfurt2.net.xml"),
+                new File ("src/main/resources/SumoConfig/Frankfurt2/frankfurt2.rou.xml"),
+                new File ("src/main/resources/SumoConfig/Frankfurt2/frankfurt2.sumocfg")
         ));
     }
 
@@ -112,7 +112,7 @@ public class SumoMapManager {
         List<String> result = new ArrayList<>();
         // filtering standard maps
         for (String key : maps.keySet()) {
-            if (!key.equals("Frankfurt") && !key.equals("RugMap")) {
+            if (!key.equals("Frankfurt1") && !key.equals("Frankfurt2")) {
                 result.add(key);
             }
         }

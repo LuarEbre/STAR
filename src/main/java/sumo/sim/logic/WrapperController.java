@@ -8,6 +8,7 @@ import sumo.sim.*;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
+import java.util.stream.Collectors;
 
 /**
  * author
@@ -32,6 +33,7 @@ public class WrapperController {
     private StreetList sl;
     private TrafficLightList tl;
     private VehicleList vl;
+    private VehicleList filteredVehicles;
     private JunctionList jl;
     private TypeList typel;
     private RouteList rl;
@@ -46,6 +48,7 @@ public class WrapperController {
 
     private String currentMap = "Frankfurt";
     private long stepCounter = 0;
+    private String currentMap = "Frankfurt";
     //private XML netXml;
 
     // config
@@ -54,6 +57,17 @@ public class WrapperController {
     public static String currentRou = null;
     public String sumoBinary;
 
+    // filtering
+    private boolean filterApplied;
+    private Color colorFilter;
+    private Double lowerSpeedFilter, upperSpeedFilter;
+    private String routeFilter, typeFilter;
+
+    // data export
+    /*private final List<VehicleWrap> allTimeVehicles = new ArrayList<>();
+    private int stepCounter = 0;
+    private final int exportSamplingRate = 100;
+    */
     //Logger
     private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
@@ -70,7 +84,7 @@ public class WrapperController {
                 : "src/main/resources/Binaries/sumo";
 
         // config knows both .rou and .net XMLs
-        mapConfig = mapManager.getConfig("Frankfurt"); // Frankfurt, TestMap
+        mapConfig = mapManager.getConfig("Frankfurt1"); // Frankfurt, TestMap
         String configFile = mapConfig.getConfigPath().toString();
         currentNet = mapConfig.getNetPath().toString();
         currentRou = mapConfig.getRouPath().toString();
@@ -96,11 +110,19 @@ public class WrapperController {
             logger.log(Level.INFO, "Connected to Sumo");
 
             vl = new VehicleList(connection);
+            filteredVehicles = new VehicleList(connection);
             sl = new StreetList(this.connection);
             tl = new TrafficLightList(connection, sl);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
             rl = new RouteList(currentRou, connection, this);
+
+            // initialize filter values
+            colorFilter = null;
+            lowerSpeedFilter = null;
+            upperSpeedFilter = null;
+            routeFilter = null;
+            typeFilter = null;
 
             tl.updateAllCurrentState(); // important for rendering
             start();
@@ -207,6 +229,41 @@ public class WrapperController {
      */
     public void stopSim() {
         paused = true;
+
+        /*try {
+
+            String desktopPath = System.getProperty("user.home") + "/Schreibtisch/";
+
+            // testfiles
+            File pdfFile = new File(desktopPath + "SUMO_Test_Report.pdf");
+            File csvFile = new File(desktopPath + "SUMO_Test_Data.csv");
+
+            System.out.println(">>> TEST: Start export zo desktop...");
+
+            this.generateExport(pdfFile);
+            this.generateExport(csvFile);
+
+            System.out.println(">>> TEST: export done!");
+        } catch (Exception e) {
+            System.err.println(">>> TEST: error: " + e.getMessage());
+            e.printStackTrace();
+        }*/
+
+    }
+
+    public void applyFilter(Color color, Double lower, Double upper, String route, String type) {
+        colorFilter = color;
+        lowerSpeedFilter = lower;
+        upperSpeedFilter = upper;
+        routeFilter = route;
+        typeFilter = type;
+        if(color == null && lower == null && upper == null && route == null && type == null) {
+            this.filterApplied = false;
+        }
+        else {
+            this.filteredVehicles.setVehicles(this.filterVehicles());
+            this.filterApplied = true;
+        }
     }
 
     /**
@@ -217,6 +274,9 @@ public class WrapperController {
         // updating gui and simulation
         try {
             connection.do_timestep();
+            if(filterApplied) {
+                this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
+            }
             vl.updateAllVehicles();
 
             //adaptive Traffic Lights
@@ -325,7 +385,36 @@ public class WrapperController {
             addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
         }
     }
+    /*public void generateExport(File file) {
+        // collect archieved and acitve vehicles
+        List<VehicleWrap> exportVehicles = new ArrayList<>(allTimeVehicles);
+        if (vl != null && vl.getVehicles() != null) {
+            exportVehicles.addAll(vl.getVehicles());
+        }
 
+        try {
+            if (file.getName().endsWith(".pdf")) {
+                DataExport.exportAsPDF(file, exportVehicles, sl.getStreets(), tl.getTrafficlights());
+            } else {
+                DataExport.exportAsCSV(file, exportVehicles, sl.getStreets(), tl.getTrafficlights(), this.simTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    private CopyOnWriteArrayList<VehicleWrap> filterVehicles() {
+        return this.vl.getVehicles().stream()
+                .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
+                .filter(v -> this.routeFilter == null || v.getRouteID().equals(this.routeFilter))
+                .filter(v -> this.colorFilter == null || v.getColor().equals(this.colorFilter))
+                .filter(v -> {
+                    boolean aboveMin = (this.lowerSpeedFilter == null || v.getSpeed() >= this.lowerSpeedFilter);
+                    boolean belowMax = (this.upperSpeedFilter == null || v.getSpeed() <= this.upperSpeedFilter);
+                    return aboveMin && belowMax;
+                })
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+    }
 
     /**
      * Sets the duration of the phase the traffic light is currently on.
@@ -375,8 +464,8 @@ public class WrapperController {
            }
         }
         // if no map is selected (error) automatically choose Map1
-        mapSwitch("Frankfurt");
-        return "Frankfurt";
+        mapSwitch("Frankfurt1");
+        return "Frankfurt1";
     }
 
     public SelectableObject getSelectedObject() {
@@ -396,6 +485,7 @@ public class WrapperController {
     public JunctionList getJunctions() { return jl; }
     public StreetList getStreets() { return sl; }
     public VehicleList getVehicles() { return vl; }
+    public VehicleList getFilteredVehicles() { return filteredVehicles; }
     public TrafficLightList getTrafficLights() { return tl; }
     public RouteList getRoutes()  { return rl; }
     public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
@@ -405,6 +495,8 @@ public class WrapperController {
     public String getCurrentMap() { return currentMap; }
     public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
     public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
+    public SumoTraciConnection getConnection() { return connection; }
+    public boolean isFilterApplied() { return filterApplied; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -414,6 +506,7 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
+    public int getAllFilteredVehicleCount() { return (filteredVehicles != null) ? filteredVehicles.getVehicles().size() : 0; }
 
-    
+
 }
