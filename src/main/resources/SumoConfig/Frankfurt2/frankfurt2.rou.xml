@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2026-01-10T03:23:45.523303+01:00 by Eclipse SUMO netedit v1_24_0+1845-01be9a8093d
--->
+
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     <!-- Routes -->
@@ -37,7 +36,19 @@
     <route id="r_8" edges="314994947#0 314789433#1 314789433#2 314789433#3 314789433#4 66227388#0 335993897 265499402#0 265499402#1 265499402#2 265499402#3 265499402#4 265499402#5 265499402#6 1267345325 439027697 1138010039 259409010#0 259409010#1 259409009#0 265499410 138478936 138478933#0 138478933#1 138478933#2 138478933#3 138478933#4 550920275 1086450111 1086450113 315030197 62788553#1 62788579#2 138497116#0 138497116#1 138497116#2 138601696#0 1084325332#2 1084325332#3 52060330#0 52060330#1 1268318127 305822761 20443908 331750841#0 331750841#1 908125589 47986355 23909842 491817112 138601667 305822763 4712783 23909841 171856691 23909871 23909872"/>
     <route id="r_9" edges="138347505#0 138347505#1 138347505#2 314789433#1 314789433#2 314789433#3 314789433#4 66227388#0 335993897 265499402#0 265499402#1 265499402#2 265499402#3 265499402#4 265499402#5 265499402#6 1267345325 439027697 1138010039 259409010#0 259409010#1 259409009#0 265499410 138478936 138478933#0 138478933#1 138478933#2 138478933#3 138478933#4 550920275 1086450111 1086450113 315030197 62788553#1 62788579#2 138497116#0 138497116#1 138497116#2 138601696#0 1084325332#2 1084325332#3 52060330#0 52060330#1 1268318127 305822761 20443908 331750841#0 331750841#1 908125589 4424616 258398603 929250438 138634156 4424311 138634184#0 138634184#1 138634153#0 138634153#1 138634153#2 138634153#3 147525021#0 147525021#1 147525021#2 147525021#3 238457589#0 238457589#1 238457589#2 238457589#3 238457589#4 238457589#5 238457589#6 1079903344#0 1079903344#1 4741731#0 4741731#1 -30070346"/>
 <vType id="casual" vClass="passenger" length="5.0" accel="2.6" decel="4.5" maxSpeed="25" />
-<vType id="emergency" vClass="passenger" length="6.5" accel="2.6" decel="4.5" maxSpeed="50" />
-<vType id="slow" vClass="passenger" length="5.0" accel="2.6" decel="4.5" maxSpeed="15" />
-<vType id="fast" vClass="passenger" length="5.0" accel="2.6" decel="4.5" maxSpeed="70" />
+<vType id="emergency" vClass="passenger" length="6.5" accel="2.6" apparentDecel="4.5" emergencyDecel="9.0" decel="4.5" maxSpeed="75" speedFactor="1.5" speedDev="0.1" impatience="1.0" sigma="0"/>
+<vType id="slow" vClass="passenger" speedFactor="0.6" speedDev="0.1" length="5.0" accel="2.6" decel="4.5" maxSpeed="15" />
+<vType id="fast" vClass="passenger" speedFactor="1.1" length="5.0" accel="10.6" decel="7.5" maxSpeed="100" />
+  <!--
+    <vType id="bus" vClass="bus" length="10.0" accel="2.6" decel="4.5" maxSpeed="70" />
+    <vType id="super fast" vClass="passenger" length="5.0" sigma="0.3" accel="15.6" tau="0.5" decel="6.5" maxSpeed="150"  emergencyDecel="20.0" />
+    <vType id="beginner" vClass="passenger" length="5.0" accel="1.6" decel="5.5" maxSpeed="45" sigma="1" tau="3.0" speedFactor="0.9" />
+    <vType id="aggressive" vClass="passenger" length="6.5" accel="5.6" emergencyDecel="5.0" decel="1.5" maxSpeed="50" speedFactor="1.1" speedDev="0.4" impatience="1.0" sigma="0.3"/>
+    <vType id="extra slow" vClass="passenger" length="6.5" accel="0.6" emergencyDecel="5.5" decel="2.5" maxSpeed="15" speedFactor="0.5" speedDev="0.3" impatience="0" sigma="0.4"/>
+    -->
+
+
+
+
+
 </routes>

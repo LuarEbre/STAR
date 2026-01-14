@@ -701,6 +701,7 @@ public class GuiController {
         toggleMenuAtButton(stressTestMenu, stressTestButton);
         if(trafficLightMenu.isVisible()) {
             closeSpecificMenu(trafficLightButton, trafficLightMenu);
+            tlCanvas.setVisible(false);
             sr.setSeeTrafficLightIDs(!sr.getSeeTrafficLightIDs());
         }
 
@@ -724,6 +725,7 @@ public class GuiController {
         toggleMenuAtButton(createMenu, createButton);
         if(trafficLightMenu.isVisible()) {
             closeSpecificMenu(trafficLightButton, trafficLightMenu);
+            tlCanvas.setVisible(false);
             sr.setSeeTrafficLightIDs(!sr.getSeeTrafficLightIDs());
         }
         if(!createButton.isSelected()) resetRouteCreateSelection();
@@ -808,6 +810,7 @@ public class GuiController {
             dynamicMap.widthProperty().bind(middlePane.widthProperty().multiply(1.25));
             dynamicMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
             dataPane.setVisible(false);
+            sr.updateStaticMap();
         } else {
             dataPane.setVisible(true);
             rescale();
