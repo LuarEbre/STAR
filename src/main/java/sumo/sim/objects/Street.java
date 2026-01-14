@@ -152,6 +152,15 @@ public class Street {
 
     }
 
+    public Street getStreetBasedOnLane(String laneID){
+       for (LaneWrap lane : lanes) {
+           if (lane.getLaneID().equals(laneID)) {
+               return this;
+           }
+       }
+        return null;
+    }
+
     public double getMinX() { return minX; }
     public double getMaxX() { return maxX; }
     public double getMinY() { return minY; }
