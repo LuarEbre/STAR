@@ -2,6 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -11,19 +15,24 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#closeAllMenus" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
-       <HBox fx:id="mainButtonBox" alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="750.0" spacing="40.0" AnchorPane.bottomAnchor="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+       <HBox fx:id="mainButtonBox" alignment="CENTER_LEFT" layoutY="470.0" prefHeight="130.0" prefWidth="881.0" spacing="40.0" AnchorPane.bottomAnchor="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
            <children>
 
                <ToggleButton fx:id="selectButton" mnemonicParsing="false" onAction="#onSelect" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
@@ -42,6 +51,7 @@
                <Button fx:id="stepButton" mnemonicParsing="false" onAction="#onStep" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
                 <ToggleButton fx:id="stressTestButton" mnemonicParsing="false" onAction="#onStressTest" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
             <ToggleButton fx:id="trafficLightButton" layoutX="561.0" layoutY="34.0" mnemonicParsing="false" onAction="#onTrafficLight" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
+            <ToggleButton fx:id="createButton" layoutX="765.0" layoutY="34.0" mnemonicParsing="false" onAction="#onCreate" prefHeight="82.0" prefWidth="157.0" styleClass="menu-btn" />
 
            </children>
            <padding>
@@ -50,19 +60,471 @@
        </HBox>
 
        <!-- Middle pane -->
-       <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseEntered="#onMiddlePaneHover" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
+       <AnchorPane fx:id="middlePane" layoutY="20.8" onMouseClicked="#onMiddlePaneClicked" prefHeight="448.0" prefWidth="941.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="22.0">
            <children>
                <Canvas fx:id="staticMap" height="447.0" layoutX="200.0" onScroll="#zoomMap" width="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 
-               <AnchorPane fx:id="dataPane" prefHeight="439.0" prefWidth="200.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="-1.0">
+               <AnchorPane fx:id="dataPane" prefHeight="447.0" prefWidth="259.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                   <ListView fx:id="listData" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0" />
-                   <Separator fx:id="dataSep" layoutX="183.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="-5" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <TabPane fx:id="tabPane" layoutY="5.0" prefHeight="442.0" prefWidth="259.0" styleClass="dataTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+                    <tabs>
+                      <Tab styleClass="Tab" text="Overall">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <GridPane alignment="CENTER" prefHeight="282.0" prefWidth="219.0" styleClass="stat-grid" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="130.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="129.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Active Vehicles">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="activeVehicles" editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Queued Vehicles" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesNotOnScreen" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Finished Vehicles" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicles Currently Stopped" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Total Time spent Stopped" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Mean Speed" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Speed σ" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="DepartedVehicles" editable="false" layoutX="130.0" layoutY="41.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesCurrentlyStopped" editable="false" layoutX="120.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="TotalTimeSpentStopped" editable="false" layoutX="120.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="MeanSpeed" editable="false" layoutX="120.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSD" editable="false" layoutX="120.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                       </children>
+                                    </GridPane>
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </Tab>
+                      <Tab styleClass="Tab" text="Selected">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label fx:id="notSelectedLabel1" layoutX="35.0" layoutY="57.0" prefHeight="165.0" prefWidth="199.0" styleClass="notSelected" text="No Object has been selected, to display data of singular Objects, please use the Select Mode" textFill="#f1f1f1" wrapText="true" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="35.0">
+                                       <font>
+                                          <Font name="Arial Black" size="14.0" />
+                                       </font></Label>
+                                    <GridPane fx:id="SelectedGrid" alignment="CENTER" prefHeight="390.0" prefWidth="259.0" styleClass="stat-grid" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="130.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="129.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicle ID">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="vehicleID" editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicle Type" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="vehicleType" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Color" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Current Speed" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Average Speed" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Peak Speed" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Acceleration" GridPane.rowIndex="7">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="color" editable="false" layoutX="130.0" layoutY="41.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="currentSpeed" editable="false" layoutX="120.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="averageSpeed" editable="false" layoutX="120.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="peakSpeed" editable="false" layoutX="120.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="acceleration" editable="false" layoutX="120.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Position" GridPane.rowIndex="8">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Angle" GridPane.rowIndex="9">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Route" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Total Lifetime" GridPane.rowIndex="10">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Time spent Stopped" GridPane.rowIndex="11">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Stops" GridPane.rowIndex="12">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="position" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="angle" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="route" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="totalLifetime" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="timeSpentStopped" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="Stops" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                       </children>
+                                    </GridPane>
+                                    <GridPane fx:id="SelectedGridTL" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="150.0" prefWidth="259.0" styleClass="stat-grid" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="130.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="129.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Traffic Light ID">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="trafficLightID" editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Position" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="TLposition" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Remaining Duration" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="remainingDur" editable="false" layoutX="130.0" layoutY="41.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Current Phase" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="currPhase" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                       </children>
+                                    </GridPane>
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </Tab>
+                        <Tab styleClass="Tab" text="Filtered">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label layoutY="64.0" prefHeight="165.0" prefWidth="199.0" styleClass="notSelected" text="No Filter has been applied, to display data of filtered Vehicles, please use the Filter Menu" textFill="#f1f1f1" wrapText="true" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="35.0">
+                                       <font>
+                                          <Font name="Arial Black" size="14.0" />
+                                       </font></Label>
+                                    <GridPane fx:id="FilteredGrid" alignment="CENTER" prefHeight="282.0" prefWidth="259.0" styleClass="stat-grid" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="130.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="129.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Active Vehicles">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="activeVehiclesFiltered" editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Queued Vehicles" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesNotOnScreenFiltered" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="12.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Finished Vehicles" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Vehicles Currently Stopped" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Total Time spent Stopped" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Mean Speed" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField editable="false" layoutX="10.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="leftText" text="Speed σ" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" right="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="DepartedVehiclesFiltered" editable="false" layoutX="130.0" layoutY="41.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="VehiclesCurrentlyStoppedFiltered" editable="false" layoutX="120.0" layoutY="68.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="TotalTimeSpentStoppedFiltered" editable="false" layoutX="120.0" layoutY="97.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="MeanSpeedFiltered" editable="false" layoutX="120.0" layoutY="126.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="SpeedSDFiltered" editable="false" layoutX="120.0" layoutY="155.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets bottom="5.0" left="4.0" top="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                       </children>
+                                    </GridPane>
+                                 </children></AnchorPane>
+                           </content>
+                        </Tab>
+                        <Tab styleClass="Tab" text="Graphs">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <LineChart id="activeVehicleGraph" fx:id="activeVehiclesChart" createSymbols="false" horizontalZeroLineVisible="false" layoutX="14.0" layoutY="23.0" prefHeight="92.0" prefWidth="259.0" styleClass="starLineChart" title="Active Vehicles" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                       <padding>
+                                          <Insets left="3.0" right="3.0" />
+                                       </padding>
+                                    </LineChart>
+                                    <LineChart id="percentStoppedGraph" fx:id="percentStoppedChart" createSymbols="false" horizontalZeroLineVisible="false" layoutY="160.0" prefHeight="92.0" prefWidth="259.0" styleClass="starLineChart" title="Vehicles Stopped (%)" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="20.0">
+                                       <xAxis>
+                                          <CategoryAxis side="BOTTOM" />
+                                       </xAxis>
+                                       <yAxis>
+                                          <NumberAxis fx:id="percentStoppedYAxis" side="LEFT" />
+                                       </yAxis>
+                                       <padding>
+                                          <Insets left="3.0" right="3.0" />
+                                       </padding>
+                                    </LineChart>
+                                    <BarChart id="currentGYR" fx:id="currentGYR" layoutY="281.0" prefHeight="111.0" prefWidth="259.0" title="Current Traffic Light Phases" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis fx:id="currentGYRYAxis" side="LEFT" />
+                                      </yAxis>
+                                    </BarChart>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
+                    </tabs>
+                  </TabPane>
                </children>
             </AnchorPane>
 
             <!-- Menus from Top right buttons -->
-            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" onMouseExited="#closeAllMenus" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" prefHeight="180.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <CheckBox layoutX="171.0" layoutY="32.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Color" />
                   <CheckBox layoutX="169.0" layoutY="88.0" mnemonicParsing="false" styleClass="topMenuLabel" text="Speed" />
@@ -72,41 +534,36 @@
                   <Label layoutX="32.0" layoutY="120.0" prefHeight="18.0" prefWidth="92.0" styleClass="topMenuLabel" text="X, Y Position" />
                   <TextField layoutX="25.0" layoutY="139.0" prefHeight="26.0" prefWidth="56.0" />
                   <TextField layoutX="25.0" layoutY="84.0" prefHeight="18.0" prefWidth="123.0" />
-                  <Spinner layoutX="25.0" layoutY="28.0" prefHeight="18.0" prefWidth="123.0" />
+                  <ChoiceBox layoutX="25.0" layoutY="28.0" prefHeight="18.0" prefWidth="123.0" />
                   <TextField layoutX="96.0" layoutY="139.0" prefHeight="26.0" prefWidth="56.0" />
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" onMouseExited="#closeAllMenus" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="mapMenuSelect" layoutX="561.0" prefHeight="282.0" prefWidth="421.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Button fx:id="map1select" onAction="#changeToMap1" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button fx:id="map2select" onAction="#changeToMap2" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
-                  <Button text="Import" layoutX="313.0" layoutY="241.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" />
-                  <Label layoutX="14.0" layoutY="241.0" styleClass="topMenuLabel" text="Real-Time Traffic Simulation with Java v1.0" textFill="VIOLET">
-                     <font>
-                        <Font size="9.0" />
-                     </font></Label>
-                  <Label layoutX="28.0" layoutY="254.0" styleClass="topMenuLabel" text="Copyright 2026 NB, KK, LL, RE, SR. ALL RIGHTS RESERVED" textFill="VIOLET">
-                     <font>
-                        <Font size="8.0" />
-                     </font></Label>
+                  <Button fx:id="map1select" layoutX="33.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap1" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
+                  <Button fx:id="map2select" layoutX="217.0" layoutY="57.0" mnemonicParsing="false" onAction="#changeToMap2" pickOnBounds="true" prefHeight="150.0" prefWidth="167.0" styleClass="mapSelect" />
+                  <Button fx:id="importMapButton" layoutX="261.0" layoutY="226.0" mnemonicParsing="false" onAction="#importMap" prefHeight="34.0" prefWidth="114.0" styleClass="std-btn" text="Import Map" />
                   <Label layoutX="122.0" layoutY="11.0" styleClass="topMenuLabel" text="Choose a Map" textFill="VIOLET">
                      <font>
                         <Font name="Arial Black" size="23.0" />
                      </font>
                   </Label>
+                  <ChoiceBox fx:id="importMapSelector" layoutX="32.0" layoutY="235.0" prefHeight="26.0" prefWidth="206.0" />
+                  <Label layoutX="33.0" layoutY="215.0" prefHeight="18.0" prefWidth="150.0" styleClass="magentaLabel" text="Imported Maps" />
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" onMouseExited="#closeAllMenus" prefHeight="199.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <CheckBox fx:id="dataView" selected="true" styleClass="viewLabel" text="Data" />
+                        <CheckBox fx:id="dataView" onAction="#onShowDataView" selected="true" styleClass="viewLabel" text="Data" />
                         <CheckBox fx:id="showButtons" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onButtonToggle" selected="true" styleClass="viewLabel" text="Buttons" />
-                        <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="true" styleClass="viewLabel" text="Density Anchor" />
+                        <CheckBox fx:id="showDensityAnchor" layoutX="10.0" layoutY="28.0" mnemonicParsing="false" onAction="#onDensityAnchorToggle" selected="false" styleClass="viewLabel" text="Density Anchor" />
                         <CheckBox fx:id="showRouteHighlighting" layoutX="10.0" layoutY="45.0" mnemonicParsing="false" onAction="#onRouteHighlightingToggle" selected="true" styleClass="viewLabel" text="Route Highlighting" wrapText="true" />
                         <CheckBox fx:id="showTrafficLightIDs" layoutX="10.0" layoutY="60.0" mnemonicParsing="false" onAction="#onTrafficLightIDToggle" selected="true" styleClass="viewLabel" text="Traffic Light IDs" />
+                        <CheckBox fx:id="densityHeatmap" mnemonicParsing="false" onAction="#onDensityHeatmapToggle" styleClass="viewLabel" text="Density Heatmap" />
                      </children>
                      <padding>
                         <Insets bottom="10.0" top="10.0" />
@@ -118,14 +575,14 @@
                </padding>
             </AnchorPane>
 
-               <VBox fx:id="fileMenuSelect" onMouseExited="#closeAllMenus" prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <VBox fx:id="fileMenuSelect" prefHeight="150.0" prefWidth="123.0" spacing="8.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Button fx:id="fileButtonClose" mnemonicParsing="false" onAction="#closeApplication" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Close">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="fileButtonReset" layoutX="15.0" layoutY="20.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Reset" />
+                  <Button fx:id="fileButtonReset" layoutX="15.0" layoutY="20.0" mnemonicParsing="false" onAction="#onResetButton" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Reset" />
                   <Button fx:id="fileButtonSettings" layoutX="15.0" layoutY="52.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Settings" />
                   <Button fx:id="fileButtonReturn" layoutX="15.0" layoutY="83.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Return" />
                </children>
@@ -140,47 +597,165 @@
        <!-- Menu button top right close -->  <!-- -->
 
          </children>
+
       </AnchorPane>
        <!-- Main Buttons menu -->
-       <AnchorPane fx:id="trafficLightMenu" layoutX="556.0" layoutY="218.0" prefHeight="275.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false">
+       <AnchorPane fx:id="trafficLightMenu" layoutX="556.0" layoutY="92.0" prefHeight="375.0" prefWidth="259.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
-               <Label layoutX="19.0" layoutY="9.0" styleClass="addMenu-labels" text="Traffic Light Control">
+               <Label layoutX="28.0" layoutY="11.0" styleClass="addMenu-labels" text="Traffic Light Control">
                    <font>
                        <Font name="System Bold" size="20.0" />
                    </font>
                </Label>
-               <Separator layoutY="38.0" prefHeight="3.0" prefWidth="230.0" />
-               <HBox layoutY="38.0" prefHeight="187.0" prefWidth="250.0" AnchorPane.bottomAnchor="51.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                   <children>
-                       <VBox prefHeight="238.0" prefWidth="147.0" spacing="28.0">
-                           <children>
-                               <Label styleClass="addMenu-labels" text="Select" />
-                               <Label layoutX="10.0" layoutY="10.0" styleClass="addMenu-labels" text="Duration" />
-                        <Label layoutX="15.0" layoutY="76.0" styleClass="addMenu-labels" text="Set Program " />
-                           </children>
-                           <padding>
-                               <Insets left="5.0" top="20.0" />
-                           </padding>
-                       </VBox>
-                       <VBox prefHeight="238.0" prefWidth="110.0" spacing="20.0">
-                           <children>
-                               <ChoiceBox fx:id="tlSelector" prefWidth="150.0" />
-                               <Spinner fx:id="durationTL" />
-                        <ChoiceBox layoutX="10.0" layoutY="25.0" prefWidth="150.0" />
-                        <Button mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="26.0" prefWidth="109.0" text="Apply" />
-                           </children>
-                           <padding>
-                               <Insets top="15.0" />
-                           </padding>
-                       </VBox>
-                   </children>
+               <Separator layoutX="-1.0" layoutY="42.0" prefHeight="3.0" prefWidth="250.0" />
+               <HBox layoutY="45.0" prefHeight="35.0" prefWidth="250.0" spacing="50.0" AnchorPane.bottomAnchor="295.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="44.8">
                <padding>
-                  <Insets left="5.0" right="5.0" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
+               <children>
+                         <Label prefHeight="22.0" prefWidth="129.0" styleClass="addMenu-labels" text="Select">
+                     <padding>
+                        <Insets top="5.0" />
+                     </padding>
+                  </Label>
+                         <ChoiceBox fx:id="tlSelector" prefHeight="26.0" prefWidth="171.0" />
+               </children>
                </HBox>
-            <TextField fx:id="stateText" editable="false" layoutX="7.0" layoutY="236.0" prefHeight="26.0" prefWidth="238.0" />
-            <Label layoutX="14.0" layoutY="215.0" styleClass="addMenu-labels" text="Current Phase" />
+            <Label layoutX="14.0" layoutY="237.0" styleClass="addMenu-labels" text="Current Phase" />
+            <TabPane fx:id="trafficLightTabPane" layoutY="87.0" prefHeight="130.0" prefWidth="259.0" styleClass="diffTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+              <tabs>
+                <Tab text="Duration">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="167.0" prefWidth="250.0">
+                           <children>
+                              <HBox layoutX="25.0" layoutY="41.0" prefHeight="188.0" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <VBox prefHeight="194.0" prefWidth="143.0" spacing="10.0">
+                                       <children>
+                                                 <Label styleClass="addMenu-labels" text="Duration" />
+                                          <CheckBox fx:id="toggleTrafficLightPermanently" mnemonicParsing="false" onAction="#onTogglePermanently" styleClass="whiteLabel" text="Permanently" />
+                                          <Label styleClass="magentaLabel" text="Phase" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="10.0" top="15.0" />
+                                       </padding>
+                                    </VBox>
+                                    <VBox prefHeight="182.0" prefWidth="154.0" spacing="5.0">
+                                       <children>
+                                                 <Spinner fx:id="durationTL" styleClass="spinner" />
+                                          <Label />
+                                          <ChoiceBox fx:id="phaseIndexSelector" prefWidth="150.0" />
+                                       </children>
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin>
+                                       <padding>
+                                          <Insets left="5.0" right="5.0" top="10.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab styleClass="magentaLabel" text="Phase">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <Label layoutX="14.0" layoutY="47.0" prefHeight="18.0" prefWidth="86.0" styleClass="magentaLabel" text="Set Phase" />
+                              <ChoiceBox fx:id="phaseSetSelector" layoutX="131.0" layoutY="43.0" prefHeight="26.0" prefWidth="114.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                  <Tab text="Program">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="128.0" prefWidth="259.0">
+                           <children>
+                              <Label layoutX="21.0" layoutY="25.0" prefHeight="18.0" prefWidth="110.0" styleClass="addMenu-labels" text="Set Program " />
+                              <ChoiceBox layoutX="151.0" layoutY="21.0" prefHeight="26.0" prefWidth="100.0" />
+                              <CheckBox layoutX="21.0" layoutY="62.0" mnemonicParsing="false" styleClass="whiteLabel" text="Adaptive" />
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+            <Button fx:id="applyButton" layoutX="151.0" layoutY="233.0" mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="10.0" prefWidth="79.0" text="Apply" />
+            <ListView fx:id="stateText" layoutX="5.0" layoutY="265.0" prefHeight="102.0" prefWidth="250.0" />
            </children>
+       </AnchorPane>
+
+       <AnchorPane fx:id="tlVisualizerPane" prefHeight="100.0" prefWidth="150.0" styleClass="mainButtonMenu" visible="">
+           <children>
+               <Canvas fx:id="tlCanvas" height="90.0" layoutX="10.0" layoutY="10.0" width="150.0" />
+           </children>
+       </AnchorPane>
+
+       <AnchorPane fx:id="createMenu" layoutX="600.0" layoutY="50.0" prefHeight="443.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
+         <children>
+            <TabPane fx:id="createTabpane" layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" styleClass="diffTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+              <tabs>
+                <Tab text="Create Type">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <VBox prefHeight="303.0" prefWidth="178.0">
+                                       <children>
+                                          <Label text="Name" />
+                                          <Label layoutX="10.0" layoutY="10.0" text="Length" />
+                                          <Label layoutX="10.0" layoutY="28.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="45.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="63.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="80.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="98.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="116.0" text="Name" />
+                                          <Label layoutX="10.0" layoutY="133.0" text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="303.0" prefWidth="166.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Create Route">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox layoutX="95.0" layoutY="66.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Label text="Start Street" />
+                                    <ChoiceBox fx:id="startStreetSelector" prefWidth="150.0" />
+                                    <Button mnemonicParsing="false" styleClass="menuButton" text="Select Start" />
+                                    <Label layoutX="10.0" layoutY="10.0" text="End Street" />
+                                    <ChoiceBox fx:id="endStreetSelector" layoutX="10.0" layoutY="28.0" prefWidth="150.0" />
+                                    <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="84.0" styleClass="menuButton" text="Select End" />
+                                    <Label layoutX="60.0" layoutY="94.0" text="ID " />
+                                    <TextField />
+                                    <Label text="Status: " />
+                                    <Separator prefWidth="200.0" />
+                                    <Button mnemonicParsing="false" onAction="#addRoute" prefHeight="26.0" prefWidth="154.0" styleClass="menuButton" text="Add" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="50.0" right="50.0" top="20.0" />
+                                 </padding>
+                              </VBox>
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+            <Label layoutX="89.0" text="Create">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+         </children>
        </AnchorPane>
 
        <AnchorPane fx:id="stressTestMenu" layoutX="364.0" layoutY="164.0" prefHeight="275.0" prefWidth="386.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
@@ -217,7 +792,7 @@
                </children></HBox>
                <Separator layoutY="182.0" prefHeight="3.0" prefWidth="386.0" />
                <Label layoutX="127.0" layoutY="22.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Mode" />
-               <Button fx:id="startTestButton" layoutX="252.0" layoutY="144.0" mnemonicParsing="false" onAction="#startStressTest" prefHeight="26.0" prefWidth="110.0" text="Start Test" />
+               <Button fx:id="startTestButton" layoutX="252.0" layoutY="144.0" mnemonicParsing="false" onAction="#startStressTest" prefHeight="26.0" prefWidth="110.0" styleClass="menuButton" text="Start Test" />
                <ChoiceBox fx:id="stressTestMode" layoutX="221.0" layoutY="18.0" prefWidth="150.0" />
                <ChoiceBox layoutX="221.0" layoutY="61.0" prefWidth="150.0" />
                <Label layoutX="126.0" layoutY="65.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Result Data" />
@@ -236,17 +811,13 @@
                        <Insets left="15.0" top="15.0" />
                    </padding>
                </VBox>
-            <Button layoutX="134.0" layoutY="144.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" text="Create Route" />
            </children>
        </AnchorPane>
-             <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="375.0" prefWidth="299.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
+             <AnchorPane fx:id="addMenu" layoutX="153.0" layoutY="177.0" prefHeight="320.0" prefWidth="299.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
-               <Button fx:id="addVehicleButton" layoutX="181.0" layoutY="339.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="27.0" prefWidth="93.0" text="Add" />
-               <Separator layoutY="260.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.bottomAnchor="43.199999999999974" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-            <ChoiceBox fx:id="presetSelector" layoutX="14.0" layoutY="291.0" prefHeight="26.0" prefWidth="79.0" />
-            <Separator layoutY="268.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-            <Label fx:id="preSetLabel" layoutX="24.0" layoutY="272.0" prefHeight="18.0" prefWidth="136.0" styleClass="addMenu-labels" text="Presets" />
-            <HBox layoutY="51.0" prefHeight="180.0" prefWidth="299.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <Button fx:id="addVehicleButton" layoutX="100.0" layoutY="339.0" mnemonicParsing="false" onAction="#addVehicle" prefHeight="35.0" prefWidth="186.0" styleClass="menuButton" text="Add" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" />
+            <Separator layoutY="234.0" prefHeight="3.0" prefWidth="299.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <HBox layoutY="51.0" prefHeight="180.0" prefWidth="299.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0">
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0" spacing="28.0">
                      <children>
@@ -254,21 +825,33 @@
                            <font>
                               <Font name="Arial Black" size="12.0" />
                            </font>
+                           <VBox.margin>
+                              <Insets left="-10.0" />
+                           </VBox.margin>
                         </Label>
                         <Label fx:id="colorLabel" styleClass="addMenu-labels" text="Color">
                            <font>
                               <Font name="Arial Black" size="12.0" />
                            </font>
+                           <VBox.margin>
+                              <Insets left="-10.0" />
+                           </VBox.margin>
                         </Label>
                         <Label fx:id="typeLabel" styleClass="addMenu-labels" text="Type">
                            <font>
                               <Font name="Arial Black" size="12.0" />
                            </font>
+                           <VBox.margin>
+                              <Insets left="-10.0" />
+                           </VBox.margin>
                         </Label>
                         <Label fx:id="routeLabel" styleClass="addMenu-labels" text="Route">
                            <font>
                               <Font name="Arial Black" size="12.0" />
                            </font>
+                           <VBox.margin>
+                              <Insets left="-10.0" />
+                           </VBox.margin>
                         </Label>
                      </children>
                      <padding>
@@ -291,12 +874,11 @@
                   </VBox>
                </children>
             </HBox>
-            <Label layoutX="94.0" layoutY="7.0" prefHeight="34.0" prefWidth="110.0" styleClass="addMenu-labels" text="Vehicles">
+            <Label layoutX="94.0" layoutY="7.0" prefHeight="34.0" prefWidth="110.0" styleClass="addMenu-labels" text="Add Vehicles" AnchorPane.leftAnchor="61.0" AnchorPane.rightAnchor="60.0">
                <font>
                   <Font size="23.0" />
                </font>
             </Label>
-            <Button fx:id="generateRoute" layoutX="170.0" layoutY="285.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="110.0" text="Generate Route" />
            </children>
        </AnchorPane>
 
@@ -308,11 +890,11 @@
                   <Insets bottom="5.0" top="5.0" />
                </HBox.margin>
             </Label>
-            <Pane fx:id="exitTopMenu" onMouseEntered="#closeAllMenus" prefHeight="30.0" prefWidth="30.0" />
-            <Button mnemonicParsing="false" onMouseEntered="#onMapsHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
-            <Button mnemonicParsing="false" onMouseEntered="#onFiltersHover" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
-            <Button mnemonicParsing="false" onMouseEntered="#onViewHover" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
-            <Button mnemonicParsing="false" onMouseEntered="#onFileHover" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
+            <Pane fx:id="exitTopMenu" prefHeight="30.0" prefWidth="30.0" />
+            <Button fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
+            <Button fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Filters" />
+            <Button fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
+            <Button fx:id="fileMenuButton" mnemonicParsing="false" onAction="#onFilePressed" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
          </children>
       </HBox>
 
@@ -325,7 +907,7 @@
                </HBox.margin>
             </Label>
 
-             <Spinner fx:id="delaySelect" prefHeight="0.0" prefWidth="66.0">
+             <Spinner fx:id="delaySelect" prefHeight="0.0" prefWidth="66.0" styleClass="spinner">
                <HBox.margin>
                   <Insets />
                </HBox.margin>

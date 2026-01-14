@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.objects.SumoGeometry;
@@ -6,8 +6,8 @@ import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import java.util.LinkedList;
-
-import static sumo.sim.Main.LOG;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper of {@link Lane} allowing for instancing of individual Lanes within a Street
@@ -21,6 +21,10 @@ public class LaneWrap {
     private final double[] shapeX;
     private final double[] shapeY;
     private final double width;
+    private final double length;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(LaneWrap.class.getName());
 
     /**
      * Initializes this lane's shape via {@link SumoTraciConnection#do_job_get(SumoCommand)}
@@ -41,6 +45,7 @@ public class LaneWrap {
             int numPoints = coords.size();
             shapeX = new double[numPoints];
             shapeY = new double[numPoints];
+            length = (double) this.connection.do_job_get(Lane.getLength(laneID));
 
             for (int i = 0; i < numPoints; i++) {
                 SumoPosition2D point = coords.get(i);
@@ -50,7 +55,7 @@ public class LaneWrap {
 
             width = (double) connection.do_job_get(Lane.getWidth(laneID));
         } catch (Exception e) {
-            LOG.error("Failed to initialize LaneWrap. " + e);
+            logger.log(Level.SEVERE, "Failed to load Lane Geometry", e);
             throw new RuntimeException(e);
         }
     }
@@ -79,4 +84,6 @@ public class LaneWrap {
     public double getWidth(){
         return width;
     }
+
+    public double getLength(){return length;}
 }

@@ -1,15 +1,14 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Lane;
-import de.tudresden.sumo.objects.SumoGeometry;
-import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.data.XML;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
-
-import static sumo.sim.Main.LOG;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
@@ -24,9 +23,12 @@ public class Street {
     private String fromJunction;
     private String toJunction;
     private double density;
-    private double noise;
+    //private double noise;
     private double minX,minY,maxX,maxY; // for rendering optimization
     private XML xml;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(Street.class.getName());
 
     /**
      * @param id Edge ID
@@ -53,7 +55,7 @@ public class Street {
             }
             updateStreet();
         } catch (Exception e) {
-            LOG.error("Failed to initialize Street " + id, e);
+            logger.log(Level.FINE, "Failed to initialize street Data", e);
             throw new RuntimeException("Failed to initialize Street " + id, e);
         }
 
@@ -73,16 +75,13 @@ public class Street {
      */
     public void calcDensity(){
         try{
-            Number num = (Number) con.do_job_get(Edge.getLastStepVehicleNumber(id));
-            Number length = (Number) con.do_job_get(Lane.getLength(id+"_0"));
+            int num = (int) con.do_job_get(Edge.getLastStepVehicleNumber(id));
+            double length = lanes.getFirst().getLength();
 
-            double num_val = num.doubleValue();
-            double length_val = length.doubleValue();
-
-            this.density = num_val/length_val/1000;
+            this.density = num / (length / 1000.0);
         }
         catch (Exception e){
-            LOG.error("Failed to fetch data for 'calcDensity()'. " + e);
+            logger.log(Level.FINE, "Failed to calculate Street Density", e);
             throw new RuntimeException(e);
         }
     }
@@ -93,11 +92,11 @@ public class Street {
     public void updateStreet() {
         try {
             calcDensity();
-            this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
+            //this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
         } catch (Exception e) {
-            LOG.warn("Failed to fetch data for 'updateStreet()'. " + e);
+            logger.log(Level.SEVERE, "Failed to update Street Data", e);
             this.density = 0;
-            this.noise = 0;
+            //this.noise = 0;
         }
     }
 

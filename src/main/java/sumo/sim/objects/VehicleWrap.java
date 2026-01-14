@@ -1,19 +1,21 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoPosition2D;
-import de.tudresden.sumo.subscription.*;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
 import java.awt.geom.Point2D;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper of {@link Vehicle} allowing for instancing of individual vehicles
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link VehicleWrap#avgSpeed},{@link VehicleWrap#accel},
  * {@link VehicleWrap#totalLifetime} and properties critical for rendering such as {@link VehicleWrap#color}
  */
-public class VehicleWrap {
+public class VehicleWrap extends SelectableObject {
 
     // currently, to set the currentStreet of a vehicle as a Street, each car would have to have a reference to Street_List
     // therefore it could be beneficial to just use a String of EdgeID
@@ -27,7 +29,6 @@ public class VehicleWrap {
     private Color color;
     private String routeID; // which route the car is assigned to (could be of RouteWrap if implemented)
 
-    // values tracked via subscription
     private double speed; // m/s
     private Point2D.Double position;
     private double angle;
@@ -36,15 +37,20 @@ public class VehicleWrap {
     private double maxSpeed;
     private double accel; // m/s²
     private double avgSpeed;
-    private int nStops;
-    private double waitingTime;
+    private int numberOfStops;
+    private int waitingTime;
     private int activeTime;
     private int totalLifetime; // = waitingTime + activeTime;
     private boolean activeLastFrame; // using oldSpeed could render activeLastFrame useless
+    private boolean currentlyStopped;
     private boolean exists; // check for despawning in gui?
+    private boolean queued;
 
     // could be used for selecting in the GUI later on
     private boolean selected;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(VehicleWrap.class.getName());
 
     /**
      * Constructor initializes most values to 0 before they can be set by {@link VehicleWrap#updateVehicle()}
@@ -55,6 +61,7 @@ public class VehicleWrap {
      * @param color Vehicle Color
      */
     public VehicleWrap(String id , SumoTraciConnection con, String type, String route, Color color) {
+        super();
         this.id = id;
         this.type = type;
         this.con = con;
@@ -62,16 +69,15 @@ public class VehicleWrap {
         this.routeID = route;
         this.speed = 0.0;
         this.position = new Point2D.Double(0.0,0.0);
-        // this.angle = 0.0;
         this.maxSpeed = 0.0;
-        // this.accel = 0.0;
         this.avgSpeed = 0.0;
-        this.nStops = 0;
-        // activeTime = 1, waitingTime = -1 -> first frame of existence = active
+        this.numberOfStops = 0;
         this.waitingTime = -1;
         this.activeTime = 1;
         this.totalLifetime = 0;
         this.activeLastFrame = false;
+        this.currentlyStopped = false;
+        this.queued = true;
     }
 
     /**
@@ -80,6 +86,7 @@ public class VehicleWrap {
      */
     public void updateVehicle() { // updates attributes each step, causes exception (if many cars are updated and delay is changed) needs fixing
         try {
+            this.currentlyStopped = false;
             // retrieve previous frame's speed before updating the vehicle's speed
             double oldSpeed = this.speed;
             // determine whether vehicle has been active last frame via oldSpeed
@@ -104,13 +111,15 @@ public class VehicleWrap {
 
             // determine whether waiting or active
             if(this.speed == 0) {
+                this.currentlyStopped = true;
                 this.waitingTime++;
-                if(this.activeLastFrame) this.nStops++;
+                if(this.activeLastFrame) this.numberOfStops++;
             } else {
                 this.activeTime++;
             }
             this.totalLifetime++;
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to update specific vehicle", e);
             this.exists = false;
         }
     }
@@ -123,6 +132,7 @@ public class VehicleWrap {
         try {
             con.do_job_set(Vehicle.setSpeed(id, speed));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set speed of specific Vehicle", e);
             throw new RuntimeException(e);
         }
     }
@@ -156,17 +166,13 @@ public class VehicleWrap {
      */
     public String getType() { return type; }
     /**
-     * @return true: if the vehicle is currently selected by the user in the GUI<br>false: else
-     */
-    public boolean isSelected() { return selected; }
-    /**
      * @return The number of times the vehicle has stopped.
      */
-    public int getnStops() { return nStops; }
+    public int getNumberOfStops() { return numberOfStops; }
     /**
      * @return The total time (in seconds) the vehicle has spent waiting.
      */
-    public double getWaitingTime() { return waitingTime; }
+    public int getWaitingTime() { return waitingTime; }
     /**
      * @return The maximum recorded speed of this vehicle.
      */
@@ -196,4 +202,7 @@ public class VehicleWrap {
      * @return ID of the route this vehicle is following.
      */
     public String getRouteID() { return routeID; }
+    public boolean isCurrentlyStopped() { return this.currentlyStopped; }
+    protected void setQueued(boolean queued) { this.queued = queued; }
+    protected boolean isQueued()  { return this.queued; }
 }

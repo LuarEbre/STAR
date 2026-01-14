@@ -13,6 +13,9 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
+        //Set up Logger
+        StarLogger.setupLogger();
+
         // Main program to run the entire simulation
             //LOG.log(Level.INFO,"Launching application...");
             LOG.info("Launching application...");

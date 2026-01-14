@@ -1,23 +1,28 @@
-package sumo.sim;
+package sumo.sim.objects;
 
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
+import sumo.sim.util.GenericList;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static sumo.sim.Main.LOG;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages an {@link ArrayList} of {@link Street} objects.
  */
 
-public class StreetList {
+public class StreetList implements GenericList {
     // List of streets (like TL_List)
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
     private final SumoTraciConnection connection;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(StreetList.class.getName());
 
     /**
      * Initializes the {@link Street} objects inside the List via {@link XML#readAllEdges()}
@@ -37,12 +42,14 @@ public class StreetList {
                     // if id is not known -> error , needs to be checked in other lists too
                     Street s = new Street(id, from, to, con);
                     streets.add(s);
+                    count++;
                 } catch (RuntimeException e) {
-                    LOG.info("Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
+                    logger.log(Level.WARNING, "Failed to initialize Streets", e);
+                    // System.out.println("Info: Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
                 }
             }
         } catch (Exception e) {
-            LOG.error("Failed to Create StreetList. " + e);
+            logger.log(Level.SEVERE, "Failed to initialize Streets and Data", e);
             throw new RuntimeException(e);
         }
     }
@@ -65,6 +72,15 @@ public class StreetList {
      */
     public List<Street> getStreets() {
         return streets;
+    }
+
+    public String[] getSelectableStreets() {
+        String[] ret = new String[streets.size()];
+        for (int i = 0; i < streets.size(); i++) {
+            ret[i] = streets.get(i).getId();
+            System.out.println("fsafa");
+        }
+        return ret;
     }
 
     /**

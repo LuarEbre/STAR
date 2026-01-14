@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.data;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -7,10 +7,13 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import javax.xml.stream.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Map;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * XML is used for writing and reading the xml files of the sumo conifg.
@@ -23,6 +26,9 @@ public class XML {
     private FileInputStream file;
     private static XMLInputFactory factory = null;
     private String path;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(XML.class.getName());
 
     /**
      * The Constructor of XML
@@ -63,6 +69,7 @@ public class XML {
             new XMLOutputter(Format.getPrettyFormat()).output(doc, new FileOutputStream(path));
 
         }catch (Exception e){
+            logger.log(Level.FINE, "Failed to set phase duration in .net.xml", e);
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -92,8 +99,42 @@ public class XML {
                 }
             }
         }catch (Exception e){
+            logger.log(Level.FINE, "Failed to set phase duration in .net.xml", e);
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public Map<String, String> getConfigInputs() {
+        Map<String, String> inputs = new HashMap<>();
+
+        try {
+            SAXBuilder builder = new SAXBuilder();
+            Document doc = builder.build(new File(path));
+            Element root = doc.getRootElement();
+
+            // only element, children of root
+            Element inputTag = root.getChild("input");
+
+            if (inputTag != null) {
+                // list of all children (net-file, route-files, additional-files...)
+                List<Element> children = inputTag.getChildren();
+
+                for (Element child : children) {
+                    String tagName = child.getName(); // like "net-file" etc.
+                    String value = child.getAttributeValue("value"); // like "test.net.xml"
+
+                    if (value != null) {
+                        inputs.put(tagName, value); // only add if not null
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to load config inputs", e);
+            throw new RuntimeException("Error reading input file");
+        }
+
+        return inputs;
     }
 
     /**
@@ -117,6 +158,7 @@ public class XML {
                 }
             }
         }catch (Exception e){
+            logger.log(Level.FINE, "Failed to load From Junctions from .net.xml", e);
             throw new RuntimeException(e);
         }
         return null;
@@ -144,6 +186,7 @@ public class XML {
                 }
             }
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to load To Junctions from .net.xml", e);
             throw new RuntimeException(e);
         }
         return null;
@@ -175,6 +218,7 @@ public class XML {
             }
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to read Edges from .net.xml", e);
             throw new RuntimeException(e);
         }
 
@@ -206,6 +250,7 @@ public class XML {
             reader.close();
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to read Routes from .net.xml", e);
             throw new RuntimeException("Error reading XML file.", e);
         }
         return map;
@@ -237,6 +282,7 @@ public class XML {
             reader.close();
 
         }catch(Exception e){
+            logger.log(Level.SEVERE, "Failed to read Streets from .net.xml", e);
             throw new RuntimeException(e);
         }
         return map;
@@ -273,6 +319,7 @@ public class XML {
             }
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to read Traffic Lights from .net.xml", e);
             throw new RuntimeException(e);
         }
 
@@ -306,6 +353,7 @@ public class XML {
             out.output(doc, new FileOutputStream(path));
 
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to add route to .rou.xml", e);
             throw new RuntimeException("Error writing new route to XML.", e);
         }
     }

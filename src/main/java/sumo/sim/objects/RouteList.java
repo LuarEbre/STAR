@@ -1,6 +1,17 @@
-package sumo.sim;
+package sumo.sim.objects;
+
+import de.tudresden.sumo.cmd.Route;
+import de.tudresden.sumo.cmd.Simulation;
+import de.tudresden.sumo.objects.SumoStage;
+import de.tudresden.sumo.objects.SumoStringList;
+import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
+import sumo.sim.util.Util;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Class for all Routes of the Simulation
@@ -10,7 +21,12 @@ import java.util.*;
 public class RouteList {
 
     private final Map<String, List<String>> allRoutes;
-    private  XML xmlReader;
+    private XML xmlReader;
+    private final SumoTraciConnection con;
+    private final WrapperController controller;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(RouteList.class.getName());
 
     /**
      * Constructor for RouteList
@@ -18,8 +34,10 @@ public class RouteList {
      * @param rouXmlFilePath
      * @throws Exception
      */
-    public RouteList(String rouXmlFilePath) throws Exception {
+    public RouteList(String rouXmlFilePath, SumoTraciConnection con, WrapperController controller) throws Exception {
 
+        this.controller = controller;
+        this.con = con;
         // parssing the xml file
         xmlReader = new XML(rouXmlFilePath);
         // map of routes(using getRoutes from XML class)
@@ -73,9 +91,11 @@ public class RouteList {
      */
     public void generateRoute(String start, String end, String routeID, JunctionList jl) {
 
+        // needs check if route id already exists
         for (JunctionWrap jw : jl.getJunctions()) {
             jw.setDistance(Double.MAX_VALUE);
             jw.setPredecessor(null);
+            //System.out.println(jw.getID());
         }
 
         JunctionWrap startNode = jl.getJunction(start);
@@ -142,8 +162,40 @@ public class RouteList {
         System.out.println("Junction Path: " + junctionPath); // empty list?
         System.out.println("Junction Path Size: " + junctionPath.size());
 
+
         allRoutes.put(routeID, edgeList);
         xmlReader.newRoute(routeID, edgeList);
+    }
+
+    public void addRoute(String start, String end, String routeID) {
+        SumoStringList route = new SumoStringList();
+        //route.addAll(edgeList);
+        SumoStage routeResult;
+        try {
+            routeResult = (SumoStage) con.do_job_get(Simulation.findRoute(start,end,"", 0 , 0));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        route.addAll(routeResult.edges);
+        for (String s : route) {
+            System.out.println(s);
+        }
+
+        // adding in Sumo
+        // check if routeID duplicate
+        routeID = Util.checkRouteDuplicate(allRoutes, routeID);
+
+        try {
+            System.out.println(con.do_job_get(Route.getIDCount()));
+            con.do_job_set(Route.add(routeID, route));
+            System.out.println(con.do_job_get(Route.getIDCount()));
+        } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to add route", e);
+            throw new RuntimeException(e);
+        }
+
+        allRoutes.put(routeID, route);
+        controller.updateRoutes();
     }
 
     /**

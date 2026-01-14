@@ -1,6 +1,7 @@
 package sumo.sim;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
@@ -8,8 +9,12 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
 import javafx.stage.StageStyle;
+import sumo.sim.logic.SumoMapManager;
+import sumo.sim.logic.WrapperController;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -28,6 +33,10 @@ import static sumo.sim.Main.LOG;
 public class GuiApplication extends Application {
     private static GuiController guiController; // static because you dont instance guiCon -> javafx instances the controller
     private WrapperController wrapper;
+
+    //Logger
+    private static final Logger logger = java.util.logging.Logger.getLogger(GuiApplication.class.getName());
+
 
     /**
      * Loads FXML file and CSS file and sets the stage
@@ -49,8 +58,15 @@ public class GuiApplication extends Application {
 
         Scene scene = new Scene(fxmlLoader.load());
 
-        Image appIcon = new Image(getClass().getResourceAsStream("/Gui/Icons/STAR.png"));
-        stage.getIcons().add(appIcon);
+        Platform.runLater(() -> {
+            var iconStream = getClass().getResourceAsStream("/Gui/Icons/STAR.png");
+            if (iconStream != null) {
+                Image appIcon = new Image(iconStream);
+                stage.getIcons().add(appIcon);
+            } else {
+                logger.log(Level.FINE, "Error while initializing icon");
+            }
+        });
 
         // link to css file
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
@@ -83,6 +99,7 @@ public class GuiApplication extends Application {
         SumoMapManager mapManager = new SumoMapManager(); // initializes Maps
         wrapper = new WrapperController(guiController, mapManager);
         guiController.initializeCon(wrapper);
+        guiController.setStageAndManager(stage, mapManager);
     }
 
     @Override
