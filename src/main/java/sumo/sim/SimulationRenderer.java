@@ -26,11 +26,12 @@ import java.util.logging.Logger;
  */
 public class SimulationRenderer {
 
-    boolean showTrafficLightIDs;
-    boolean showDensityAnchor;
-    boolean showRouteHighlighting;
-    boolean seeTrafficLightIDs;
-    boolean selectMode;
+    private boolean showTrafficLightIDs;
+    private boolean showDensityAnchor;
+    private boolean showRouteHighlighting;
+    private boolean seeTrafficLightIDs;
+    private boolean selectMode;
+    private boolean filterApplied;
 
     private Affine currentTransform = new Affine();
     private final GraphicsContext gc;
@@ -46,6 +47,7 @@ public class SimulationRenderer {
     private final JunctionList jl;
     private final StreetList sl;
     private final VehicleList vl;
+    private final VehicleList filteredVehicles;
     private final TrafficLightList tls;
     private final Font tlFont;
     private final RouteList rl;
@@ -80,11 +82,12 @@ public class SimulationRenderer {
      *
      * </p>
      */
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls, RouteList rl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, VehicleList filteredVehicles, TrafficLightList tls, RouteList rl) {
 
         this.showTrafficLightIDs = true;
         this.showRouteHighlighting = true;
         this.showDensityAnchor = false;
+        this.filterApplied = false;
 
         this.seeTrafficLightIDs = false;
 
@@ -94,6 +97,7 @@ public class SimulationRenderer {
         this.sl = sl;
         this.jl = jl;
         this.vl = vl;
+        this.filteredVehicles = filteredVehicles;
         this.tls = tls;
         this.rl = rl;
         this.camX = jl.getCenterPosX(); // center Position is max + min / 2
@@ -310,7 +314,6 @@ public class SimulationRenderer {
             if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX
                     || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
             gc.setFill(Color.BLACK);
-            gc.setStroke(Color.BLACK);
             gc.setLineWidth(scale);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
@@ -398,12 +401,39 @@ public class SimulationRenderer {
      * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(VehicleWrap, double, double)} for every vehicle (still on the map)
      */
     private void renderVehicle() throws RenderingException {
-        for (VehicleWrap v : vl.getVehicles()) {
-            if (!v.exists() && v.getPosition() == null) continue;
-            // no need to translate coordinates since translation is already applied to graphics context
-            if (v.getPosition().getX() <= viewMinX || v.getPosition().getX() >= viewMaxX
-             || v.getPosition().getY() <= viewMinY || v.getPosition().getY() >= viewMaxY) continue;
-            this.drawTriangleCar(v, 1.5, 3); // ? set length / width in vehicle class -> internal
+        if(!filterApplied) {
+            for (VehicleWrap v : vl.getVehicles()) {
+                if (!v.exists()) continue;
+
+                var pos = v.getPosition();
+                if (pos == null) continue;
+
+                double x = pos.getX();
+                double y = pos.getY();
+
+                if (x < viewMinX || x > viewMaxX || y < viewMinY || y > viewMaxY) {
+                    continue;
+                }
+
+                this.drawTriangleCar(v, 1.5, 3);
+            }
+        }
+        else {
+            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+                if (!v.exists()) continue;
+
+                var pos = v.getPosition();
+                if (pos == null) continue;
+
+                double x = pos.getX();
+                double y = pos.getY();
+
+                if (x < viewMinX || x > viewMaxX || y < viewMinY || y > viewMaxY) {
+                    continue;
+                }
+
+                this.drawTriangleCar(v, 1.5, 3);
+            }
         }
     }
 
@@ -664,6 +694,8 @@ public class SimulationRenderer {
     protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
     protected boolean getSelectMode() { return selectMode; }
     protected void setSelectMode(boolean selectMode) { this.selectMode = selectMode; }
+    public void setFilterApplied(boolean filterApplied) { this.filterApplied = filterApplied; }
+    public boolean isFilterApplied() { return this.filterApplied; }
 }
 
 

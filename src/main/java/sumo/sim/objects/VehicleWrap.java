@@ -1,5 +1,6 @@
 package sumo.sim.objects;
 
+
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
