@@ -51,7 +51,7 @@ public class TrafficLightWrap extends SelectableObject {
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
     private final Point2D.Double position; // position as a junction
-    String [] stateArray;
+    private String [] stateArray;
     private final List<SumoLink> controlledLinks;
     private final List<String> incomingLanes;
     private XML xml;
