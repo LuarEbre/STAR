@@ -1061,9 +1061,10 @@ public class GuiController {
                             trafficLightButton.setSelected(true);
                             tlSelector.setValue(tl.getId());
                         }
-                    }
-                } catch (NullPointerException e) {
-                   System.err.println(e);
+                  }
+                }catch (NullPointerException e) {
+                    logger.log(Level.SEVERE,"Failed to setup SelectionHandler");
+                     System.err.println(e);
                 }
             }
         });

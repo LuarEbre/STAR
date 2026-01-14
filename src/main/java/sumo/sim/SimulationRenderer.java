@@ -14,6 +14,7 @@ import sumo.sim.objects.*;
 
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -179,6 +180,7 @@ public class SimulationRenderer {
             javafx.geometry.Point2D worldPos = currentTransform.inverseTransform(x, y);
             return new java.awt.geom.Point2D.Double(worldPos.getX(), worldPos.getY());
         } catch (Exception e) {
+            logger.log(Level.SEVERE,"Failed to transform coordinates.");
             throw new RuntimeException(e);
         }
     }

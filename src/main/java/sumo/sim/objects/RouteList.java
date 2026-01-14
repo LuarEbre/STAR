@@ -174,6 +174,7 @@ public class RouteList {
         try {
             routeResult = (SumoStage) con.do_job_get(Simulation.findRoute(start,end,"", 0 , 0));
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to to check if route already exists.");
             throw new RuntimeException(e);
         }
         route.addAll(routeResult.edges);
