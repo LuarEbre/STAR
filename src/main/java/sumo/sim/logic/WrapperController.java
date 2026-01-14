@@ -48,7 +48,6 @@ public class WrapperController {
 
     private String currentMap = "Frankfurt";
     private long stepCounter = 0;
-    private String currentMap = "Frankfurt";
     //private XML netXml;
 
     // config
