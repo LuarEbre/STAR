@@ -43,6 +43,8 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+
+    private String currentMap = "Frankfurt";
     private long stepCounter = 0;
     private String currentMap = "Frankfurt";
     //private XML netXml;
@@ -102,6 +104,7 @@ public class WrapperController {
 
         try {
             connection.runServer(8813); // preventing random port
+
             logger.log(Level.INFO, "Connected to Sumo");
 
             vl = new VehicleList(connection);
@@ -290,6 +293,7 @@ public class WrapperController {
     }
 
     public void mapSwitch(String mapName) {
+
         logger.log(Level.INFO, "Map switching to " + mapName);
         paused = true;
         terminated = true; // stops executor
