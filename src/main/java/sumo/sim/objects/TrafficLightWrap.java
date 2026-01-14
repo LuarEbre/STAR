@@ -382,13 +382,13 @@ public class TrafficLightWrap extends SelectableObject {
         return stateArray;
     }
 
-    public String getCurrentStateString(){
-        String state = "";
-        try{
-            state = (String)con.do_job_get(Trafficlight.getRedYellowGreenState(id));
-        }catch(Exception e){
+    public String getCurrentStateString() {
+        String state ="";
+        try {
+            state = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(id));
+        } catch (Exception e) {
             logger.log(Level.FINE, "Failed to get current state of Traffic Light", e);
-            throw new RuntimeException(e);
+            return state;
         }
         return state;
     }
