@@ -417,5 +417,4 @@ public class TrafficLightWrap extends SelectableObject {
         }
 
     }
-
 }
