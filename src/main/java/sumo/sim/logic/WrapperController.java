@@ -6,8 +6,11 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import sumo.sim.*;
 import sumo.sim.objects.*;
+import sumo.sim.util.ExportableData;
 import sumo.sim.util.Util;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -208,24 +211,28 @@ public class WrapperController {
     public void stopSim() {
         paused = true;
 
-        /*try {
+        try {
+            // Test for pdf output
+            String home = System.getProperty("user.home");
+            File desktop = new File(home, "Desktop");
 
-            String desktopPath = System.getProperty("user.home") + "/Schreibtisch/";
+            if (!desktop.exists()) {
+                desktop = new File(home, "Schreibtisch");
+            }
 
-            // testfiles
-            File pdfFile = new File(desktopPath + "SUMO_Test_Report.pdf");
-            File csvFile = new File(desktopPath + "SUMO_Test_Data.csv");
+            File pdfFile = new File(desktop, "SUMO_Test_Report.pdf");
+            //File csvFile = new File(desktop, "SUMO_Test_Data.csv");
 
-            System.out.println(">>> TEST: Start export zo desktop...");
+            System.out.println(">>> EXPORT: Export to desktop: " + desktop.getAbsolutePath());
 
             this.generateExport(pdfFile);
-            this.generateExport(csvFile);
+            // this.generateExport(csvFile);
 
-            System.out.println(">>> TEST: export done!");
+            System.out.println(">>> EXPORT: done!");
         } catch (Exception e) {
-            System.err.println(">>> TEST: error: " + e.getMessage());
+            System.err.println(">>> EXPORT ERROR: " + e.getMessage());
             e.printStackTrace();
-        }*/
+        }
 
     }
 
@@ -346,24 +353,53 @@ public class WrapperController {
             addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
         }
     }
-    /*public void generateExport(File file) {
-        // collect archieved and acitve vehicles
-        List<VehicleWrap> exportVehicles = new ArrayList<>(allTimeVehicles);
+    public void generateExport(File file) {
+        // preparing lists
+        List<ExportableData> selections = new ArrayList<>();
+        List<ExportableData> allObjects = new ArrayList<>();
+
+        // collecting data
         if (vl != null && vl.getVehicles() != null) {
-            exportVehicles.addAll(vl.getVehicles());
+            for (VehicleWrap v : vl.getVehicles()) {
+                allObjects.add(v); // all objects
+                if (v.isSelected()) {
+                    selections.add(v); // selected objects
+                }
+            }
         }
 
+        if (tl != null && tl.getTrafficlights() != null) {
+            for (TrafficLightWrap t : tl.getTrafficlights()) {
+                allObjects.add(t);
+                if (t.isSelected()) {
+                    selections.add(t);
+                }
+            }
+        }
+
+        // if selected is empty all data will be exported
+        List<ExportableData> finalData = selections.isEmpty() ? allObjects : selections;
+
+        // export
         try {
-            if (file.getName().endsWith(".pdf")) {
-                DataExport.exportAsPDF(file, exportVehicles, sl.getStreets(), tl.getTrafficlights());
+            if (!finalData.isEmpty()) {
+                if (file.getName().endsWith(".pdf")) {
+                    DataExport.exportSelectionAsPDF(file, finalData);
+
+                    // console message for testing
+                    if (selections.isEmpty()) {
+                        System.out.println("No selection: All data will be exported");
+                    } else {
+                        System.out.println("Export " + selections.size() + " selected objects.");
+                    }
+                }
             } else {
-                DataExport.exportAsCSV(file, exportVehicles, sl.getStreets(), tl.getTrafficlights(), this.simTime);
+                System.out.println("No simulation, no data exported.");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }*/
-
+    }
 
     /**
      * Sets the duration of the phase the traffic light is currently on.

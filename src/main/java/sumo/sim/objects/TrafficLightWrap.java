@@ -9,6 +9,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import sumo.sim.SimulationRenderer;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
+import sumo.sim.util.ExportableData;
 
 import java.awt.geom.Point2D;
 import java.util.HashSet;
@@ -27,7 +28,36 @@ import java.util.logging.Logger;
  * </p>
  *
  */
-public class TrafficLightWrap extends SelectableObject {
+public class TrafficLightWrap extends SelectableObject implements ExportableData {
+
+    @Override
+    public String getExportCategory() {
+        return "TrafficLights";
+    }
+    @Override
+    public String[] getColumnHeaders() {
+        return new String[] {
+                "ID",
+                "Program",
+                "Phase",
+                "Color",
+                "Duration"};
+    }
+    @Override
+    public String[] getRowData() {
+        TrafficLightPhase currentphase = getCurrentPhaseObject();
+
+        String phaseIdx = (currentphase != null) ? String.valueOf(currentphase.getIndex()) : "unknown";
+        String phaseState = (currentphase != null) ? currentphase.getState() : "unknown";
+
+        return new String[]{
+                getId(),
+                getProgram(),
+                phaseIdx,
+                phaseState,
+                getDuration() + "s"
+        };
+    }
 
     private final SumoTraciConnection con;
     private final String id;
@@ -365,6 +395,18 @@ public class TrafficLightWrap extends SelectableObject {
             logger.log(Level.FINE, "Failed to get program of Traffic Light", e);
             throw new RuntimeException(e);
         }
+    }
+    public TrafficLightPhase getCurrentPhaseObject() {
+        try {
+            int currentIndex = getPhaseNumber();
+
+            if (phases != null && currentIndex >= 0 && currentIndex < phases.size()) {
+                return phases.get(currentIndex);
+            }
+        } catch (Exception e) {
+            logger.log(Level.FINE, "Error: Phase not available", e);
+        }
+        return null;
     }
 
     public String getId() {
