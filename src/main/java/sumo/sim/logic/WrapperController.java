@@ -8,6 +8,7 @@ import sumo.sim.*;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
+import java.util.stream.Collectors;
 
 /**
  * author
@@ -31,6 +32,7 @@ public class WrapperController {
     private StreetList sl;
     private TrafficLightList tl;
     private VehicleList vl;
+    private VehicleList filteredVehicles;
     private JunctionList jl;
     private TypeList typel;
     private RouteList rl;
@@ -50,6 +52,12 @@ public class WrapperController {
     public static String currentNet = null;
     public static String currentRou = null;
     public String sumoBinary;
+
+    // filtering
+    private boolean filterApplied;
+    private Color colorFilter;
+    private Double lowerSpeedFilter, upperSpeedFilter;
+    private String routeFilter, typeFilter;
 
     // data export
     /*private final List<VehicleWrap> allTimeVehicles = new ArrayList<>();
@@ -97,11 +105,19 @@ public class WrapperController {
             logger.log(Level.INFO, "Connected to Sumo");
 
             vl = new VehicleList(connection);
+            filteredVehicles = new VehicleList(connection);
             sl = new StreetList(this.connection);
             tl = new TrafficLightList(connection, sl);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
             rl = new RouteList(currentRou, connection, this);
+
+            // initialize filter values
+            colorFilter = null;
+            lowerSpeedFilter = null;
+            upperSpeedFilter = null;
+            routeFilter = null;
+            typeFilter = null;
 
             tl.updateAllCurrentState(); // important for rendering
             start();
@@ -230,6 +246,21 @@ public class WrapperController {
 
     }
 
+    public void applyFilter(Color color, Double lower, Double upper, String route, String type) {
+        colorFilter = color;
+        lowerSpeedFilter = lower;
+        upperSpeedFilter = upper;
+        routeFilter = route;
+        typeFilter = type;
+        if(color == null && lower == null && upper == null && route == null && type == null) {
+            this.filterApplied = false;
+        }
+        else {
+            this.filteredVehicles.setVehicles(this.filterVehicles());
+            this.filterApplied = true;
+        }
+    }
+
     /**
      * Performs one simulation step and gui simulation step.
      * All important updates are done here -> e.g. vl.updateAllVehicles()
@@ -238,13 +269,11 @@ public class WrapperController {
         // updating gui and simulation
         try {
             connection.do_timestep();
+            if(filterApplied) {
+                this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
+            }
             vl.updateAllVehicles();
-            // safes disappeared vehicles for data export
-            /*for (VehicleWrap v : vl.getVehicles()) {
-                if (!v.exists() && !allTimeVehicles.contains(v)) {
-                    allTimeVehicles.add(v);
-                }
-            }*/
+
             tl.updateAllCurrentState();
             sl.updateStreets();
 
@@ -366,6 +395,18 @@ public class WrapperController {
         }
     }*/
 
+    private CopyOnWriteArrayList<VehicleWrap> filterVehicles() {
+        return this.vl.getVehicles().stream()
+                .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
+                .filter(v -> this.routeFilter == null || v.getRouteID().equals(this.routeFilter))
+                .filter(v -> this.colorFilter == null || v.getColor().equals(this.colorFilter))
+                .filter(v -> {
+                    boolean aboveMin = (this.lowerSpeedFilter == null || v.getSpeed() >= this.lowerSpeedFilter);
+                    boolean belowMax = (this.upperSpeedFilter == null || v.getSpeed() <= this.upperSpeedFilter);
+                    return aboveMin && belowMax;
+                })
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+    }
 
     /**
      * Sets the duration of the phase the traffic light is currently on.
@@ -436,6 +477,7 @@ public class WrapperController {
     public JunctionList getJunctions() { return jl; }
     public StreetList getStreets() { return sl; }
     public VehicleList getVehicles() { return vl; }
+    public VehicleList getFilteredVehicles() { return filteredVehicles; }
     public TrafficLightList getTrafficLights() { return tl; }
     public RouteList getRoutes()  { return rl; }
     public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
@@ -444,6 +486,8 @@ public class WrapperController {
     public boolean isPaused() { return paused; }
     public String getCurrentMap() { return currentMap; }
     public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
+    public SumoTraciConnection getConnection() { return connection; }
+    public boolean isFilterApplied() { return filterApplied; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -453,6 +497,7 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
+    public int getAllFilteredVehicleCount() { return (filteredVehicles != null) ? filteredVehicles.getVehicles().size() : 0; }
 
 
 }
