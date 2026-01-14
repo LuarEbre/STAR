@@ -85,7 +85,7 @@ public class GuiController {
     private ComboBox<String> filterMenuColorSelector;
     @FXML
     private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
-            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, filterColor, filterSpeed, filterRoute, filterType;
+            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, adaptiveTrafficLightCheck, filterColor, filterSpeed, filterRoute, filterType;
     @FXML
     private TextField   amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD, speedRangeLower, speedRangeUpper,
                         vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops, trafficLightID, TLposition, currPhase,
@@ -765,6 +765,15 @@ public class GuiController {
         changeMap(wrapperController.getCurrentMap());
     }
 
+    @FXML
+    protected void onAdaptiveTrafficLight(){
+        if(!(adaptiveTrafficLightCheck.isSelected())) {
+            wrapperController.setAdaptiveOn(true);
+        }else{
+            wrapperController.setAdaptiveOn(false);
+        }
+    }
+
     // top right menu buttons hovered
 
     private void topMenuButtonToggle(Node menu) {
@@ -976,7 +985,8 @@ public class GuiController {
     }
 
     /**
-     * Refreshes the data list view (currently placeholder structure).
+     * Refreshes the data list view.
+     * This includes Overall, Selected, Filtered and Graphs
      */
     public void updateDataPane() {
 
@@ -993,8 +1003,8 @@ public class GuiController {
             stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
         }
 
-        // Setup new Axis Data
-        if ((int) wrapperController.getTime() % 4 == 0) {
+        //Setup new Axis Data
+        if(!(wrapperController.getVehicles().getVehicles().isEmpty()) && ((int) wrapperController.getTime() % 4 == 0)) {
             activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
             percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
         }
@@ -1279,6 +1289,10 @@ public class GuiController {
         unselectButtons();
         closeAllMainButtonMenus();
 
+        // Graph Reset
+        activeVehiclesSeries.getData().clear();
+        percentStoppedSeries.getData().clear();
+
         // Text reset
         vehicleCount.setText("0");
     }
@@ -1476,10 +1490,6 @@ public class GuiController {
         map1select.setDisable(true);
         map2select.setDisable(true);
         if (mapName != null) {
-
-            activeVehiclesSeries.getData().clear();
-            percentStoppedSeries.getData().clear();
-
             wrapperController.mapSwitch(mapName);
         }
         importMapSelector.getSelectionModel().clearSelection(); // resets previous selection

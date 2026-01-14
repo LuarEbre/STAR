@@ -116,4 +116,13 @@ public class StreetList implements GenericList {
             s.updateStreet();
         }
     }
+
+    public Street getStreetBasedOnLane(String laneID){
+        for(Street s : streets){
+            if(s.getStreetBasedOnLane(laneID) != null){
+                return s;
+            };
+        }
+        return null;
+    }
 }
