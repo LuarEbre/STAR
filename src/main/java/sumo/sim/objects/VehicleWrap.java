@@ -5,8 +5,11 @@ import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
+import sumo.sim.util.ExportableData;
+
 import java.awt.geom.Point2D;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,8 +18,34 @@ import java.util.logging.Logger;
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link VehicleWrap#avgSpeed},{@link VehicleWrap#accel},
  * {@link VehicleWrap#totalLifetime} and properties critical for rendering such as {@link VehicleWrap#color}
  */
-public class VehicleWrap extends SelectableObject {
+public class VehicleWrap extends SelectableObject implements ExportableData {
 
+    @Override
+    public String getExportCategory() {return "Vehicles: "; }
+    @Override
+    public String[] getColumnHeaders() {
+        return new String[] {
+                "ID",
+                "Avg Speed",
+                "Stops",
+                "Waiting Time",
+                "Max Speed"
+        };
+    }
+    @Override
+    public String[] getRowData() {
+        double avg = Double.isFinite(avgSpeed) ? avgSpeed : 0.0;
+        double max = Double.isFinite(maxSpeed) ? maxSpeed : 0.0;
+        double wait = Double.isFinite(waitingTime) ? waitingTime : 0.0;
+
+        return new String[] {
+                id,
+                String.format(Locale.US, "%.2f m/s", avg),
+                String.valueOf(numberOfStops),
+                String.format(Locale.US, "%.0f s", wait),
+                String.format(Locale.US, "%.2f m/s", max)
+        };
+    }
     // currently, to set the currentStreet of a vehicle as a Street, each car would have to have a reference to Street_List
     // therefore it could be beneficial to just use a String of EdgeID
     private Street currentStreet;
