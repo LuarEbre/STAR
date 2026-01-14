@@ -424,11 +424,12 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
         return stateArray;
     }
 
-    public String getCurretStateString() {
+    public String getCurrentStateString() {
         String state ="";
         try {
             state = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(id));
         } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to get current state of Traffic Light", e);
             return state;
         }
         return state;
@@ -458,5 +459,4 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
         }
 
     }
-
 }
