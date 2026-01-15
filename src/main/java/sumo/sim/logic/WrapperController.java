@@ -43,7 +43,7 @@ public class WrapperController {
     private double simTime;
     private long stepCounter = 0;
     private String currentMap = "Frankfurt";
-    //private XML netXml;
+    private volatile boolean isUiUpdatePending = false; // readable on all threads
 
     // config
     private SumoMapConfig mapConfig;
@@ -121,8 +121,8 @@ public class WrapperController {
         if (executor != null && !executor.isShutdown()) {
             return;
         }
-        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly
-        executor.scheduleAtFixedRate(() -> {
+        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly, waits for previous step
+        executor.scheduleWithFixedDelay(() -> {
             if (paused || terminated) return;
 
             if (connection.isClosed()) {
@@ -237,20 +237,30 @@ public class WrapperController {
     public void doStepUpdate() {
         // updating gui and simulation
         try {
+            // updating all lists
             connection.do_timestep();
+            simTime = (double) connection.do_job_get(Simulation.getTime());
             vl.updateAllVehicles();
+            tl.updateAllCurrentState();
+            sl.updateStreets();
+
             // safes disappeared vehicles for data export
             /*for (VehicleWrap v : vl.getVehicles()) {
                 if (!v.exists() && !allTimeVehicles.contains(v)) {
                     allTimeVehicles.add(v);
                 }
             }*/
-            tl.updateAllCurrentState();
-            sl.updateStreets();
 
-            simTime = (double) connection.do_job_get(Simulation.getTime());
-            if (!terminated) {
-                Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
+            if (!isUiUpdatePending) {
+                // only update if gui is done with rendering a single step
+                isUiUpdatePending = true;
+                Platform.runLater(() -> {
+                    try {
+                        guiController.doSimStep();
+                    } finally {
+                        isUiUpdatePending = false; // gui is done
+                    }
+                });
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Sim Step", e);

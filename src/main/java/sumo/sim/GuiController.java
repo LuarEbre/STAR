@@ -810,11 +810,11 @@ public class GuiController {
             dynamicMap.widthProperty().bind(middlePane.widthProperty().multiply(1.25));
             dynamicMap.heightProperty().bind(middlePane.heightProperty().multiply(0.985));
             dataPane.setVisible(false);
-            sr.updateStaticMap();
         } else {
             dataPane.setVisible(true);
             rescale();
         }
+        sr.updateStaticMap();
     }
 
     @FXML

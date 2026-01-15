@@ -44,7 +44,7 @@
     <vType id="super fast" vClass="passenger" length="5.0" sigma="0.3" accel="15.6" tau="0.5" decel="6.5" maxSpeed="150"  emergencyDecel="20.0" />
     <vType id="beginner" vClass="passenger" length="5.0" accel="1.6" decel="5.5" maxSpeed="45" sigma="1" tau="3.0" speedFactor="0.9" />
     <vType id="aggressive" vClass="passenger" length="6.5" accel="5.6" emergencyDecel="5.0" decel="1.5" maxSpeed="50" speedFactor="1.1" speedDev="0.4" impatience="1.0" sigma="0.3"/>
-    <vType id="extra slow" vClass="passenger" length="6.5" accel="0.6" emergencyDecel="5.5" decel="2.5" maxSpeed="15" speedFactor="0.5" speedDev="0.3" impatience="0" sigma="0.4"/>
+    <vType id="extra slow" vClass="passenger" length="6.5" accel="0.6" emergencyDecel="5.5" decel="2.5" maxSpeed="5" speedFactor="0.5" speedDev="0.3" impatience="0" sigma="0.4"/>
     -->
 
 
