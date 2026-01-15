@@ -369,6 +369,15 @@ public class WrapperController {
     }
 
     public void generateExport(File file, boolean useFilterCheckbox) {
+        if (sl != null) {
+            for (Street s : sl.getStreets()) {
+                s.updateStreet(); // includes the ticks/updating
+            }
+        }
+        if (tl != null) {
+            tl.updateTLs(); // updates tl
+        }
+
         List<ExportableData> exportList = new ArrayList<>();
             if (useFilterCheckbox) {
                 // if filter apllied lists gets filterd
@@ -387,6 +396,9 @@ public class WrapperController {
                 // if no filter applied list contains active and archived vehicles
                 exportList.addAll(this.allTimeVehicles);
         }
+        if (sl != null) {
+            exportList.addAll(sl.getStreets());
+        }
         // traffic lights
         if (tl != null) {
             exportList.addAll(tl.getTrafficlights());
@@ -394,7 +406,16 @@ public class WrapperController {
         // export starts if data is available(always the case because of traffic lights)
         if (!exportList.isEmpty()) {
             try {
-                DataExport.exportSelectionAsPDF(file, exportList, this.stepCounter, this.simTime);
+                String fileName = file.getName().toLowerCase();
+
+                if (fileName.endsWith(".csv")) {
+                    DataExport.exportDataAsCsv(file, exportList, this.stepCounter, this.simTime);
+                    System.out.println("CSV-Export done.");
+                }
+                else if (fileName.endsWith(".pdf")) {
+                    DataExport.exportDataAsPDF(file, exportList, this.stepCounter, this.simTime);
+                    System.out.println("PDF-Export done.");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

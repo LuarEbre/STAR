@@ -32,30 +32,54 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
 
     @Override
     public String getExportCategory() {
-        return "TrafficLights";
+        return "Traffic Light Adaption Analysis";
     }
     @Override
     public String[] getColumnHeaders() {
         return new String[] {
                 "ID",
-                "Program",
-                "Phase",
-                "Color",
-                "Duration"};
+                "State Duration",
+                "Street: From/to",
+                "Avg/Peak Density",
+                "Interventions"
+        };
     }
     @Override
     public String[] getRowData() {
-        TrafficLightPhase currentphase = getCurrentPhaseObject();
+        TrafficLightPhase currentPhase = getCurrentPhaseObject();
 
-        String phaseIdx = (currentphase != null) ? String.valueOf(currentphase.getIndex()) : "unknown";
-        String phaseState = (currentphase != null) ? currentphase.getState() : "unknown";
+        String stateInfo = (currentPhase != null ? currentPhase.getState() : "unknown")
+                + " (" + getDuration() + "s)";
+        StringBuilder streetDetails = new StringBuilder();
+        double sumOfAverages = 0;
+        double globalPeak = 0;
+        int count = 0;
+
+        for (Street s : controlledStreets) {
+            // infor about streets from/to
+            streetDetails.append(s.getId())
+                    .append(" (").append(s.getFromJunction()).append("to").append(s.getToJunction()).append(")")
+                    .append("\n"); // line breaks for overview
+
+            // statistics
+            sumOfAverages += s.getAverageDensity();
+            if (s.getMaxDensity() > globalPeak) {
+                globalPeak = s.getMaxDensity();
+            }
+            count++;
+        }
+        double totalAvg = (count > 0) ? (sumOfAverages / count) : 0;
+
+        // sumup change history
+        String historyLog = String.join(" | ", changeTlHistory);
+        if (historyLog.isEmpty()) historyLog = "No changes";
 
         return new String[]{
-                getId(),
-                getProgram(),
-                phaseIdx,
-                phaseState,
-                getDuration() + "s"
+                this.id,
+                stateInfo,
+                streetDetails.toString().trim(),
+                String.format(java.util.Locale.US, "Avg: %.2f / Peak: %.2f", totalAvg, globalPeak),
+                historyLog
         };
     }
 
@@ -75,6 +99,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
     //
     // </tlLogic>
 
+    private final List<String> changeTlHistory = new ArrayList<>();
     private List<TrafficLightPhase> phases; // G = green priority , g , y, r , u = red_yellow , o = off;
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
@@ -210,6 +235,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
     public void setPhaseNumber(int index) {
         try {
             con.do_job_set(Trafficlight.setPhase(id,index));
+            triggerReset("Changed phasse to " + index);
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set phase number of Traffic Light", e);
             throw new RuntimeException(e);
@@ -273,6 +299,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
                 con.do_job_set(Trafficlight.setCompleteRedYellowGreenDefinition(id, program));
                 phases.get(phaseIndex).setDuration(newDuration);
             }
+            triggerReset("Duaration of phase " + phaseIndex + " changed to " + newDuration);
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set phase duration of Traffic Light", e);
             return;
@@ -283,6 +310,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
     public void setProgram(String programID) {
         try {
             con.do_job_set(Trafficlight.setProgram(id, programID));
+            triggerReset("Progamm ID changed to " + programID);
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set program of Traffic Light", e);
             throw new RuntimeException(e);
@@ -458,5 +486,18 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
             throw new RuntimeException(e);
         }
 
+    }
+    /**
+     * Resets the tracking data (average, peak, ticks) for all streets
+     * controlled by this traffic light.
+     */
+    public void triggerReset(String change) {
+        if (controlledStreets != null) {
+            for (Street s : controlledStreets) {
+                s.resetDataTracking();
+            }
+            changeTlHistory.add(change);
+            logger.log(Level.INFO, "Reset controlled streets due to manual traffic light setting change.", this.id);
+        }
     }
 }

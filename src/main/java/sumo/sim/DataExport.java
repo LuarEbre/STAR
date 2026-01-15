@@ -5,15 +5,16 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import sumo.sim.util.ExportableData;
-import java.io.File;
-import java.io.FileOutputStream;
+
+import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DataExport {
 
-    public static void exportSelectionAsPDF(File file, List<ExportableData> selections, long simSteps, double simTime) throws Exception {
+    public static void exportDataAsPDF(File file, List<ExportableData> exportPdf, long simSteps, double simTime) throws Exception {
         // format
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, new FileOutputStream(file));
@@ -31,7 +32,7 @@ public class DataExport {
         document.add(new Paragraph("Steps: " + simSteps, metaFont));
         document.add(new Paragraph(" "));
 
-        Map<String, List<ExportableData>> grouped = selections.stream()
+        Map<String, List<ExportableData>> grouped = exportPdf.stream()
                 .collect(Collectors.groupingBy(ExportableData::getExportCategory));
 
         for (Map.Entry<String, List<ExportableData>> entry : grouped.entrySet()) {
@@ -51,7 +52,7 @@ public class DataExport {
             float[] widths = new float[headers.length];
             if (headers.length > 0) {
                 widths[0] = 0.8f; // ID
-                for(int i = 1; i < headers.length; i++) {
+                for (int i = 1; i < headers.length; i++) {
                     widths[i] = 2.0f; // remaining columns
                 }
                 table.setWidths(widths);
@@ -78,5 +79,33 @@ public class DataExport {
             document.add(new Paragraph(" "));
         }
         document.close();
+    }
+
+    public static void exportDataAsCsv(File file, List<ExportableData> exportCsv, long simSteps, double simTime) throws Exception {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)))) {
+            writer.println("SUMO Simulation Report");
+            writer.println("Simulation runtime: " + String.format(java.util.Locale.US, "%.2f s", simTime));
+            writer.println("Steps: " + simSteps);
+            writer.println();
+
+            Map<String, List<ExportableData>> grouped = exportCsv.stream()
+                    .collect(Collectors.groupingBy(ExportableData::getExportCategory));
+
+            for (Map.Entry<String, List<ExportableData>> entry : grouped.entrySet()) {
+                writer.println("[" + entry.getKey().replace(":", "") + "]");
+
+                List<ExportableData> items = entry.getValue();
+                String[] headers = items.get(0).getColumnHeaders();
+                writer.println(String.join(";", headers));
+
+                for (ExportableData item : items) {
+                    String row = java.util.Arrays.stream(item.getRowData())
+                            .map(s -> s == null ? "" : s.trim().replace(";", ","))
+                            .collect(Collectors.joining(";"));
+                    writer.println(row);
+                }
+                writer.println();
+            }
+        }
     }
 }
