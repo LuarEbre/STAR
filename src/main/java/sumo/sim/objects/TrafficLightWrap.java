@@ -1,5 +1,7 @@
 package sumo.sim.objects;
 
+import de.tudresden.sumo.cmd.Edge;
+import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoTLSController;
@@ -104,7 +106,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
     //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
     private int duration; // time
     private final Point2D.Double position; // position as a junction
-    String [] stateArray;
+    private String [] stateArray;
     private final List<SumoLink> controlledLinks;
     private final List<String> incomingLanes;
     private XML xml;
@@ -211,6 +213,42 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
         // links.get(0).from
         try {
             currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
+        } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
+            throw new RuntimeException(e);
+        }
+        stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
+        for (int i = 0; i < stateArray.length; i+=2 ) {
+            int sumoIndex = i/2; // to not skip values
+            stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
+            stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
+            //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
+            // [G, lane_G ,y , lane_y , r, lane_r ] format
+        }
+    }
+
+    /**
+     * Adaptive States based on Density of Controlled Lanes
+     * Replaces setCurrentState if adaptive is checked
+     */
+    public void adaptiveStateUpdate(StreetList  streetList) {
+        int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
+        // -> state differs from index to index (index is controlled lanes that have tl)
+        String currentState;
+        // links.get(0).from
+        double densityOfAllLanes = 0.0;
+
+        try {
+            for(String lane : this.incomingLanes) {
+                Street s = streetList.getStreetBasedOnLane(lane);
+                densityOfAllLanes += s.getDensity();
+            }
+
+            if(densityOfAllLanes >= 100.0 && this.duration > 1) {
+                this.setPhaseDuration(this.duration - 1);
+            }
+            currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
+
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
             throw new RuntimeException(e);

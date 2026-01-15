@@ -26,24 +26,34 @@ import java.util.logging.Logger;
  */
 public class SimulationRenderer {
 
+    // rendering modes
     private boolean showTrafficLightIDs;
     private boolean showDensityAnchor;
     private boolean showRouteHighlighting;
     private boolean seeTrafficLightIDs;
     private boolean selectMode;
+    private boolean createRouteMode;
     private boolean filterApplied;
-
-    private Affine currentTransform = new Affine();
-    private final GraphicsContext gc;
-    private final Canvas map;
     private boolean showSelectablePoints;
     private boolean pickedARoute;
     private boolean viewDensityOn;
+
+    // rendering
+    private final Affine currentTransform = new Affine();
+    private final GraphicsContext gcStatic;
+    private final GraphicsContext gcDynamic;
+    private final Canvas mapStatic;
+    private final Canvas mapDynamic;
+    private boolean redrawStaticMap;
+
+    // camera
     private double zoom;
     private double camX;
     private double camY;
     private double scale; // should depend on how big the map is -> difference between max and min?
     private double rotation;
+
+    // lists
     private final JunctionList jl;
     private final StreetList sl;
     private final VehicleList vl;
@@ -53,6 +63,7 @@ public class SimulationRenderer {
     private final RouteList rl;
     private String RouteID;
 
+    // rendering limit
     private double viewMinX;
     private double viewMaxX;
     private double viewMinY;
@@ -71,7 +82,7 @@ public class SimulationRenderer {
      * Arguments passed on by {@link GuiController}: <br>
      *
      * @param canvas The JavaFX Canvas to draw on
-     * @param gc     The GraphicsContext associated with the canvas. Which controls its content
+     * @param gcStatic     The GraphicsContext associated with the canvas. Which controls its content
      * @param jl     The list of junctions to render.
      * @param sl     The list of streets to render -> to get its associated lanes
      * @param vl     The list of vehicles to render.
@@ -82,33 +93,42 @@ public class SimulationRenderer {
      *
      * </p>
      */
-    public SimulationRenderer(Canvas canvas, GraphicsContext gc, JunctionList jl, StreetList sl, VehicleList vl, VehicleList filteredVehicles, TrafficLightList tls, RouteList rl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gcStatic, Canvas dynamic, GraphicsContext gcDynamic, JunctionList jl, StreetList sl, VehicleList vl, VehicleList filteredVehicles,  TrafficLightList tls, RouteList rl) {
 
+        // modes
         this.showTrafficLightIDs = true;
         this.showRouteHighlighting = true;
         this.showDensityAnchor = false;
         this.filterApplied = false;
-
         this.seeTrafficLightIDs = false;
+        this.redrawStaticMap = true;
 
+        // javafx render objects
         this.tlFont = new Font("Arial", 7);
-        this.map = canvas;
-        this.gc = gc; // for drawing on canvas
+        this.mapStatic = canvas;
+        this.gcStatic = gcStatic; // for drawing on canvas
+        this.mapDynamic = dynamic;
+        this.gcDynamic = gcDynamic;
+
+        // lists
         this.sl = sl;
         this.jl = jl;
         this.vl = vl;
         this.filteredVehicles = filteredVehicles;
         this.tls = tls;
         this.rl = rl;
+
+        // cam
         this.camX = jl.getCenterPosX(); // center Position is max + min / 2
         this.camY = jl.getCenterPosY();
         double scaleX = (jl.getMaxPosX() - jl.getMinPosX()); // e.g : max 3, min -3 -> 3 -- 3 = 6 -> difference
         double scaleY = (jl.getMaxPosY() - jl.getMinPosY());
         //System.out.println("scaleX: " + scaleX +  " scaleY: " + scaleY);
         this.scale = 1 + (scaleX / scaleY); // should calculate the rough scale of the map
-
         this.zoom = scale + 1;
         this.rotation = 0;
+
+        // boundaries for rendering
         for (Street s: sl.getStreets()) {
             s.calculateBounds();
         }
@@ -120,7 +140,7 @@ public class SimulationRenderer {
 
     /**
      * Main rendering method. Clears the canvas, applies transformations with {@link #transform()}, and triggers
-     * the drawing of map layers {@link #renderTrafficLight()} {@link #renderMap()} {@link #renderVehicle()}  }
+     * the drawing of map layers {@link #renderTrafficLight()} {@link ()} {@link #renderVehicle()}  }
      * <p>
      * This method is called by {@link GuiController#renderUpdate()} method ~60 times per second
      * </p>
@@ -130,16 +150,17 @@ public class SimulationRenderer {
         updateViewportBounds();
         // area the size of canvas : frame -> canvas cords.
         // -> network: only do the following rendering with objects inside this restricting area;
-        gc.setTransform(new Affine()); // transformation matrix, clears canvas
 
-        gc.setFill(Paint.valueOf("#86858E")); // background color
-        gc.fillRect(0, 0, map.getWidth(), map.getHeight()); // covers whole screen (edge detection)
+        transform(); // applying transformation
 
-        transform();
-        renderMap();
-        if(this.selectMode) {
-            this.renderSelectableObjects();
+        // only render static map if zoom/pan occured
+        if (redrawStaticMap  || viewDensityOn) {
+            renderStaticMap();
+            redrawStaticMap = false;
         }
+        // render dynamic Objects always
+        renderDynamicMap();
+
     }
     // [ mxx , mxy , tx ]
     // [ myx , myy , ty ]
@@ -165,7 +186,7 @@ public class SimulationRenderer {
      */
     private void transform() {
         this.currentTransform.setToIdentity();
-        this.currentTransform.appendTranslation(map.getWidth() / 2, map.getHeight() / 2); // moves 0,0 to map middle : add/sub
+        this.currentTransform.appendTranslation(mapStatic.getWidth() / 2, mapStatic.getHeight() / 2); // moves 0,0 to map middle : add/sub
         // [ 1 , 0 , width ]        [ x + w ] <-- this is our point x -> + is to the right on x
         // [ 0 , 1 , height ]  *    [ y+h ]  <-- this is our point y
         // [ 0 , 0 , 1 ]            [ 1 ] <-- homogeneuos (added 1 row )
@@ -175,7 +196,143 @@ public class SimulationRenderer {
         // [ 0 , ySC , 0 ]  *    [ y * ySc ]
         // [ 0 , 0 , 1 ]            [ 1 ]
         this.currentTransform.appendTranslation(-camX, -camY); // centralizes our view
-        gc.setTransform(currentTransform); // applies new matrix to gc matrix
+        gcStatic.setTransform(currentTransform); // applies new matrix to gc matrix
+    }
+
+    // could throw rendering exception
+    private void renderDynamicMap() {
+        gcDynamic.setTransform(new Affine());
+        gcDynamic.clearRect(0, 0, mapDynamic.getWidth(), mapDynamic.getHeight());
+        gcDynamic.setTransform(currentTransform);
+
+        try {
+            renderVehicle();
+            renderTrafficLight();
+
+            if (showDensityAnchor) renderDensityAnchor();
+            if (showTrafficLightIDs && seeTrafficLightIDs) displayTrafficLights();
+            if (this.selectMode) renderSelectableObjects();
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void renderStaticMap() {
+        // initialize gcStatic
+        gcStatic.setTransform(new Affine()); // transformation matrix, clears canvas
+        gcStatic.setFill(Paint.valueOf("#86858E")); // background color
+        gcStatic.fillRect(0, 0, mapStatic.getWidth(), mapStatic.getHeight()); // covers whole screen (edge detection)
+        gcStatic.setTransform(currentTransform);
+
+        List<String> currentRoute = (pickedARoute && RouteID != null) ? rl.getAllRoutes().get(RouteID) : null;
+
+        for (Street s : sl.getStreets()) {
+            // stroke Polyline for lanes -> only render visible objects
+            if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
+                    || s.getMaxY() < viewMinY || s.getMinY() > viewMaxY) continue;
+
+            // Route mode
+            if (createRouteMode) {
+                double radius = 5.0;
+                double sidelength = radius * 2;
+
+                gcStatic.setFill(Color.RED);
+                gcStatic.fillRect(s.getMeanPositionX() - radius, s.getMeanPositionY() - radius, sidelength, sidelength);
+            }
+            String streetId = s.getId();
+
+            // map color
+            gcStatic.setLineWidth(scale);
+
+            // Route highlighting
+            if (currentRoute != null && !currentRoute.isEmpty() && showRouteHighlighting) {
+                String startId = currentRoute.getFirst();
+                if (streetId.equals(startId)) {
+                    gcStatic.setStroke(Color.GREEN);
+                }
+                else if (currentRoute.contains(streetId)) {
+                    gcStatic.setStroke(Color.RED);
+                }
+                else {
+                    gcStatic.setStroke(Color.rgb(0,0,0,0.6));
+                }
+
+            } else if (viewDensityOn) {
+                // density rendering, colors lanes based on density
+                double dens = s.getDensity(); // density of current street
+                if (dens >=100.0) gcStatic.setStroke(Color.rgb(163, 29, 45, 0.6));
+                else if (dens < 100.0 && dens >= 50.0) gcStatic.setStroke(Color.rgb(217, 126, 22, 0.6));
+                else if (dens < 50.0 && dens >= 20.0)  gcStatic.setStroke(Color.rgb(231, 240, 58, 0.6));
+                else gcStatic.setStroke(Color.rgb(96, 219, 68, 0.6));
+
+            } else {
+                gcStatic.setStroke(Color.rgb(0,0,0,0.6)); // standard street color
+            }
+
+            for (LaneWrap l : s.getLanes()) { // lanes of streets
+
+                double[] rawX = l.getShapeX();
+                double[] rawY = l.getShapeY();
+                // needs checking -> error preventing
+                if (rawX == null || rawY == null || rawX.length == 0) continue;
+
+                // Draws Lanes
+                if (rawX.length >= 2) {
+                    // if there are at least 2 values in pointCount -> it's a line e.g. : [54.7, 38.75]
+                    gcStatic.setFill(Color.BLACK);
+                    gcStatic.setLineWidth(3.3); // should be adjustable
+                    gcStatic.strokePolyline(rawX, rawY, rawX.length);
+                }
+            }
+        }
+
+        for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
+            if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX // skip if not visible
+                    || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
+            gcStatic.setFill(Color.rgb(54,53,57));
+            gcStatic.setStroke(Color.rgb(54,53,57));
+            gcStatic.setLineWidth(scale);
+            double[] rawX = jw.getShapeX();
+            double[] rawY = jw.getShapeY();
+
+            if (rawX == null || rawY == null || rawX.length == 0) continue;
+
+            // draw
+            // 1 element in array: dot -> oval
+            // [54.7, 38.75] 2 -> line
+            // > 3 elements in array : polygon
+            if (rawX.length >= 3) {
+                gcStatic.fillPolygon(rawX, rawY, rawX.length); // fills polygon
+                //gcStatic.strokePolygon(rawX, rawY, rawX.length); // border
+            } else if (rawX.length == 2) {
+                //gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]);
+            } else {
+                gcStatic.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
+            }
+
+        }
+    }
+  
+    private void renderSelectableObjects() {
+        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
+        gcDynamic.setFill(Color.rgb(66,245,245,0.5));
+        if(!this.filterApplied) {
+            for (VehicleWrap v : vl.getVehicles()) {
+                if (v.exists()) {
+                    gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
+            }
+        } else {
+            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+                if (v.exists()) {
+                    gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
+            }
+        }
+        for(TrafficLightWrap tl : tls.getTrafficlights()) {
+            gcDynamic.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
+        }
     }
 
     public Point2D.Double screenToWorld(double x, double y) {
@@ -187,162 +344,12 @@ public class SimulationRenderer {
         }
     }
 
-    private void renderSelectableObjects() {
-        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
-        gc.setFill(Color.rgb(66,245,245,0.5));
-        for(VehicleWrap v: vl.getVehicles()) {
-            if(v.exists()) {
-                gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
-            }
-        }
-        for(TrafficLightWrap tl : tls.getTrafficlights()) {
-            gc.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
-        }
-    }
-
     /**
-     * Renders the static map elements (streets and junctions) and triggers rendering
-     * of dynamic elements (Vehicle / TL)
-     *
-     * <p>
-     *     Performs rendering by parsing raw shapes of objects onto gc via the given lists
-     * </p>
+     * Calculates the visible space for rendering
      */
-    private void renderMap() throws RenderingException {
-        // map color
-        gc.setFill(Color.BLACK);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(scale);
-
-        List<String> currentRoute = (pickedARoute && RouteID != null) ? rl.getAllRoutes().get(RouteID) : null;
-
-        for (Street s : sl.getStreets()) {
-            String streetId = s.getId();
-
-            if (currentRoute != null && !currentRoute.isEmpty() && showRouteHighlighting) {
-
-                String startId = currentRoute.getFirst();
-
-                if (streetId.equals(startId)) {
-                    gc.setStroke(Color.GREEN);
-                }
-                else if (currentRoute.contains(streetId)) {
-                    gc.setStroke(Color.RED);
-                }
-                else {
-                    gc.setStroke(Color.BLACK);
-                }
-            // density rendering, colors lanes based on density
-            } else if (viewDensityOn){
-                if (s.getDensity() >=100.0){
-                    gc.setStroke(Color.rgb(163, 29, 45, 0.6));
-                } else if ((s.getDensity() < 100.0) && (s.getDensity() >= 50.0)) {
-                    gc.setStroke(Color.rgb(217, 126, 22, 0.6));
-                } else if ((s.getDensity() < 50.0) && (s.getDensity() >= 20.0)) {
-                    gc.setStroke(Color.rgb(231, 240, 58, 0.6));
-                }else {
-                    gc.setStroke(Color.rgb(96, 219, 68, 0.6));
-                }
-            } else {
-                gc.setStroke(Color.rgb(0,0,0,0.6)); // standard street color
-            }
-            // stroke Polyline for lanes
-            if (s.getMaxX() < viewMinX || s.getMinX() > viewMaxX
-                    || s.getMaxY() < viewMinY || s.getMinY() > viewMaxY) continue;
-            int countLanes = s.getLanes().size();
-            double[] meanLaneX = null;
-            double[] meanLaneY = null;
-
-            for (LaneWrap l : s.getLanes()) { // lanes of streets
-
-                double[] rawX = l.getShapeX();
-                double[] rawY = l.getShapeY();
-                // needs checking -> error preventing
-                if (rawX == null || rawY == null || rawX.length == 0) continue;
-
-                if (meanLaneX == null) {
-                    // only the first time if there are no lanes for this street saved yet
-                    meanLaneX = new double[rawX.length];
-                    meanLaneY = new double[rawY.length];
-                }
-
-                int limit = Math.min(meanLaneX.length, rawX.length); // out of bounce check -> if not the same size
-
-                /* // should be calculated in street
-                for (int i = 0; i < limit; i++) {
-                    meanLaneX[i] += rawX[i];
-                    meanLaneY[i] += rawY[i];
-                    // sums up all point for mean calculation later
-                } */
-
-                // Draws Lanes
-                if (rawX.length >= 2) {
-                    // if there are at least 2 values in pointCount -> it's a line e.g. : [54.7, 38.75]
-                    gc.setFill(Color.BLACK);
-                    gc.setLineWidth(3.3); // should be adjustable
-                    gc.setLineDashes(null);
-                    gc.strokePolyline(rawX, rawY, rawX.length);
-                }
-            }
-
-            /*
-            // test, only works if lanesCount == 2 , if odd -> cant place line in the middle, if even: needs offset
-            // Draws lane lines
-            if (meanLaneX != null) {
-                for (int i = 0; i < meanLaneX.length; i++) {
-                    // mean calculation / countLanes -> gets a line exactly in the middle of the road
-                    meanLaneX[i] /= countLanes;
-                    meanLaneY[i] /= countLanes;
-                }
-
-                gc.setStroke(Color.WHITE);
-                gc.setLineWidth(0.25);
-                gc.setLineDashes(10d, 10d);
-
-                // experimental , needs fixing
-                if (countLanes == 2) {
-                    gc.strokePolyline(meanLaneX, meanLaneY, meanLaneX.length); // middle line
-                } else if (countLanes % 2 == 0) {
-
-                } else if (countLanes % 2 == 1) {
-
-                }
-            } */
-        }
-
-        for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
-            if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX
-                    || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
-            gc.setFill(Color.BLACK);
-            gc.setLineWidth(scale);
-            double[] rawX = jw.getShapeX();
-            double[] rawY = jw.getShapeY();
-
-            if (rawX == null || rawY == null || rawX.length == 0) continue;
-
-            // draw
-            // 1 element in array: dot -> oval
-            // [54.7, 38.75] 2 -> line
-            // > 3 elements in array : polygon
-            if (rawX.length >= 3) {
-                gc.fillPolygon(rawX, rawY, rawX.length); // fills polygon
-                //gc.strokePolygon(rawX, rawY, rawX.length); // border
-            } else if (rawX.length == 2) {
-                //gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]);
-            } else {
-                gc.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
-            }
-
-        }
-        renderVehicle();
-        renderTrafficLight();
-        if (showDensityAnchor) renderDensityAnchor();
-        if (showTrafficLightIDs && seeTrafficLightIDs) displayTrafficLights();
-    }
-
     private void updateViewportBounds() {
-        double viewWidthWorld = map.getWidth() / zoom;
-        double viewHeightWorld = map.getHeight() / zoom;
+        double viewWidthWorld = mapStatic.getWidth() / zoom;
+        double viewHeightWorld = mapStatic.getHeight() / zoom;
 
         this.viewMinX = camX - (viewWidthWorld / 2);
         this.viewMaxX = camX + (viewWidthWorld / 2);
@@ -368,14 +375,14 @@ public class SimulationRenderer {
      */
     protected void displayTrafficLights() {
         // text adjustments (color, alignment, font)
-        gc.setFill(Color.rgb(241, 241, 241));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.CENTER);
-        gc.setFont(tlFont);
+        gcDynamic.setFill(Color.rgb(241, 241, 241));
+        gcDynamic.setTextAlign(TextAlignment.CENTER);
+        gcDynamic.setTextBaseline(VPos.CENTER);
+        gcDynamic.setFont(tlFont);
 
         for (TrafficLightWrap tl : tls.getTrafficlights()) {
             // save and restore context, as each traffic light gets a unique translation
-            gc.save();
+            gcDynamic.save();
 
             // using TL position as "offset" so we can later render at translated (0 | 0)
             double newX = tl.getPosition().getX();
@@ -383,13 +390,13 @@ public class SimulationRenderer {
             String id = tl.getId();
 
             // translate using position
-            gc.translate(newX, newY);
+            gcDynamic.translate(newX, newY);
             // flip Y-axis so text renders right side up
-            gc.scale(1, -1);
+            gcDynamic.scale(1, -1);
 
-            gc.fillText(id, 0, 0);
+            gcDynamic.fillText(id, 0, 0);
             // restore previously saved GraphicsContext
-            gc.restore();
+            gcDynamic.restore();
         }
     }
 
@@ -447,15 +454,15 @@ public class SimulationRenderer {
      */
     private void drawTriangleCar(VehicleWrap v, double width, double length) {
         if (v.exists()) {
-            gc.save(); // saves previous gc state
-            gc.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
-            gc.rotate(-v.getAngle() + 180); // mirror along x -> rotate 180 degree
-            gc.setFill(v.getColor());
+            gcDynamic.save(); // saves previous gc state
+            gcDynamic.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
+            gcDynamic.rotate(-v.getAngle() + 180); // mirror along x -> rotate 180 degree
+            gcDynamic.setFill(v.getColor());
             double[] xPoints = {0, -width, width}; // width relative to start point 0 , 0
             double[] yPoints = {-length, length, length}; // set 3 Polygon point relative to car position
-            gc.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
+            gcDynamic.fillPolygon(xPoints, yPoints, 3); // 3 ->  length
 
-            gc.restore(); // restores previous
+            gcDynamic.restore(); // restores previous
         }
     }
 
@@ -467,11 +474,11 @@ public class SimulationRenderer {
         if (meanPos != null) {
             double width = 5;
             // subtracting half the width to account for oval center
-            gc.setFill(Color.rgb(220, 35, 15, 0.8));
-            gc.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
+            gcDynamic.setFill(Color.rgb(220, 35, 15, 0.8));
+            gcDynamic.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
             width += 2;
-            gc.setFill(Color.rgb(220, 35, 15, 0.2));
-            gc.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
+            gcDynamic.setFill(Color.rgb(220, 35, 15, 0.2));
+            gcDynamic.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
         }
     }
 
@@ -492,7 +499,10 @@ public class SimulationRenderer {
             if (state == null) continue; // protection
 
             Color lightColor;
-            gc.setLineWidth(2.0);
+            gcDynamic.setLineWidth(2.0);
+
+            if (tl.getPosition().x < viewMinX || tl.getPosition().x > viewMaxX ||
+                    tl.getPosition().y < viewMinY || tl.getPosition().y > viewMaxY) continue;
 
             for (Street controlledStreet : tl.getControlledStreets()) {
                 for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets , maybe performance hashmap
@@ -505,7 +515,7 @@ public class SimulationRenderer {
                                 case "r" -> lightColor = Color.RED;
                                 default -> lightColor = Color.GRAY;
                             }
-                            gc.setStroke(lightColor);
+                            gcDynamic.setStroke(lightColor);
                             break; // lane found
                         }
                     }
@@ -541,7 +551,7 @@ public class SimulationRenderer {
                     double lineX2 = endX - (perpX * halfWidth);
                     double lineY2 = endY - (perpY * halfWidth);
 
-                    gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
+                    gcDynamic.strokeLine(lineX1, lineY1, lineX2, lineY2);
                 }
             }
 
@@ -556,6 +566,7 @@ public class SimulationRenderer {
     public void padMad(double x, double y) {
         camX += x / (zoom / 2); // zoom / 2 -> if zoomed out -> x gets bigger
         camY += y / (zoom / 2);
+        redrawStaticMap = true;
     }
 
     /**
@@ -566,13 +577,19 @@ public class SimulationRenderer {
         // should have a zoom min and max cap based on map scale , max cap = scale*2
         if (zoom < scale*2) {
             zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+            redrawStaticMap = true;
         }
     }
 
     public void zoomMapOut(double z) {
         if (zoom > scale / 5) {
             zoom *= z; // zoom with values > 1 , // unzoom with val < 1
+            redrawStaticMap = true;
         }
+    }
+
+    public void updateStaticMap() {
+        redrawStaticMap = true;
     }
 
     public void renderTrafficLightPreview(String id, String[] streets, String phase, Canvas canvas, GraphicsContext gcTL) {
@@ -598,11 +615,11 @@ public class SimulationRenderer {
         Affine transform = new Affine();
         transform.appendTranslation(canvas.getWidth() / 2, canvas.getHeight() / 2); // move to middle
         transform.appendScale(previewZoom, -previewZoom);
-        transform.appendTranslation(-pos.getX(), -pos.getY());
+        transform.appendTranslation(-pos.getX(), -pos.getY()); // centralizes cam to tl position
         gcTL.setTransform(transform);
 
         // render junctions
-        JunctionWrap jw = jl.getJunction(id);
+        JunctionWrap jw = jl.getJunction(id); // id of tl = junction id
         if (jw != null) {
             // should check shape mean to determine camera?
             double[] jx = jw.getShapeX();
@@ -694,6 +711,7 @@ public class SimulationRenderer {
     protected void setViewDensityOn(boolean viewDensityOn) { this.viewDensityOn = viewDensityOn; }
     protected boolean getSelectMode() { return selectMode; }
     protected void setSelectMode(boolean selectMode) { this.selectMode = selectMode; }
+    protected void setRouteCreateMode(boolean mode) {this.createRouteMode = mode;}
     public void setFilterApplied(boolean filterApplied) { this.filterApplied = filterApplied; }
     public boolean isFilterApplied() { return this.filterApplied; }
 }

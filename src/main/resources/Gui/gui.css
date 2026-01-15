@@ -187,9 +187,6 @@
     -fx-background-position: center
 }
 
-#vehicleCount:hover {
-    -fx-text-fill: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
-}
 /* Map choosing */
 
 .mapSelect:hover {
@@ -283,7 +280,7 @@
 }
 
 #createButton {
-    -fx-background-image: url("/Gui/Icons/create.png");
+    -fx-background-image: url("/Gui/Icons/createRoute.png");
     -fx-background-size: 50px 50px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center
@@ -456,7 +453,10 @@
     -fx-text-fill: -fx-color-white;
 }
 
-#addMenu .separator .line {
+#addMenu .separator .line,
+#stressTestMenu .separator .line,
+#trafficLightMenu .separator .line,
+#createMenu .separator .line {
     -fx-border-color: -fx-color-grey-darkest;
     -fx-border-width: 1.5px;
     -fx-background-color: null;

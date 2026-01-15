@@ -1,16 +1,32 @@
 package sumo.sim;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.*;
 import java.util.logging.Logger;
 
+/**
+ * Custom Logger for STAR
+ * @author simonr
+ * @see LoggFormatter
+ * @see LoggFilter
+ */
+
 public class StarLogger {
 
+    /**
+     * Initiates the Logger
+     * Uses LoggFormatter and LoggFilter to format the log entries
+     * Logs are saved in Logs/logger.log
+     *
+     * @see LoggFilter
+     * @see LoggFormatter
+     */
     public static void setupLogger() {
         try {
-
-           // LogManager.getLogManager().readConfiguration(new FileInputStream("mylogging.properties"));
 
             Logger rootLogger = Logger.getLogger("");
 
@@ -19,7 +35,11 @@ public class StarLogger {
             }
 
             // FileHandler
-            FileHandler fileHandler = new FileHandler("src/main/resources/Logs/logger.log", 2_000_000, 5, true);
+            if(Files.notExists(Paths.get("Logs"))) {
+                new File("Logs").mkdirs();
+            }
+
+            FileHandler fileHandler = new FileHandler("Logs/logger.log", true);
             fileHandler.setFormatter(new LoggFormatter());
             fileHandler.setFilter(new LoggFilter());
 
