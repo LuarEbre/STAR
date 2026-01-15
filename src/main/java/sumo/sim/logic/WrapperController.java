@@ -8,6 +8,7 @@ import sumo.sim.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -525,6 +526,7 @@ public class WrapperController {
     public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
     public SumoTraciConnection getConnection() { return connection; }
     public boolean isFilterApplied() { return filterApplied; }
+    public TypeList getTypeListAsTypeList() {return typel;}
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null

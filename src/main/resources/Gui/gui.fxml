@@ -513,7 +513,7 @@
                                                    <Insets left="3.0" right="3.0" />
                                                </padding>
                                            </LineChart>
-                                          <BarChart id="currentGYR" fx:id="currentGYR" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="200.0" prefWidth="229.0" title="Current Traffic Light Phases">
+                                          <BarChart id="currentGYR" fx:id="currentGYR" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="170.0" prefWidth="229.0" title="Current Traffic Light Phases">
                                             <xAxis>
                                               <CategoryAxis side="BOTTOM" />
                                             </xAxis>
@@ -521,6 +521,15 @@
                                               <NumberAxis fx:id="currentGYRYAxis" side="LEFT" />
                                             </yAxis>
                                           </BarChart>
+
+                                           <BarChart id="typeAmountChart" fx:id="typeAmountChart" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="200.0" prefWidth="229.0" title="Vehicle Types Amount">
+                                               <xAxis>
+                                                   <CategoryAxis side="BOTTOM" />
+                                               </xAxis>
+                                               <yAxis>
+                                                   <NumberAxis fx:id="typeAmountYAxis" side="LEFT" />
+                                               </yAxis>
+                                           </BarChart>
                                        </children>
                                     </VBox>
                                  </children>

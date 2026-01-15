@@ -5,13 +5,11 @@ import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
 import sumo.sim.data.CSV;
+import sumo.sim.logic.Type;
 import sumo.sim.util.GenericList;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +62,7 @@ public class VehicleList implements GenericList {
                 //vehicles.add(new VehicleWrap("v" + count, con, type, route, color)); // adds new vehicle
                 newVehicles.add(new VehicleWrap("v"+count, con, type, route, color));
                 count++; // increment to prevent identical car ids
+
             }
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to add vehicle", e);
@@ -262,6 +261,16 @@ public class VehicleList implements GenericList {
             }
         }
         return Math.sqrt(sumofsquares/activeVehicles);
+    }
+
+    public int getVehiclesAmountByType(Type type) {
+        List<VehicleWrap> vehiclesWithType = new ArrayList<>();
+        for(VehicleWrap v : vehicles) {
+            if(v.getType().equals(type.getId())) {
+                vehiclesWithType.add(v);
+            }
+        }
+        return vehiclesWithType.size();
     }
 
     public void deselectAll() {
