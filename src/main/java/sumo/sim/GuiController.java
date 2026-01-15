@@ -18,12 +18,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 import javafx.scene.paint.Color;
@@ -85,7 +88,7 @@ public class GuiController {
     private ComboBox<String> filterMenuColorSelector;
     @FXML
     private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
-            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, filterColor, filterSpeed, filterRoute, filterType;
+            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, filterColor, filterSpeed, filterRoute, filterType, applyFilter;
     @FXML
     private TextField   amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped, TotalTimeSpentStopped, MeanSpeed, SpeedSD, speedRangeLower, speedRangeUpper,
                         vehicleID, vehicleType, route, color, currentSpeed, averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops, trafficLightID, TLposition, currPhase,
@@ -467,6 +470,24 @@ public class GuiController {
         sr.setFilterApplied(false);
         this.updateDataPane();
         tabPane.getSelectionModel().select(2);
+    }
+    @FXML
+    private void managePdfExport () {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose Directory");
+        chooser.setInitialFileName("Simulation Report.pdf");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Data", "*.pdf"));
+
+        String userHome = System.getProperty("user.home");
+        File desktop = new File(userHome, "Desktop");
+            if (desktop.exists() && desktop.isDirectory()) {
+            chooser.setInitialDirectory(desktop);
+            }
+        File pdfFile = chooser.showSaveDialog(null);
+            if( pdfFile != null) {
+                boolean usingFilter = applyFilter.isSelected();
+                this.wrapperController.generateExport(pdfFile, usingFilter);
+            }
     }
 
     @FXML

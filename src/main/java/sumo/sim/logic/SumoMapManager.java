@@ -47,12 +47,6 @@ public class SumoMapManager {
                 new File ("src/main/resources/SumoConfig/Frankfurt2/frankfurt2.sumocfg")
         ));
 
-        /*maps.put("MiquelAllee", new SumoMapConfig(
-                "MiquelAllee",
-                new File ("src/main/resources/SumoConfig/MiquelAllee/MiquelAllee.net.xml"),
-                new File ("src/main/resources/SumoConfig/MiquelAllee/MiquelAllee.rou.xml"),
-                new File ("src/main/resources/SumoConfig/MiquelAllee/MiquelAllee.sumocfg")
-        ));*/
     }
 
     public void chooseFile(Stage stage) {

@@ -48,8 +48,7 @@ public class WrapperController {
     private double simTime;
 
     private String currentMap = "Frankfurt";
-    private long stepCounter = 0;
-    private String currentMap = "Frankfurt";
+    private long stepCounter;
     //private XML netXml;
 
     // config
@@ -65,10 +64,8 @@ public class WrapperController {
     private String routeFilter, typeFilter;
 
     // data export
-    /*private final List<VehicleWrap> allTimeVehicles = new ArrayList<>();
-    private int stepCounter = 0;
-    private final int exportSamplingRate = 100;
-    */
+    private CopyOnWriteArrayList<VehicleWrap> allTimeVehicles = new CopyOnWriteArrayList<>();
+
     //Logger
     private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
@@ -96,7 +93,7 @@ public class WrapperController {
         this.mapManager = mapManager;
         this.terminated = false;
         this.paused = true;
-        this.simTime = 0;
+        this.simTime = 0.0;
 
         // initial setup to initiate server connection and start sim
         initializeSimulationStart();
@@ -230,30 +227,6 @@ public class WrapperController {
      */
     public void stopSim() {
         paused = true;
-
-        try {
-            // Test for pdf output
-            String home = System.getProperty("user.home");
-            File desktop = new File(home, "Desktop");
-
-            if (!desktop.exists()) {
-                desktop = new File(home, "Schreibtisch");
-            }
-
-            File pdfFile = new File(desktop, "SUMO_Test_Report.pdf");
-            //File csvFile = new File(desktop, "SUMO_Test_Data.csv");
-
-            System.out.println(">>> EXPORT: Export to desktop: " + desktop.getAbsolutePath());
-
-            this.generateExport(pdfFile);
-            // this.generateExport(csvFile);
-
-            System.out.println(">>> EXPORT: done!");
-        } catch (Exception e) {
-            System.err.println(">>> EXPORT ERROR: " + e.getMessage());
-            e.printStackTrace();
-        }
-
     }
 
     public void applyFilter(Color color, Double lower, Double upper, String route, String type) {
@@ -284,19 +257,17 @@ public class WrapperController {
             }
             vl.updateAllVehicles();
             // safes disappeared vehicles for data export
-            /*for (VehicleWrap v : vl.getVehicles()) {
-                if (!v.exists() && !allTimeVehicles.contains(v)) {
+            for (VehicleWrap v : vl.getVehicles()) {
+                if (v.getSpeed() > 0 && !allTimeVehicles.contains(v)) {
                     allTimeVehicles.add(v);
                 }
-            }*/
-
+            }
+            //for data export
+            stepCounter++;
             tl.updateAllCurrentState();
             sl.updateStreets();
-
-            simTime = (double) connection.do_job_get(Simulation.getTime());
             //vl.printVehicles();
             simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
-            //stepCounter++;
             if (!terminated) {
                 Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
             }
@@ -332,17 +303,16 @@ public class WrapperController {
                 this.currentMap = mapName;
 
                 this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath().toString()); // new connection
-                simTime = 0;
-
+                this.simTime = 0;
+                this.stepCounter = 0;
+                allTimeVehicles.clear();
                 // prevents new sim from starting instantly
                 paused = true;
                 Platform.runLater(guiController::doSimStep);
 
                 terminated = false;
-
                 // start again
                 initializeSimulationStart();
-
                 // initializes new map
                 Platform.runLater(() -> guiController.initializeCon(this));
 
@@ -397,53 +367,40 @@ public class WrapperController {
             addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
         }
     }
-    public void generateExport(File file) {
-        // preparing lists
-        List<ExportableData> selections = new ArrayList<>();
-        List<ExportableData> allObjects = new ArrayList<>();
 
-        // collecting data
-        if (vl != null && vl.getVehicles() != null) {
-            for (VehicleWrap v : vl.getVehicles()) {
-                allObjects.add(v); // all objects
-                if (v.isSelected()) {
-                    selections.add(v); // selected objects
-                }
-            }
-        }
-
-        if (tl != null && tl.getTrafficlights() != null) {
-            for (TrafficLightWrap t : tl.getTrafficlights()) {
-                allObjects.add(t);
-                if (t.isSelected()) {
-                    selections.add(t);
-                }
-            }
-        }
-
-        // if selected is empty all data will be exported
-        List<ExportableData> finalData = selections.isEmpty() ? allObjects : selections;
-
-        // export
-        try {
-            if (!finalData.isEmpty()) {
-                if (file.getName().endsWith(".pdf")) {
-                    DataExport.exportSelectionAsPDF(file, finalData);
-
-                    // console message for testing
-                    if (selections.isEmpty()) {
-                        System.out.println("No selection: All data will be exported");
-                    } else {
-                        System.out.println("Export " + selections.size() + " selected objects.");
-                    }
-                }
+    public void generateExport(File file, boolean useFilterCheckbox) {
+        List<ExportableData> exportList = new ArrayList<>();
+            if (useFilterCheckbox) {
+                // if filter apllied lists gets filterd
+                List<VehicleWrap> filtered = this.allTimeVehicles.stream()
+                    .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
+                    .filter(v -> this.routeFilter == null || v.getRouteID().equals(this.routeFilter))
+                    .filter(v -> this.colorFilter == null || v.getColor().equals(this.colorFilter))
+                    .filter(v -> {
+                        boolean aboveMin = (this.lowerSpeedFilter == null || v.getSpeed() >= this.lowerSpeedFilter);
+                        boolean belowMax = (this.upperSpeedFilter == null || v.getSpeed() <= this.upperSpeedFilter);
+                        return aboveMin && belowMax;
+                    })
+                    .collect(Collectors.toList());
+                exportList.addAll(filtered);
             } else {
-                System.out.println("No simulation, no data exported.");
+                // if no filter applied list contains active and archived vehicles
+                exportList.addAll(this.allTimeVehicles);
+        }
+        // traffic lights
+        if (tl != null) {
+            exportList.addAll(tl.getTrafficlights());
+        }
+        // export starts if data is available(always the case because of traffic lights)
+        if (!exportList.isEmpty()) {
+            try {
+                DataExport.exportSelectionAsPDF(file, exportList, this.stepCounter, this.simTime);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
+
     private CopyOnWriteArrayList<VehicleWrap> filterVehicles() {
         return this.vl.getVehicles().stream()
                 .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
