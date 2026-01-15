@@ -238,7 +238,7 @@ public class SimulationRenderer {
                     gc.setStroke(Color.RED);
                 }
                 else {
-                    gc.setStroke(Color.BLACK);
+                    gc.setStroke(Color.rgb(0,0,0,0.6));
                 }
             // density rendering, colors lanes based on density
             } else if (viewDensityOn){
