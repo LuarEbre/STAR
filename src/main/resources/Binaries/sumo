@@ -1,4 +1,4 @@
-#!/usr/bin/python3.13
+#!/usr/bin/python3
 import sys
 from sumo import sumo
 if __name__ == '__main__':

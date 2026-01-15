@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * </p>
  */
 public class VehicleList implements GenericList {
-    private final CopyOnWriteArrayList<VehicleWrap> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
+    private CopyOnWriteArrayList<VehicleWrap> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     private int activeCount; // vehicles currently on the road network
@@ -176,6 +176,7 @@ public class VehicleList implements GenericList {
     public CopyOnWriteArrayList<VehicleWrap> getVehicles() {
         return vehicles;
     }
+    public void setVehicles(CopyOnWriteArrayList<VehicleWrap> vehicles) { this.vehicles = vehicles; }
 
     public VehicleWrap getSelectedVehicle() {
         for(VehicleWrap v : vehicles) {
@@ -234,6 +235,33 @@ public class VehicleList implements GenericList {
             }
         }
         return Math.sqrt(sumofsquares/this.activeCount);
+    }
+
+    public double getMeanSpeedFiltered() {
+        double meanspeed = 0;
+        int activeVehicles = getExistingVehCount();
+        if(activeVehicles == 0) return meanspeed;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                meanspeed += v.getSpeed();
+            }
+        }
+        meanspeed /= activeVehicles;
+        return meanspeed;
+    }
+
+    public double getSpeedStdDevFiltered() {
+        int activeVehicles = getExistingVehCount();
+        if(activeVehicles == 0) return 0.0;
+        double meanspeed = this.getMeanSpeed();
+        double sumofsquares = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                double diff = v.getSpeed() - meanspeed;
+                sumofsquares += diff*diff;
+            }
+        }
+        return Math.sqrt(sumofsquares/activeVehicles);
     }
 
     public void deselectAll() {

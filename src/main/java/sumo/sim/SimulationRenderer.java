@@ -27,12 +27,13 @@ import java.util.logging.Logger;
 public class SimulationRenderer {
 
     // rendering modes
-    boolean showTrafficLightIDs;
-    boolean showDensityAnchor;
-    boolean showRouteHighlighting;
-    boolean seeTrafficLightIDs;
-    boolean selectMode;
-    boolean createRouteMode;
+    private boolean showTrafficLightIDs;
+    private boolean showDensityAnchor;
+    private boolean showRouteHighlighting;
+    private boolean seeTrafficLightIDs;
+    private boolean selectMode;
+    private boolean createRouteMode;
+    private boolean filterApplied;
     private boolean showSelectablePoints;
     private boolean pickedARoute;
     private boolean viewDensityOn;
@@ -56,6 +57,7 @@ public class SimulationRenderer {
     private final JunctionList jl;
     private final StreetList sl;
     private final VehicleList vl;
+    private final VehicleList filteredVehicles;
     private final TrafficLightList tls;
     private final Font tlFont;
     private final RouteList rl;
@@ -91,12 +93,13 @@ public class SimulationRenderer {
      *
      * </p>
      */
-    public SimulationRenderer(Canvas canvas, GraphicsContext gcStatic, Canvas dynamic, GraphicsContext gcDynamic, JunctionList jl, StreetList sl, VehicleList vl, TrafficLightList tls, RouteList rl) {
+    public SimulationRenderer(Canvas canvas, GraphicsContext gcStatic, Canvas dynamic, GraphicsContext gcDynamic, JunctionList jl, StreetList sl, VehicleList vl, VehicleList filteredVehicles,  TrafficLightList tls, RouteList rl) {
 
         // modes
         this.showTrafficLightIDs = true;
         this.showRouteHighlighting = true;
         this.showDensityAnchor = false;
+        this.filterApplied = false;
         this.seeTrafficLightIDs = false;
         this.redrawStaticMap = true;
 
@@ -111,6 +114,7 @@ public class SimulationRenderer {
         this.sl = sl;
         this.jl = jl;
         this.vl = vl;
+        this.filteredVehicles = filteredVehicles;
         this.tls = tls;
         this.rl = rl;
 
@@ -288,9 +292,9 @@ public class SimulationRenderer {
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
             if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX // skip if not visible
                     || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
-            gcStatic.setFill(Color.BLACK);
-            gcStatic.setStroke(Color.BLACK);
-            gcStatic.setLineWidth(scale);
+            gc.setFill(Color.rgb(54,53,57));
+            gc.setStroke(Color.rgb(54,53,57));
+            gc.setLineWidth(scale);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
 
@@ -309,6 +313,27 @@ public class SimulationRenderer {
                 gcStatic.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
             }
 
+        }
+    }
+  
+    private void renderSelectableObjects() {
+        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
+        gc.setFill(Color.rgb(66,245,245,0.5));
+        if(!this.filterApplied) {
+            for (VehicleWrap v : vl.getVehicles()) {
+                if (v.exists()) {
+                    gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
+            }
+        } else {
+            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+                if (v.exists()) {
+                    gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
+            }
+        }
+        for(TrafficLightWrap tl : tls.getTrafficlights()) {
+            gc.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
         }
     }
 
@@ -398,12 +423,39 @@ public class SimulationRenderer {
      * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(VehicleWrap, double, double)} for every vehicle (still on the map)
      */
     private void renderVehicle() throws RenderingException {
-        for (VehicleWrap v : vl.getVehicles()) {
-            if (!v.exists() && v.getPosition() == null) continue;
-            // no need to translate coordinates since translation is already applied to graphics context
-            if (v.getPosition().getX() <= viewMinX || v.getPosition().getX() >= viewMaxX
-             || v.getPosition().getY() <= viewMinY || v.getPosition().getY() >= viewMaxY) continue;
-            this.drawTriangleCar(v, 1.5, 3); // ? set length / width in vehicle class -> internal
+        if(!filterApplied) {
+            for (VehicleWrap v : vl.getVehicles()) {
+                if (!v.exists()) continue;
+
+                var pos = v.getPosition();
+                if (pos == null) continue;
+
+                double x = pos.getX();
+                double y = pos.getY();
+
+                if (x < viewMinX || x > viewMaxX || y < viewMinY || y > viewMaxY) {
+                    continue;
+                }
+
+                this.drawTriangleCar(v, 1.5, 3);
+            }
+        }
+        else {
+            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+                if (!v.exists()) continue;
+
+                var pos = v.getPosition();
+                if (pos == null) continue;
+
+                double x = pos.getX();
+                double y = pos.getY();
+
+                if (x < viewMinX || x > viewMaxX || y < viewMinY || y > viewMaxY) {
+                    continue;
+                }
+
+                this.drawTriangleCar(v, 1.5, 3);
+            }
         }
     }
 
@@ -675,6 +727,8 @@ public class SimulationRenderer {
     protected boolean getSelectMode() { return selectMode; }
     protected void setSelectMode(boolean selectMode) { this.selectMode = selectMode; }
     protected void setRouteCreateMode(boolean mode) {this.createRouteMode = mode;}
+    public void setFilterApplied(boolean filterApplied) { this.filterApplied = filterApplied; }
+    public boolean isFilterApplied() { return this.filterApplied; }
 }
 
 

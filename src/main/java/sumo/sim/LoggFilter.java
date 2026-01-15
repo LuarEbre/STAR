@@ -4,6 +4,11 @@ import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+/**
+ * Custom Filter for STAR Logger
+ * @see StarLogger
+ *
+ */
 public class LoggFilter implements Filter {
 
     @Override

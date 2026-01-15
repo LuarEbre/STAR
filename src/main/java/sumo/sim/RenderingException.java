@@ -1,5 +1,10 @@
 package sumo.sim;
 
+/**
+ * Custom Rendering Exception, extends RuntimeException
+ * @author simonr
+ * @see RuntimeException
+ */
 public class RenderingException extends RuntimeException {
 
     public RenderingException(String message) {
