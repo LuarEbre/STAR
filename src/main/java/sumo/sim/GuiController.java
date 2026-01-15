@@ -18,7 +18,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -100,11 +99,11 @@ public class GuiController {
     @FXML
     private HBox mainButtonBox;
     @FXML
-    private LineChart<String, Number> activeVehiclesChart, percentStoppedChart;
+    private LineChart<String, Number> activeVehiclesChart, percentStoppedChart, meanDensityChart;
     @FXML
     private BarChart<String, Number> currentGYR;
     @FXML
-    private NumberAxis percentStoppedYAxis, currentGYRYAxis;
+    private NumberAxis percentStoppedYAxis, currentGYRYAxis, meanDensityYAxis;
 
     // rendering
     private GraphicsContext gcStatic;
@@ -140,6 +139,7 @@ public class GuiController {
     private XYChart.Series<String, Number> activeVehiclesSeries = new XYChart.Series<>();
     private XYChart.Series<String, Number> percentStoppedSeries = new XYChart.Series<>();
     private XYChart.Series<String, Number> currentGYRSeries = new XYChart.Series<>();
+    private XYChart.Series<String, Number> meanStreetDensitySeries = new XYChart.Series<>();
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(GuiController.class.getName());
@@ -1095,15 +1095,19 @@ public class GuiController {
             stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
         }
 
+        double meanDensity = wrapperController.getStreets().meanDensity();
+
         //Setup new Axis Data
         if(!(wrapperController.getVehicles().getVehicles().isEmpty())) {
             activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
             percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
+            meanStreetDensitySeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), meanDensity));
         }
 
         if(activeVehiclesSeries.getData().size()>300) {
             activeVehiclesSeries.getData().removeFirst();
             percentStoppedSeries.getData().removeFirst();
+            meanStreetDensitySeries.getData().removeFirst();
         }
 
         if (currentTab.equals("Overall")) {
@@ -1424,6 +1428,7 @@ public class GuiController {
         // Graph Reset
         activeVehiclesSeries.getData().clear();
         percentStoppedSeries.getData().clear();
+        meanStreetDensitySeries.getData().clear();
 
         // Text reset
         vehicleCount.setText("0");
@@ -1447,6 +1452,10 @@ public class GuiController {
         //closeAllMenus();
     }
 
+    /**
+     * Adds the ChartSeries to the Charts and Set Chart Formats
+     *
+     */
     public void setupCharts(){
         //activeVehicles
         activeVehiclesChart.getXAxis().setTickLabelsVisible(false);
@@ -1462,7 +1471,7 @@ public class GuiController {
         percentStoppedYAxis.setAutoRanging(false);
         percentStoppedYAxis.setLowerBound(0);
         percentStoppedYAxis.setUpperBound(100);
-        percentStoppedYAxis.setTickUnit(10); // 0,10,20,...100
+        percentStoppedYAxis.setTickUnit(10);
 
         percentStoppedChart.getXAxis().setTickLabelsVisible(false);
 
@@ -1495,6 +1504,22 @@ public class GuiController {
         currentGYR.getData().add(currentGYRSeries);
 
         currentGYR.setAnimated(false);
+
+        //MeanDensity
+        meanDensityYAxis.setAutoRanging(false);
+        meanDensityYAxis.setLowerBound(0);
+        meanDensityYAxis.setUpperBound(50);
+        meanDensityYAxis.setTickUnit(10);
+
+        meanDensityChart.getXAxis().setTickLabelsVisible(false);
+
+        meanStreetDensitySeries.setName("MeanStreetDensity");
+
+        meanStreetDensitySeries.getData().clear();
+        meanDensityChart.getData().add(meanStreetDensitySeries);
+
+        meanDensityChart.setAnimated(false);
+
     }
 
     /**
