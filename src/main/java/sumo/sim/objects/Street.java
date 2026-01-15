@@ -7,7 +7,6 @@ import sumo.sim.data.XML;
 import sumo.sim.util.ExportableData;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,16 +14,19 @@ import java.util.logging.Logger;
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link Street#density}
  */
-public class Street implements ExportableData {
-    private double maxSpeed; // same attributes as in .net
+public class Street extends SelectableObject implements ExportableData {
+    // connection
     private final SumoTraciConnection con;
     private final String id;
+
     // List of <Lane> objects
     private final ArrayList<LaneWrap> lanes = new ArrayList<>();
     private String fromJunction;
     private String toJunction;
+
+    // attributes
+    private double maxSpeed; // same attributes as in .net
     private double density;
-    //private double noise;
     private double minX,minY,maxX,maxY; // for rendering optimization
     private XML xml;
     // Data Export
@@ -33,9 +35,21 @@ public class Street implements ExportableData {
     private double maxDensity = 0;
 
 
+    private double meanPositionX;
+    private double meanPositionY;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(Street.class.getName());
+
+    /**
+     * @param id Edge ID
+     * @param con an instance of {@link SumoTraciConnection}
+     */
+    public Street(String id, SumoTraciConnection con) {
+        this.id = id;
+        this.con = con;
+        calcMeanPosition();
+    }
 
     /**
      * @param id Edge ID
@@ -49,6 +63,7 @@ public class Street implements ExportableData {
         this.fromJunction = from;
         this.toJunction = to;
         initializeStreet();
+        calcMeanPosition();
     }
 
     /**
@@ -101,15 +116,6 @@ public class Street implements ExportableData {
     }
 
     /**
-     * @param id Edge ID
-     * @param con an instance of {@link SumoTraciConnection}
-     */
-    public Street(String id, SumoTraciConnection con) {
-        this.id = id;
-        this.con = con;
-    }
-
-    /**
      * Calculates the Street's density based on its length and the amount of vehicles currently on the Street
      */
     public void calcDensity(){
@@ -124,12 +130,35 @@ public class Street implements ExportableData {
             throw new RuntimeException(e);
         }
     }
-
     public void resetDataTracking() {
         this.sumDensity = 0.0;
         this.densityTicks = 0;
         this.maxDensity = 0.0;
     }
+    /**
+     *
+     */
+    private void calcMeanPosition() {
+        if (lanes.isEmpty()) return;
+        LaneWrap middleLane = lanes.get(lanes.size() / 2); // middle index
+
+        double[] rawX = middleLane.getShapeX();
+        double[] rawY = middleLane.getShapeY();
+
+        if (rawX == null || rawX.length < 2) return;
+        // Normal Line
+        if (rawX.length == 2) {
+            this.meanPositionX = (rawX[0] + rawX[1]) / 2.0;
+            this.meanPositionY = (rawY[0] + rawY[1]) / 2.0;
+        }
+
+        // Polyline
+        else {
+            this.meanPositionX = rawX[rawX.length / 2];
+            this.meanPositionY = rawY[rawX.length / 2];
+        }
+    }
+
     /**
      * Calculates the Street's density each tick via {@link Street#calcDensity()} and sets the noise emission via {@link SumoTraciConnection#do_job_get(SumoCommand)}
      */
@@ -149,6 +178,39 @@ public class Street implements ExportableData {
         }
     }
 
+    public void calculateBounds() {
+        minX = Double.MAX_VALUE;
+        maxX = -Double.MAX_VALUE;
+        minY = Double.MAX_VALUE;
+        maxY = -Double.MAX_VALUE;
+
+        for (LaneWrap lane : lanes) {
+            double[] xCoords = lane.getShapeX();
+            double[] yCoords = lane.getShapeY();
+
+            for (double x : xCoords) {
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+            }
+            for (double y : yCoords) {
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+    }
+
+    // setter
+    public void setDensity(double den) { this.density = den; }
+    // getter
+    public Street getStreetBasedOnLane(String laneID){
+       for (LaneWrap lane : lanes) {
+           if (lane.getLaneID().equals(laneID)) {
+               return this;
+           }
+       }
+        return null;
+    }
     /**
      * @return The {@link ArrayList} of {@link LaneWrap} objects contained in this street.
      */
@@ -179,28 +241,6 @@ public class Street implements ExportableData {
      */
     public double getDensity() { return density; }
 
-    public void calculateBounds() {
-        minX = Double.MAX_VALUE;
-        maxX = -Double.MAX_VALUE;
-        minY = Double.MAX_VALUE;
-        maxY = -Double.MAX_VALUE;
-
-        for (LaneWrap lane : lanes) {
-            double[] xCoords = lane.getShapeX();
-            double[] yCoords = lane.getShapeY();
-
-            for (double x : xCoords) {
-                if (x < minX) minX = x;
-                if (x > maxX) maxX = x;
-            }
-            for (double y : yCoords) {
-                if (y < minY) minY = y;
-                if (y > maxY) maxY = y;
-            }
-        }
-
-    }
-
     public double getMinX() { return minX; }
     public double getMaxX() { return maxX; }
     public double getMinY() { return minY; }
@@ -209,4 +249,13 @@ public class Street implements ExportableData {
     public long getDensityTicks() {return densityTicks; }
     public double getMaxDensity() {return maxDensity;}
     public double getAverageDensity() {return (densityTicks > 0) ? (sumDensity / densityTicks) : 0;}
+    public double getMeanPositionX() { return meanPositionX; }
+    public double getMeanPositionY() { return meanPositionY; }
+    public ArrayList<LaneWrap> getLanes() { return lanes; }
+    public String getId() { return id; }
+    public String getFromJunction() { return fromJunction; }
+    public String getToJunction() { return toJunction; }
+    public Street getStreet() { return this; }
+    public double getDensity() { return density; }
+}
 }

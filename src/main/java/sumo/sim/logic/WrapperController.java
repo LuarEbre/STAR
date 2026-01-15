@@ -4,7 +4,7 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
-import sumo.sim.*;
+import sumo.sim.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.ExportableData;
 import sumo.sim.util.Util;
@@ -17,9 +17,12 @@ import java.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +34,7 @@ public class WrapperController {
     private SumoTraciConnection connection;
     private final GuiController guiController;
     private final SumoMapManager mapManager;
+
     // lists
     private StreetList sl;
     private TrafficLightList tl;
@@ -46,10 +50,13 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private boolean adaptiveOn;
 
     private String currentMap = "Frankfurt";
     private long stepCounter;
     //private XML netXml;
+    private long stepCounter = 0;
+    private volatile boolean isUiUpdatePending = false; // readable on all threads
 
     // config
     private SumoMapConfig mapConfig;
@@ -74,7 +81,7 @@ public class WrapperController {
      *
      * @param guiController
      */
-    public WrapperController(GuiController guiController,  SumoMapManager mapManager) {
+    public WrapperController(GuiController guiController, SumoMapManager mapManager) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
         sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
@@ -88,12 +95,12 @@ public class WrapperController {
         currentRou = mapConfig.getRouPath().toString();
 
         // create new connection with the binary and map config file
-        this.connection = new SumoTraciConnection(sumoBinary,configFile);
+        this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
         this.mapManager = mapManager;
         this.terminated = false;
         this.paused = true;
-        this.simTime = 0.0;
+        this.simTime = 0;
 
         // initial setup to initiate server connection and start sim
         initializeSimulationStart();
@@ -136,12 +143,12 @@ public class WrapperController {
      * Starts/Continues the simulation.
      * If the connection is closed it will terminate immediate.
      */
-    public void start() { // maybe with connection as argument? closing connection opened prior
+    private void start() { // maybe with connection as argument? closing connection opened prior
         if (executor != null && !executor.isShutdown()) {
             return;
         }
-        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly
-        executor.scheduleAtFixedRate(() -> {
+        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly, waits for previous step
+        executor.scheduleWithFixedDelay(() -> {
             if (paused || terminated) return;
 
             if (connection.isClosed()) {
@@ -155,7 +162,7 @@ public class WrapperController {
                 terminate();
             }
 
-            }, 0, delay, TimeUnit.MILLISECONDS); // initial delay, delay, unit
+        }, 0, delay, TimeUnit.MILLISECONDS); // initial delay, delay, unit
     }
 
     /**
@@ -196,11 +203,12 @@ public class WrapperController {
 
     /**
      * Changes delay based on "delay" argument and reruns executor thread with new delay.
+     *
      * @param delay
      */
     public void changeDelay(int delay) {
         this.delay = delay;
-        if (!executor.isShutdown() && executor!= null) {
+        if (!executor.isShutdown() && executor != null) {
             try {
                 executor.shutdown();
                 if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
@@ -235,10 +243,9 @@ public class WrapperController {
         upperSpeedFilter = upper;
         routeFilter = route;
         typeFilter = type;
-        if(color == null && lower == null && upper == null && route == null && type == null) {
+        if (color == null && lower == null && upper == null && route == null && type == null) {
             this.filterApplied = false;
-        }
-        else {
+        } else {
             this.filteredVehicles.setVehicles(this.filterVehicles());
             this.filterApplied = true;
         }
@@ -251,8 +258,9 @@ public class WrapperController {
     public void doStepUpdate() {
         // updating gui and simulation
         try {
+            // updating all lists
             connection.do_timestep();
-            if(filterApplied) {
+            if (filterApplied) {
                 this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
             }
             vl.updateAllVehicles();
@@ -262,14 +270,26 @@ public class WrapperController {
                     allTimeVehicles.add(v);
                 }
             }
-            //for data export
             stepCounter++;
-            tl.updateAllCurrentState();
+            //adaptive Traffic Lights
+            if (!adaptiveOn) {
+                tl.updateAllCurrentState();
+            } else {
+                tl.adaptiveUpdate();
+            }
+
             sl.updateStreets();
-            //vl.printVehicles();
-            simTime = (double) connection.do_job_get(Simulation.getTime()); // exception thrown here needs fix
-            if (!terminated) {
-                Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
+            simTime = (double) connection.do_job_get(Simulation.getTime());
+            if (!isUiUpdatePending) {
+                // only update if gui is done with rendering a single step
+                isUiUpdatePending = true;
+                Platform.runLater(() -> {
+                    try {
+                        guiController.doSimStep();
+                    } finally {
+                        isUiUpdatePending = false; // gui is done
+                    }
+                });
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Sim Step", e);
@@ -290,13 +310,15 @@ public class WrapperController {
             terminate(); // instantly forces termination of current thread
 
             // time to close and open old port
-            try { Thread.sleep(500); } catch (InterruptedException e) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
                 // should have something here
             }
 
             // load new config
             try {
-                mapConfig= mapManager.getConfig(mapName);
+                mapConfig = mapManager.getConfig(mapName);
                 currentNet = mapConfig.getNetPath().toString();
                 currentRou = mapConfig.getRouPath().toString();
 
@@ -326,10 +348,11 @@ public class WrapperController {
 
     /**
      * Used by {@link GuiController} to add Vechicles
+     *
      * @param amount How many Vehicles will spawn
-     * @param type Sets type based on existing types in .rou XML
-     * @param route Sets route
-     * @param color Color based on Hex code
+     * @param type   Sets type based on existing types in .rou XML
+     * @param route  Sets route
+     * @param color  Color based on Hex code
      */
     public void addVehicle(int amount, String type, String route, Color color) {
         if (executor != null && !executor.isShutdown()) {
@@ -343,28 +366,30 @@ public class WrapperController {
         }
     }
 
-    public void addRoute(String start, String end, String id) {
-        rl.addRoute(start,end,id);
+    public boolean addRoute(String start, String end, String id) {
+        return rl.addRoute(start, end, id);
     }
 
     public void updateRoutes() {
         Platform.runLater(guiController::initializeDropDowns);
     }
+
     /**
      * Spread the amount of vehicles determined by the stress test setting evenly across all existing routes
+     *
      * @param amount number of cars (set in Stress Test Menu)
-     * @param color {@link Color}
-     * @param type Type ID (defaults to "DEFAULT_VEHTYPE" if null)
+     * @param color  {@link Color}
+     * @param type   Type ID (defaults to "DEFAULT_VEHTYPE" if null)
      */
     public void StressTest(int amount, Color color, String type) {
         Map<String, List<String>> Routes = rl.getAllRoutes();
-        int amount_per = amount/Routes.size();
+        int amount_per = amount / Routes.size();
         type = (type == null) ? "DEFAULT_VEHTYPE" : type;
 
         logger.log(Level.INFO, "Stress testing for " + amount);
 
-        for(String key : Routes.keySet()) {
-            addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
+        for (String key : Routes.keySet()) {
+            addVehicle(amount_per, type, key, color);
         }
     }
 
@@ -478,9 +503,9 @@ public class WrapperController {
     public String getChosenMap(){
         List<String> maps = mapManager.getNames();
         for(String key : maps) {
-           if(mapManager.getConfig(key).isChosen()) {
-               return key;
-           }
+            if(mapManager.getConfig(key).isChosen()) {
+                return key;
+            }
         }
         // if no map is selected (error) automatically choose Map1
         mapSwitch("Frankfurt1");
@@ -513,6 +538,7 @@ public class WrapperController {
     public boolean isPaused() { return paused; }
     public String getCurrentMap() { return currentMap; }
     public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
+    public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
     public SumoTraciConnection getConnection() { return connection; }
     public boolean isFilterApplied() { return filterApplied; }
 

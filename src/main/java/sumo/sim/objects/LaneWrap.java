@@ -86,4 +86,11 @@ public class LaneWrap {
     }
 
     public double getLength(){return length;}
+
+    public LaneWrap getLane(String laneID){
+        if(laneID.equals(this.laneID)){
+            return this;
+        }
+        return null;
+    }
 }

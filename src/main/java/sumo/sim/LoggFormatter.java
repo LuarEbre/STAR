@@ -6,8 +6,9 @@ import java.util.logging.LogRecord;
 
 
 /**
- * @author simonr
  * Formats Logging Messages
+ * @author simonr
+ * @see StarLogger
  */
 public class LoggFormatter extends Formatter {
 
