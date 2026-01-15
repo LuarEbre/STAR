@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -21,6 +22,7 @@ import javafx.scene.layout.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +32,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 import sumo.sim.logic.SumoMapManager;
+import sumo.sim.logic.Type;
+import sumo.sim.logic.TypeList;
 import sumo.sim.logic.WrapperController;
 import sumo.sim.objects.*;
 
@@ -101,9 +105,9 @@ public class GuiController {
     @FXML
     private LineChart<String, Number> activeVehiclesChart, percentStoppedChart, meanDensityChart;
     @FXML
-    private BarChart<String, Number> currentGYR;
+    private BarChart<String, Number> currentGYR, typeAmountChart;
     @FXML
-    private NumberAxis percentStoppedYAxis, currentGYRYAxis, meanDensityYAxis;
+    private NumberAxis percentStoppedYAxis, currentGYRYAxis, meanDensityYAxis, typeAmountYAxis;
 
     // rendering
     private GraphicsContext gcStatic;
@@ -140,6 +144,7 @@ public class GuiController {
     private XYChart.Series<String, Number> percentStoppedSeries = new XYChart.Series<>();
     private XYChart.Series<String, Number> currentGYRSeries = new XYChart.Series<>();
     private XYChart.Series<String, Number> meanStreetDensitySeries = new XYChart.Series<>();
+    private XYChart.Series<String, Number> typeAmountSeries = new XYChart.Series<>();
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(GuiController.class.getName());
@@ -1089,13 +1094,12 @@ public class GuiController {
         int activeCount = wrapperController.getVehicles().getActiveCount();
         int simTime = (int)wrapperController.getTime();
         int currentlyStopped = wrapperController.getVehicles().getStoppedCount();
+        double meanDensity = wrapperController.getStreets().meanDensity();
 
         float stoppedPercentage = 0f;
         if (activeCount > 0) {
             stoppedPercentage = (currentlyStopped / (float) activeCount) * 100;
         }
-
-        double meanDensity = wrapperController.getStreets().meanDensity();
 
         //Setup new Axis Data
         if(!(wrapperController.getVehicles().getVehicles().isEmpty())) {
@@ -1178,11 +1182,26 @@ public class GuiController {
             }
         } else if (currentTab.equals("Graphs")) {
 
+            // Update GYR Series
             HashMap<String, Integer> gyr = wrapperController.getTrafficLights().getCurrentGYR();
 
             currentGYRSeries.getData().get(0).setYValue(gyr.get("G"));
             currentGYRSeries.getData().get(1).setYValue(gyr.get("Y"));
             currentGYRSeries.getData().get(2).setYValue(gyr.get("R"));
+
+            // Update Type Amount Series
+            TypeList typeList = wrapperController.getTypeListAsTypeList();
+            HashMap<String, Type> typeMap = typeList.getTypesAsMap();
+
+            typeAmountSeries.getData().clear();
+
+            for (Map.Entry<String, Type> entry : typeMap.entrySet()) {
+                String typeName = entry.getKey();
+                int amount = wrapperController.getVehicles().getVehiclesAmountByType(entry.getValue());
+                typeAmountSeries.getData().add(new XYChart.Data<>(typeName, amount));
+            }
+
+            updateTypeChart();
 
         } else {
             if (sr.isFilterApplied()) {
@@ -1484,14 +1503,13 @@ public class GuiController {
 
         //currentGYR
         int amountTLs = wrapperController.getTrafficLights().getCount();
-        logger.log(Level.INFO, "Total TL Count: "+amountTLs);
 
         currentGYRYAxis.setAutoRanging(false);
         currentGYRYAxis.setLowerBound(0);
         currentGYRYAxis.setUpperBound(amountTLs);
         currentGYRYAxis.setTickUnit(10);
 
-        percentStoppedChart.getXAxis().setTickLabelsVisible(false);
+        currentGYR.getXAxis().setTickLabelsVisible(false);
 
         currentGYRSeries.setName("CurrentGYR");
 
@@ -1520,6 +1538,31 @@ public class GuiController {
 
         meanDensityChart.setAnimated(false);
 
+        //typeChart Initial
+        //typeAmountYAxis.setAutoRanging(false);
+        typeAmountYAxis.setLowerBound(0);
+        typeAmountYAxis.setTickUnit(10);
+
+        typeAmountSeries.setName("typeChart");
+        typeAmountChart.getXAxis().setTickLabelGap(0);
+
+        typeAmountChart.getData().clear();
+
+        typeAmountSeries.getData().add(new XYChart.Data<>("Default_Type", 0));
+
+        typeAmountChart.getData().clear();
+        typeAmountChart.getData().add(typeAmountSeries);
+
+        typeAmountChart.setAnimated(false);
+
+    }
+
+    public void updateTypeChart() {
+        if (typeAmountChart.getData().size() > wrapperController.getTypeList().length) {
+            typeAmountSeries.getData().clear();
+
+            typeAmountChart.getData().add(typeAmountSeries);
+        }
     }
 
     /**
