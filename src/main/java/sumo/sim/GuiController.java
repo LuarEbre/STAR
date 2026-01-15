@@ -69,6 +69,8 @@ public class GuiController {
 
     private ButtonBase[] allButtons;
 
+    private ChoiceBox<String>[] sortedDropdowns;
+
     @FXML
     private Spinner <Integer> delaySelect, durationTL;
     @FXML
@@ -237,7 +239,7 @@ public class GuiController {
             i++;
         }
 
-        allButtons = new ButtonBase[]{
+        this.allButtons = new ButtonBase[] {
                 playButton,
                 selectButton,
                 addButton,
@@ -256,15 +258,24 @@ public class GuiController {
         String[] routes = wrapperController.getRouteList();
         routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         routeSelector.setValue(routes[0]);
-        this.sortChoiceBox(routeSelector);
 
         filterMenuRouteSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         filterMenuRouteSelector.setValue(routes[0]);
-        this.sortChoiceBox(filterMenuRouteSelector);
 
         // traffic lights
         tlSelector.setItems(FXCollections.observableArrayList(wrapperController.getTLids()));
         tlSelector.setValue(wrapperController.getTLids()[0]);
+
+        // private ChoiceBox array used for sorting all ChoiceBoxes at once
+        this.sortedDropdowns = new ChoiceBox[] {
+                typeSelector,
+                filterMenuTypeSelector,
+                stressTestTypeSelect,
+                routeSelector,
+                filterMenuRouteSelector,
+                tlSelector
+        };
+        this.sortChoiceBoxes();
 
         // add our stress test colors to ColorSelector
         filterMenuColorSelector.setItems(FXCollections.observableArrayList(
@@ -1224,11 +1235,13 @@ public class GuiController {
         }
     }
 
-    private void sortChoiceBox(ChoiceBox<String> choiceBox) {
-        if (choiceBox == null || choiceBox.getItems() == null) {
-            return;
-        } else {
-            FXCollections.sort(choiceBox.getItems());
+    private void sortChoiceBoxes() {
+        for(ChoiceBox<String> choiceBox : this.sortedDropdowns) {
+            if (choiceBox == null || choiceBox.getItems() == null) {
+                continue;
+            } else {
+                FXCollections.sort(choiceBox.getItems());
+            }
         }
     }
 
@@ -1667,8 +1680,7 @@ public class GuiController {
         } else {
             routeStatus.setText("Status: Missing arguments!");
         }
-        this.sortChoiceBox(routeSelector);
-        this.sortChoiceBox(filterMenuRouteSelector);
+        this.sortChoiceBoxes();
     }
 
     /**
