@@ -72,7 +72,7 @@ public class GuiController {
     @FXML
     private Spinner <Integer> delaySelect, durationTL;
     @FXML
-    private Canvas staticMap, tlCanvas;
+    private Canvas staticMap, dynamicMap, tlCanvas;
     @FXML
     private Label timeLabel, vehicleCount, notSelectedLabel1, routeStatus, notFilteredLabel;
     @FXML
@@ -90,7 +90,8 @@ public class GuiController {
             TotalTimeSpentStopped, MeanSpeed, SpeedSD, vehicleID, vehicleType, route, color, currentSpeed,
             averageSpeed, peakSpeed, acceleration, position, angle, totalLifetime, timeSpentStopped, Stops,
             trafficLightID, TLposition, currPhase, remainingDur, routeCreateId, activeVehiclesFiltered, VehiclesNotOnScreenFiltered,
-            DepartedVehiclesFiltered, VehiclesCurrentlyStoppedFiltered, TotalTimeSpentStoppedFiltered, MeanSpeedFiltered, SpeedSDFiltered;
+            DepartedVehiclesFiltered, VehiclesCurrentlyStoppedFiltered, TotalTimeSpentStoppedFiltered,
+            MeanSpeedFiltered, SpeedSDFiltered, speedRangeLower, speedRangeUpper;
 
     @FXML
     private TabPane tabPane, trafficLightTabPane;
@@ -1090,7 +1091,7 @@ public class GuiController {
         }
 
         //Setup new Axis Data
-        if(!(wrapperController.getVehicles().getVehicles().isEmpty()) && ((int) wrapperController.getTime() % 4 == 0)) {
+        if(!(wrapperController.getVehicles().getVehicles().isEmpty())) {
             activeVehiclesSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), activeCount));
             percentStoppedSeries.getData().add(new XYChart.Data<>(String.valueOf(simTime), stoppedPercentage));
         }
@@ -1166,7 +1167,7 @@ public class GuiController {
                     this.remainingDur.setText(String.format("%d / %d ", (int)remaining, (int)tl.getDuration()));
                 }
             }
-        } else if (currentTab.equals("Graphs") && (int) wrapperController.getTime() % 2 == 0) {
+        } else if (currentTab.equals("Graphs")) {
 
             HashMap<String, Integer> gyr = wrapperController.getTrafficLights().getCurrentGYR();
 
