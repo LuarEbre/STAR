@@ -256,8 +256,11 @@ public class GuiController {
         String[] routes = wrapperController.getRouteList();
         routeSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         routeSelector.setValue(routes[0]);
+        this.sortChoiceBox(routeSelector);
+
         filterMenuRouteSelector.setItems(FXCollections.observableArrayList(wrapperController.getRouteList()));
         filterMenuRouteSelector.setValue(routes[0]);
+        this.sortChoiceBox(filterMenuRouteSelector);
 
         // traffic lights
         tlSelector.setItems(FXCollections.observableArrayList(wrapperController.getTLids()));
@@ -1221,7 +1224,13 @@ public class GuiController {
         }
     }
 
-
+    private void sortChoiceBox(ChoiceBox<String> choiceBox) {
+        if (choiceBox == null || choiceBox.getItems() == null) {
+            return;
+        } else {
+            FXCollections.sort(choiceBox.getItems());
+        }
+    }
 
     /**
      * Updates the vehicle count label.
@@ -1658,6 +1667,8 @@ public class GuiController {
         } else {
             routeStatus.setText("Status: Missing arguments!");
         }
+        this.sortChoiceBox(routeSelector);
+        this.sortChoiceBox(filterMenuRouteSelector);
     }
 
     /**
