@@ -283,7 +283,7 @@
 }
 
 #createButton {
-    -fx-background-image: url("/Gui/Icons/create.png");
+    -fx-background-image: url("/Gui/Icons/createRoute.png");
     -fx-background-size: 50px 50px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center
@@ -418,6 +418,26 @@
 
 .choice-box .menu-item:focused {
     -fx-background-color: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
+}
+
+.combo-box {
+    -fx-background-color: -fx-color-grey-light;
+    -fx-background-radius: 3;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: -fx-color-white;
+    -fx-font-family: "Arial Black";
+    -fx-alignment: CENTER;
+}
+
+.combo-box .arrow-button .arrow {
+    -fx-background-color: -fx-color-white;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -fx-color-grey-middle;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0.0, 0, 1);
 }
 
 .menuButton {
@@ -649,4 +669,36 @@
 .chart-line-symbol {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
+}
+
+#currentGYR .chart-bar.data0 {
+    -fx-bar-fill: green;
+}
+
+#currentGYR .chart-bar.data1 {
+    -fx-bar-fill: yellow;
+}
+
+#currentGYR .chart-bar.data2 {
+    -fx-bar-fill: red;
+}
+
+#currentGYR .chart-vertical-grid-lines,
+#currentGYR .chart-horizontal-grid-lines {
+    -fx-stroke: transparent;
+}
+
+#currentGYR .axis {
+    -fx-tick-label-fill: -fx-color-white;
+}
+
+#currentGYR .axis-label,
+#currentGYR .chart-title,
+#currentGYR .chart-legend-item {
+    -fx-text-fill: -fx-color-white;
+}
+
+#currentGYR .chart-legend {
+    visibility: hidden;
+    -fx-padding: 0; /* Removes the empty space it leaves behind */
 }
