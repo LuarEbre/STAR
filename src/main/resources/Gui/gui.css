@@ -283,7 +283,7 @@
 }
 
 #createButton {
-    -fx-background-image: url("/Gui/Icons/create.png");
+    -fx-background-image: url("/Gui/Icons/createRoute.png");
     -fx-background-size: 50px 50px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center

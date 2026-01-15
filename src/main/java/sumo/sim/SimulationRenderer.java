@@ -321,7 +321,8 @@ public class SimulationRenderer {
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
             if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX
                     || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
-            gc.setFill(Color.BLACK);
+            gc.setFill(Color.rgb(54,53,57));
+            gc.setStroke(Color.rgb(54,53,57));
             gc.setLineWidth(scale);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();
