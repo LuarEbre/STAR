@@ -472,7 +472,7 @@ public class GuiController {
         tabPane.getSelectionModel().select(2);
     }
     @FXML
-    private void managePdfExport () {
+    private void onPdfExport () {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Choose Directory");
         chooser.setInitialFileName("Simulation Report.pdf");
@@ -487,6 +487,23 @@ public class GuiController {
             if( pdfFile != null) {
                 boolean usingFilter = applyFilter.isSelected();
                 this.wrapperController.generateExport(pdfFile, usingFilter);
+            }
+    }
+    @FXML
+    private void onCsvExport() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose Directory");
+        chooser.setInitialFileName("Simulation Report.csv");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Data", "*.csv"));
+        String userHome = System.getProperty("user.home");
+        File desktop = new File(userHome, "Desktop");
+            if (desktop.exists() && desktop.isDirectory()) {
+                chooser.setInitialDirectory(desktop);
+            }
+        File csvFile = chooser.showSaveDialog(null);
+            if (csvFile != null) {
+                boolean usingFilter = applyFilter.isSelected();
+                this.wrapperController.generateExport(csvFile, usingFilter);
             }
     }
 

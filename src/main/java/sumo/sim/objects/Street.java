@@ -4,6 +4,7 @@ import de.tudresden.sumo.cmd.Edge;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import sumo.sim.data.XML;
+import sumo.sim.util.ExportableData;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link Street#density}
  */
-public class Street {
+public class Street implements ExportableData {
     private double maxSpeed; // same attributes as in .net
     private final SumoTraciConnection con;
     private final String id;
@@ -26,6 +27,12 @@ public class Street {
     //private double noise;
     private double minX,minY,maxX,maxY; // for rendering optimization
     private XML xml;
+    // Data Export
+    private double sumDensity = 0.0;
+    private long densityTicks = 0;
+    private double maxDensity = 0;
+
+
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(Street.class.getName());
@@ -47,6 +54,38 @@ public class Street {
     /**
      * Gets the number of lanes within the Edge and fills the {@link ArrayList} of {@link LaneWrap} with new objects
      */
+
+    @Override
+    public String getExportCategory() {
+        //header
+        return "Traffic Density";
+    }
+
+    @Override
+    public String[] getColumnHeaders() {
+        // header for rows
+        return new String[] {
+                "Street ID",
+                "Avg Density (Veh/km)",
+                "Peak Denisty",
+                "Duration (Ticks)",
+                "from",
+                "to"
+        };
+    }
+
+    @Override
+    public String[] getRowData() {
+        // data for columns
+        return new String[]{
+                this.id,
+                String.format(java.util.Locale.US, "%.2f", getAverageDensity()),
+                String.format(java.util.Locale.US, "%.2f", this.maxDensity),
+                String.valueOf(this.densityTicks),
+                this.fromJunction != null ? this.fromJunction : "unknown",
+                this.toJunction != null ? this.toJunction : "unknown"
+        };
+    }
     public void initializeStreet() {
         try {
             int laneCount = (Integer) this.con.do_job_get(Edge.getLaneNumber(id));
@@ -86,6 +125,11 @@ public class Street {
         }
     }
 
+    public void resetDataTracking() {
+        this.sumDensity = 0.0;
+        this.densityTicks = 0;
+        this.maxDensity = 0.0;
+    }
     /**
      * Calculates the Street's density each tick via {@link Street#calcDensity()} and sets the noise emission via {@link SumoTraciConnection#do_job_get(SumoCommand)}
      */
@@ -93,6 +137,11 @@ public class Street {
         try {
             calcDensity();
             //this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
+            this.sumDensity = this.sumDensity + this.density;
+            this.densityTicks++;
+                if(this.density > this.maxDensity) {
+                    this.maxDensity = this.density;
+                }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Street Data", e);
             this.density = 0;
@@ -156,4 +205,8 @@ public class Street {
     public double getMaxX() { return maxX; }
     public double getMinY() { return minY; }
     public double getMaxY() { return maxY; }
+    public double getSumDensity() {return sumDensity; }
+    public long getDensityTicks() {return densityTicks; }
+    public double getMaxDensity() {return maxDensity;}
+    public double getAverageDensity() {return (densityTicks > 0) ? (sumDensity / densityTicks) : 0;}
 }
