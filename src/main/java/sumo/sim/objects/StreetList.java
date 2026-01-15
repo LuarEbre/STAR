@@ -116,10 +116,4 @@ public class StreetList implements GenericList {
             s.updateStreet();
         }
     }
-
-    public void setLanesDensity(){
-        for(Street s : streets){
-            s.setLaneDensity();
-        }
-    }
 }

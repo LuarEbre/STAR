@@ -96,16 +96,4 @@ public class LaneWrap {
         return null;
     }
 
-    /**
-     * Sets Density of Lane.
-     * Used to set it to the density of its corresponding Street
-     * @param d density
-     */
-    public void setDensity(double d){
-        this.density = d;
-    }
-
-    public double getDensity(){
-        return this.density;
-    }
 }

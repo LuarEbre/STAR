@@ -170,50 +170,56 @@ public class TrafficLightWrap extends SelectableObject {
      * Adaptive States based on Density of Controlled Lanes
      * Replaces setCurrentState if adaptive is checked
      */
-    public void adaptiveStateUpdate()throws NullPointerException {
+    public void adaptiveStateUpdate() {
 
-        int currentPhase =  getPhaseNumber();  // GYR
+        if (phases == null || phases.isEmpty()) return;
 
-        String[] currentState = getCurrentState(); //G,1,Y,2,R,3
+        int currentPhase = getPhaseNumber();
 
-        if(phases.isEmpty()){
-            return;
-        }
-
-        TrafficLightPhase bestPhase = phases.getFirst();
-
+        TrafficLightPhase bestPhase = null;
         double bestScore = -1;
 
-        for(TrafficLightPhase phase : phases) {
+        for (TrafficLightPhase phase : phases) {
+
             double score = 0;
+            List<Integer> greenLanesIndex = phase.getGreenLanes();
+            List<String> greenLanesID = new ArrayList<>();
 
-            for(int i : phase.getGreenLanes()) {
-
-                String laneID = currentState[i*2 +1];
-                LaneWrap lane = null;
-
-                for(Street street : controlledStreets) {
-                    if(street.getLanes().contains(laneID)) {
-                        lane = street.getLaneBasedOnID(laneID);
-                    }
-                }
-
-                score += lane.getDensity();
+            for(Integer greenLaneIndex : greenLanesIndex){
+                greenLanesID.add(controlledLinks.get(greenLaneIndex).from);
             }
 
-            if(score > bestScore) {
+            for (String laneID : greenLanesID) {
+
+                try {
+                    double veh = (int) con.do_job_get(Lane.getLastStepVehicleNumber(laneID));
+                    double len = (double) con.do_job_get(Lane.getLength(laneID));
+
+                    double maxVeh = len / 7.5;
+                    double density = veh / Math.max(1.0, maxVeh);
+
+                    score += density;
+
+                } catch (Exception e) {
+                    logger.fine("Cannot read lane " + laneID);
+                }
+            }
+
+            if (bestPhase == null || score > bestScore) {
                 bestPhase = phase;
                 bestScore = score;
             }
         }
 
-        if(bestPhase.getIndex() == currentPhase) {
-            setPhaseDuration(duration + 3);
+        if (bestPhase == null) return;
+
+        if (bestPhase.getIndex() == currentPhase) {
+            setPhaseDuration(getNextSwitch() + 5);
         } else {
-            logger.log(Level.INFO, "TL: " + id + " changed state " + currentState + " to " + bestPhase.getState());
             setPhaseNumber(bestPhase.getIndex());
         }
     }
+
 
     /**
      * Sets the active phase of the traffic light to the specified index.
