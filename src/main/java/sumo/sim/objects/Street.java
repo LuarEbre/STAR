@@ -154,12 +154,6 @@ public class Street extends SelectableObject {
     public void setDensity(double den) { this.density = den; }
     // getter
 
-    public void setLaneDensity(){
-        for (LaneWrap lane : lanes) {
-            lane.setDensity(density);
-        }
-    }
-
     public LaneWrap getLaneBasedOnID(String laneID){
         for (LaneWrap lane : lanes) {
             if (lane.getLaneID().equals(laneID)) {

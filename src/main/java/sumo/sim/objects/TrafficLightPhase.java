@@ -18,7 +18,7 @@ public class TrafficLightPhase {
     private final int index;
     private final String state;
     private double duration;
-    private ArrayList<Integer> greenLanes;
+    private ArrayList<Integer> greenLanes = new ArrayList<>();
 
     public TrafficLightPhase(int index, String state, double duration) {
         this.index = index;
@@ -48,11 +48,11 @@ public class TrafficLightPhase {
         }
     }
 
-    public void buildGreenList(){
-        for(char s :  state.toCharArray()){
-
-            if(String.valueOf(s).equalsIgnoreCase("G")){
-                greenLanes.add(state.indexOf(s));
+    public void buildGreenList() {
+        for (int i = 0; i < state.length(); i++) {
+            char s = state.charAt(i);
+            if (s == 'G' || s == 'g') {
+                greenLanes.add(i);
             }
         }
     }
