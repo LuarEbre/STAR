@@ -502,7 +502,18 @@
                                                 <Insets left="3.0" right="3.0" />
                                              </padding>
                                           </LineChart>
-                                          <BarChart id="currentGYR" fx:id="currentGYR" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="105.0" prefWidth="229.0" title="Current Traffic Light Phases">
+                                           <LineChart id="meanDensityGraph" fx:id="meanDensityChart" createSymbols="false" horizontalZeroLineVisible="false" prefHeight="92.0" prefWidth="259.0" styleClass="starLineChart" title="Mean Street Density (%)">
+                                               <xAxis>
+                                                   <CategoryAxis side="BOTTOM" />
+                                               </xAxis>
+                                               <yAxis>
+                                                   <NumberAxis fx:id="meanDensityYAxis" side="LEFT" />
+                                               </yAxis>
+                                               <padding>
+                                                   <Insets left="3.0" right="3.0" />
+                                               </padding>
+                                           </LineChart>
+                                          <BarChart id="currentGYR" fx:id="currentGYR" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="200.0" prefWidth="229.0" title="Current Traffic Light Phases">
                                             <xAxis>
                                               <CategoryAxis side="BOTTOM" />
                                             </xAxis>

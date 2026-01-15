@@ -109,6 +109,19 @@ public class StreetList implements GenericList {
     }
 
     /**
+     * Calculates the Mean Density of all Streets
+     * @return mean density
+     */
+    public double meanDensity(){
+        double mean = 0;
+        for (Street s : streets) {
+            mean += s.getDensity();
+        }
+        mean /= streets.size();
+        return mean;
+    }
+
+    /**
      * Allows for batch updating of Streets
      */
     public void updateStreets(){
