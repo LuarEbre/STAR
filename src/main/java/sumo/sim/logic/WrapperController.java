@@ -405,7 +405,7 @@ public class WrapperController {
         logger.log(Level.INFO, "Stress testing for " + amount);
 
         for (String key : Routes.keySet()) {
-            addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
+            addVehicle(amount_per, type, key, color);
         }
     }
 
