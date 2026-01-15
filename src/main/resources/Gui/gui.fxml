@@ -561,7 +561,7 @@
                </children>
             </AnchorPane>
 
-            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" prefHeight="221.0" prefWidth="146.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="viewMenuSelect" layoutX="795.0" prefHeight="222.0" prefWidth="210.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <VBox layoutX="6.0" prefHeight="180.0" prefWidth="150.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -573,7 +573,7 @@
                         <CheckBox fx:id="densityHeatmap" mnemonicParsing="false" onAction="#onDensityHeatmapToggle" styleClass="viewLabel" text="Density Heatmap" />
                      </children>
                      <padding>
-                        <Insets bottom="10.0" top="10.0" />
+                        <Insets bottom="10.0" left="10.0" top="10.0" />
                      </padding>
                   </VBox>
                </children>
@@ -707,7 +707,7 @@
 
        <AnchorPane fx:id="createMenu" layoutX="600.0" layoutY="50.0" prefHeight="320.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
          <children>
-            <Label styleClass="magentaLabel" layoutX="39.0" layoutY="22.0" text="Create Route">
+            <Label layoutX="39.0" layoutY="22.0" styleClass="magentaLabel" text="Create Route">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
@@ -741,8 +741,8 @@
                <ChoiceBox layoutX="88.0" layoutY="94.0" prefHeight="26.0" prefWidth="86.0" />
                <Label layoutX="13.0" layoutY="98.0" prefHeight="18.0" prefWidth="74.0" styleClass="addMenu-labels" text="Types" />
             <Spinner layoutX="111.0" layoutY="145.0" prefHeight="26.0" prefWidth="74.0" />
-            <Label styleClass="whiteLabel" layoutX="13.0" layoutY="149.0" prefHeight="18.0" prefWidth="106.0" text="Test Duration" />
-            <Label styleClass="magentaLabel" layoutX="62.0" layoutY="14.0" prefHeight="18.0" prefWidth="114.0" text="Stress Test">
+            <Label layoutX="13.0" layoutY="149.0" prefHeight="18.0" prefWidth="106.0" styleClass="whiteLabel" text="Test Duration" />
+            <Label layoutX="62.0" layoutY="14.0" prefHeight="18.0" prefWidth="114.0" styleClass="magentaLabel" text="Stress Test">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font>
@@ -819,7 +819,7 @@
        </AnchorPane>
 
        <!-- Buttons top right menu -->
-      <HBox fx:id="topMenuBox" layoutX="701.0" layoutY="-5.0" prefHeight="27.0" prefWidth="386.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox fx:id="topMenuBox" layoutX="701.0" layoutY="-5.0" prefHeight="27.0" prefWidth="458.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Label fx:id="vehicleCount" alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="85.0" styleClass="whiteLabel" text="0">
                <HBox.margin>
@@ -827,9 +827,9 @@
                </HBox.margin>
             </Label>
             <Pane fx:id="exitTopMenu" prefHeight="30.0" prefWidth="30.0" />
-            <Button fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="32.0" prefWidth="66.0" styleClass="topmenu-button" text="Map" />
-            <Button fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="28.0" prefWidth="89.0" styleClass="topmenu-button" text="Filters" />
-            <Button fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="32.0" prefWidth="68.0" styleClass="topmenu-button" text="View" />
+            <Button fx:id="mapsMenuButton" mnemonicParsing="false" onAction="#onMapsPressed" prefHeight="27.0" prefWidth="72.0" styleClass="topmenu-button" text="Map" />
+            <Button fx:id="filterMenuButton" mnemonicParsing="false" onAction="#onFiltersPressed" prefHeight="27.0" prefWidth="77.0" styleClass="topmenu-button" text="Filters" />
+            <Button fx:id="viewMenuButton" mnemonicParsing="false" onAction="#onViewPressed" prefHeight="27.0" prefWidth="72.0" styleClass="topmenu-button" text="View" />
             <Button mnemonicParsing="false" onAction="#onExportPressed" prefHeight="28.0" prefWidth="81.0" styleClass="topmenu-button" text="Export" />
             <Button fx:id="fileMenuButton" mnemonicParsing="false" onAction="#onFilePressed" prefHeight="32.0" prefWidth="69.0" styleClass="topmenu-button" text="File" />
          </children>

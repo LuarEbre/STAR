@@ -187,9 +187,6 @@
     -fx-background-position: center
 }
 
-#vehicleCount:hover {
-    -fx-text-fill: linear-gradient(to top, -fx-color-magenta-dark, -fx-color-orange);
-}
 /* Map choosing */
 
 .mapSelect:hover {
