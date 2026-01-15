@@ -194,6 +194,9 @@ public class GuiController {
 
         // initialize Phase text
         updateTLPhaseText();
+
+        // initialize Data Pane
+        this.updateDataPane();
     }
 
     public void initializeDropDowns() {
@@ -295,7 +298,6 @@ public class GuiController {
                 changeToImportedMap();
             }
         });
-
     }
 
     private void setUpInputs() {
