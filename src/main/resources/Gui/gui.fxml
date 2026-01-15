@@ -28,7 +28,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="598.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sumo.sim.GuiController">
    <children>
 
        <!-- Main Buttons -->
@@ -732,17 +732,17 @@
          </children>
        </AnchorPane>
 
-       <AnchorPane fx:id="stressTestMenu" layoutX="511.0" layoutY="164.0" minWidth="100.0" prefHeight="150.0" prefWidth="200.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
+       <AnchorPane fx:id="stressTestMenu" layoutX="502.0" layoutY="164.0" minWidth="100.0" prefHeight="282.0" prefWidth="259.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
-               <Separator layoutX="1.0" layoutY="131.0" prefHeight="3.0" prefWidth="198.0" />
-               <Label layoutX="14.0" layoutY="55.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Mode" />
-               <Button fx:id="startTestButton" layoutX="39.0" layoutY="185.0" mnemonicParsing="false" onAction="#startStressTest" prefHeight="26.0" prefWidth="122.0" styleClass="menuButton" text="Start Test" />
-               <ChoiceBox fx:id="stressTestMode" layoutX="88.0" layoutY="52.0" prefHeight="0.0" prefWidth="86.0" />
-               <ChoiceBox layoutX="88.0" layoutY="94.0" prefHeight="26.0" prefWidth="86.0" />
-               <Label layoutX="13.0" layoutY="98.0" prefHeight="18.0" prefWidth="74.0" styleClass="addMenu-labels" text="Types" />
-            <Spinner layoutX="111.0" layoutY="145.0" prefHeight="26.0" prefWidth="74.0" />
-            <Label layoutX="13.0" layoutY="149.0" prefHeight="18.0" prefWidth="106.0" styleClass="whiteLabel" text="Test Duration" />
-            <Label layoutX="62.0" layoutY="14.0" prefHeight="18.0" prefWidth="114.0" styleClass="magentaLabel" text="Stress Test">
+               <Separator layoutX="2.0" layoutY="194.0" prefHeight="3.0" prefWidth="198.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="-2.0" />
+               <Label layoutX="14.0" layoutY="55.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Mode" AnchorPane.leftAnchor="25.0" />
+               <Button fx:id="startTestButton" layoutX="55.0" layoutY="190.0" mnemonicParsing="false" onAction="#startStressTest" prefHeight="35.0" prefWidth="209.0" styleClass="menuButton" text="Start Test" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+               <ChoiceBox fx:id="stressTestMode" layoutX="88.0" layoutY="52.0" prefHeight="25.0" prefWidth="122.0" AnchorPane.rightAnchor="25.0" />
+               <ChoiceBox fx:id="stressTestTypeSelect" layoutX="88.0" layoutY="94.0" prefHeight="26.0" prefWidth="121.0" AnchorPane.rightAnchor="25.0" />
+               <Label layoutX="13.0" layoutY="98.0" prefHeight="18.0" prefWidth="74.0" styleClass="addMenu-labels" text="Type" AnchorPane.leftAnchor="25.0" />
+            <Spinner layoutX="160.0" layoutY="145.0" prefHeight="26.0" prefWidth="74.0" AnchorPane.rightAnchor="25.0" />
+            <Label layoutX="25.0" layoutY="149.0" prefHeight="18.0" prefWidth="106.0" styleClass="magentaLabel" text="Test Duration" AnchorPane.leftAnchor="25.0" />
+            <Label layoutX="62.0" layoutY="14.0" prefHeight="25.0" prefWidth="86.0" styleClass="magentaLabel" text="Stress Test" AnchorPane.leftAnchor="85.0" AnchorPane.rightAnchor="50.0">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font>
