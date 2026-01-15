@@ -243,8 +243,6 @@ public class SimulationRenderer {
             String streetId = s.getId();
 
             // map color
-            gcStatic.setFill(Color.BLACK);
-            gcStatic.setStroke(Color.BLACK);
             gcStatic.setLineWidth(scale);
 
             // Route highlighting
@@ -257,7 +255,7 @@ public class SimulationRenderer {
                     gcStatic.setStroke(Color.RED);
                 }
                 else {
-                    gcStatic.setStroke(Color.BLACK);
+                    gcStatic.setStroke(Color.rgb(0,0,0,0.6));
                 }
 
             } else if (viewDensityOn) {

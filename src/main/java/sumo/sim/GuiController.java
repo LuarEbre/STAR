@@ -79,7 +79,7 @@ public class GuiController {
     private ListView<String> stateText; // list displaying data as a string
     @FXML
     private ChoiceBox<String> typeSelector, routeSelector, stressTestMode, tlSelector, importMapSelector,
-            phaseIndexSelector, phaseSetSelector, filterMenuRouteSelector, filterMenuTypeSelector;
+            phaseIndexSelector, phaseSetSelector, filterMenuRouteSelector, filterMenuTypeSelector, stressTestTypeSelect;
     @FXML
     private ComboBox<String> filterMenuColorSelector;
     @FXML
@@ -223,6 +223,8 @@ public class GuiController {
         String[] arr = wrapperController.getTypeList();
         typeSelector.setItems(FXCollections.observableArrayList(arr));
         filterMenuTypeSelector.setItems(FXCollections.observableArrayList(arr));
+        stressTestTypeSelect.setItems(FXCollections.observableArrayList(arr));
+
         int i = 0;
         boolean found = false;
         while (i< arr.length && !found ) {
@@ -230,6 +232,7 @@ public class GuiController {
                 found = true;
                 typeSelector.setValue(arr[i]); // default vehtype standard
                 filterMenuTypeSelector.setValue(arr[i]);
+                stressTestTypeSelect.setValue(arr[i]);
             }
             i++;
         }
@@ -991,11 +994,14 @@ public class GuiController {
         boolean wasRunning = !wrapperController.isPaused();
         if(wasRunning) wrapperController.stopSim();
         String mode = stressTestMode.getValue();
+        String type = stressTestTypeSelect.getValue();
+
         switch (mode) {
-            case "Light Test" -> wrapperController.StressTest(1000, Color.GREEN, null);
-            case "Medium Test" -> wrapperController.StressTest(2500, Color.YELLOW, null);
-            case "Heavy Test" -> wrapperController.StressTest(5000, Color.RED, null);
+            case "Light Test" -> wrapperController.StressTest(1000, Color.GREEN, type);
+            case "Medium Test" -> wrapperController.StressTest(2500, Color.YELLOW, type);
+            case "Heavy Test" -> wrapperController.StressTest(5000, Color.RED, type);
         }
+
         if(wasRunning) wrapperController.startSim();
     }
 
