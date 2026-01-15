@@ -28,6 +28,7 @@ public class WrapperController {
     private SumoTraciConnection connection;
     private final GuiController guiController;
     private final SumoMapManager mapManager;
+
     // lists
     private StreetList sl;
     private TrafficLightList tl;
@@ -43,10 +44,10 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private boolean adaptiveOn;
 
     private String currentMap = "Frankfurt";
     private long stepCounter = 0;
-    private String currentMap = "Frankfurt";
     //private XML netXml;
 
     // config
@@ -277,7 +278,9 @@ public class WrapperController {
             }
             vl.updateAllVehicles();
 
-            tl.updateAllCurrentState();
+            //adaptive Traffic Lights
+            if(!adaptiveOn){tl.updateAllCurrentState();}else{tl.adaptiveUpdate();}
+
             sl.updateStreets();
 
             simTime = (double) connection.do_job_get(Simulation.getTime());
@@ -490,6 +493,7 @@ public class WrapperController {
     public boolean isPaused() { return paused; }
     public String getCurrentMap() { return currentMap; }
     public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
+    public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
     public SumoTraciConnection getConnection() { return connection; }
     public boolean isFilterApplied() { return filterApplied; }
 

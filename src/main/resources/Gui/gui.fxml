@@ -686,7 +686,7 @@
                            <children>
                               <Label layoutX="21.0" layoutY="25.0" prefHeight="18.0" prefWidth="110.0" styleClass="addMenu-labels" text="Set Program " />
                               <ChoiceBox layoutX="151.0" layoutY="21.0" prefHeight="26.0" prefWidth="100.0" />
-                              <CheckBox layoutX="21.0" layoutY="62.0" mnemonicParsing="false" styleClass="whiteLabel" text="Adaptive" />
+                              <CheckBox id="adaptiveTrafficLightCheck" fx:id="adaptiveTrafficLightCheck" layoutX="21.0" layoutY="62.0" mnemonicParsing="false" onAction="#onAdaptiveTrafficLight" styleClass="whiteLabel" text="Adaptive" />
                            </children>
                         </AnchorPane>
                      </content>
@@ -698,7 +698,7 @@
            </children>
        </AnchorPane>
 
-       <AnchorPane fx:id="tlVisualizerPane" prefHeight="100.0" prefWidth="150.0" styleClass="mainButtonMenu" visible="">
+       <AnchorPane fx:id="tlVisualizerPane" prefHeight="100.0" prefWidth="150.0" styleClass="mainButtonMenu" visible="false">
            <children>
                <Canvas fx:id="tlCanvas" height="90.0" layoutX="10.0" layoutY="10.0" width="150.0" />
            </children>

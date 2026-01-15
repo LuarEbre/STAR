@@ -237,6 +237,33 @@ public class VehicleList implements GenericList {
         return Math.sqrt(sumofsquares/this.activeCount);
     }
 
+    public double getMeanSpeedFiltered() {
+        double meanspeed = 0;
+        int activeVehicles = getExistingVehCount();
+        if(activeVehicles == 0) return meanspeed;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                meanspeed += v.getSpeed();
+            }
+        }
+        meanspeed /= activeVehicles;
+        return meanspeed;
+    }
+
+    public double getSpeedStdDevFiltered() {
+        int activeVehicles = getExistingVehCount();
+        if(activeVehicles == 0) return 0.0;
+        double meanspeed = this.getMeanSpeed();
+        double sumofsquares = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                double diff = v.getSpeed() - meanspeed;
+                sumofsquares += diff*diff;
+            }
+        }
+        return Math.sqrt(sumofsquares/activeVehicles);
+    }
+
     public void deselectAll() {
         for(VehicleWrap v : vehicles) {
             v.deselect();
