@@ -278,11 +278,12 @@ public class WrapperController {
             }
             vl.updateAllVehicles();
 
+            tl.updateAllCurrentState();
+
             //adaptive Traffic Lights
-            if (!adaptiveOn) {
-                tl.updateAllCurrentState();
-            } else {
-                tl.adaptiveUpdate();
+            if (adaptiveOn && (simTime % 10 == 0)) {
+                for (TrafficLightWrap t : tl.getTrafficlights())
+                    t.adaptiveStateUpdate();
             }
 
             sl.updateStreets();
@@ -306,6 +307,10 @@ public class WrapperController {
                     }
                 });
             }
+        }catch (NullPointerException npe) {
+            logger.log(Level.WARNING, "adaptive Traffic Light got NullPointer as lane denstiy", npe);
+            guiController.doSimStep();
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Sim Step", e);
             terminate();

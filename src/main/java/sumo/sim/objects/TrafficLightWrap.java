@@ -130,12 +130,6 @@ public class TrafficLightWrap extends SelectableObject {
         }
     }
 
-    /**
-     * Should automatically adjust Traffic Light configurations based on Vehicle density and waiting time.
-     */
-    public void enableAdaptiveTrafficLightLogic() {
-        // based on numbers of vehicles and waiting time -> adjust tl timings
-    }
 
     // setter
 
@@ -176,38 +170,46 @@ public class TrafficLightWrap extends SelectableObject {
      * Adaptive States based on Density of Controlled Lanes
      * Replaces setCurrentState if adaptive is checked
      */
-    public void adaptiveStateUpdate(StreetList  streetList) {
-        int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
-        // -> state differs from index to index (index is controlled lanes that have tl)
-        String currentState;
-        // links.get(0).from
-        double densityOfAllLanes = 0.0;
+    public void adaptiveStateUpdate()throws NullPointerException {
 
-        try {
-            for(String lane : this.incomingLanes) {
-                Street s = streetList.getStreetBasedOnLane(lane);
-                densityOfAllLanes += s.getDensity();
+        int currentPhase =  getPhaseNumber();  // GYR
+
+        String[] currentState = getCurrentState(); //G,1,Y,2,R,3
+
+        TrafficLightPhase bestPhase = null;
+
+        double bestScore = -1;
+
+        for(TrafficLightPhase phase : phases) {
+            double score = 0;
+
+            for(int i : phase.getGreenLanes()) {
+
+                String laneID = currentState[i*2 +1];
+                LaneWrap lane = null;
+
+                for(Street street : controlledStreets) {
+                    if(street.getLanes().contains(laneID)) {
+                        lane = street.getLaneBasedOnID(laneID);
+                    }
+                }
+
+                score += lane.getDensity();
             }
 
-            if(densityOfAllLanes >= 100.0 && this.duration > 1) {
-                this.setPhaseDuration(this.duration - 1);
+            if(score > bestScore) {
+                bestPhase = phase;
+                bestScore = score;
             }
-            currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
-
-        } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
-            throw new RuntimeException(e);
         }
-        stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
-        for (int i = 0; i < stateArray.length; i+=2 ) {
-            int sumoIndex = i/2; // to not skip values
-            stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
-            stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
-            //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
-            // [G, lane_G ,y , lane_y , r, lane_r ] format
+
+        if(bestPhase.getIndex() == currentPhase || bestPhase == null) {
+            setPhaseDuration(duration + 3);
+        } else {
+            logger.log(Level.INFO, "TL: " + id + " changed state " + currentState + " to " + bestPhase.getState());
+            setPhaseNumber(bestPhase.getIndex());
         }
     }
-
 
     /**
      * Sets the active phase of the traffic light to the specified index.

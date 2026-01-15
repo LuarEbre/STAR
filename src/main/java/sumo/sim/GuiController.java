@@ -189,9 +189,6 @@ public class GuiController {
         //Setup Graphs of Stats Section
         setupCharts();
 
-        //Setup Graphs of Stats Section
-        setupCharts();
-
         // allows map switching
         map1select.setDisable(false);
         map2select.setDisable(false);
@@ -836,10 +833,18 @@ public class GuiController {
         changeMap(wrapperController.getCurrentMap());
     }
 
+    /**
+     * Triggered when enabling the adaptive Checkbox in Traffic Light Control Menu
+     * Starts to update Traffic Light States based on adaptive algorithm
+     * @see TrafficLightWrap
+     * @see TrafficLightPhase
+     */
     @FXML
     protected void onAdaptiveTrafficLight(){
         if(!(adaptiveTrafficLightCheck.isSelected())) {
             wrapperController.setAdaptiveOn(true);
+
+            logger.log(Level.INFO, "Adaptive Traffic Light Enabled");
         }else{
             wrapperController.setAdaptiveOn(false);
         }

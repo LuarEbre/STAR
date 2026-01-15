@@ -117,12 +117,9 @@ public class StreetList implements GenericList {
         }
     }
 
-    public Street getStreetBasedOnLane(String laneID){
+    public void setLanesDensity(){
         for(Street s : streets){
-            if(s.getStreetBasedOnLane(laneID) != null){
-                return s;
-            };
+            s.setLaneDensity();
         }
-        return null;
     }
 }

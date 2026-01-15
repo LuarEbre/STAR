@@ -2,6 +2,9 @@ package sumo.sim.objects;
 
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A helper class storing information about a {@link de.tudresden.sumo.objects.SumoTLSPhase}.
  *
@@ -15,11 +18,14 @@ public class TrafficLightPhase {
     private final int index;
     private final String state;
     private double duration;
+    private ArrayList<Integer> greenLanes;
 
     public TrafficLightPhase(int index, String state, double duration) {
         this.index = index;
         this.state = state;
         this.duration = duration;
+
+        buildGreenList();
     }
 
     public char getStateCode(int signalIndex) {
@@ -40,6 +46,19 @@ public class TrafficLightPhase {
             // case 'o': return Color.BLACK;
             default: return Color.GREY;
         }
+    }
+
+    public void buildGreenList(){
+        for(char s :  state.toCharArray()){
+
+            if(String.valueOf(s).equalsIgnoreCase("G")){
+                greenLanes.add(state.indexOf(s));
+            }
+        }
+    }
+
+    public ArrayList<Integer> getGreenLanes() {
+        return greenLanes;
     }
 
     public int getIndex() { return index; }

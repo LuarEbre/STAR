@@ -23,6 +23,8 @@ public class LaneWrap {
     private final double width;
     private final double length;
 
+    private double density;
+
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(LaneWrap.class.getName());
 
@@ -92,5 +94,18 @@ public class LaneWrap {
             return this;
         }
         return null;
+    }
+
+    /**
+     * Sets Density of Lane.
+     * Used to set it to the density of its corresponding Street
+     * @param d density
+     */
+    public void setDensity(double d){
+        this.density = d;
+    }
+
+    public double getDensity(){
+        return this.density;
     }
 }
