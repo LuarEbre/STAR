@@ -190,9 +190,17 @@ public class SimulationRenderer {
     private void renderSelectableObjects() {
         float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
         gc.setFill(Color.rgb(66,245,245,0.5));
-        for(VehicleWrap v: vl.getVehicles()) {
-            if(v.exists()) {
-                gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+        if(!this.filterApplied) {
+            for (VehicleWrap v : vl.getVehicles()) {
+                if (v.exists()) {
+                    gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
+            }
+        } else {
+            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+                if (v.exists()) {
+                    gc.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
             }
         }
         for(TrafficLightWrap tl : tls.getTrafficlights()) {
@@ -313,7 +321,8 @@ public class SimulationRenderer {
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
             if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX
                     || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
-            gc.setFill(Color.BLACK);
+            gc.setFill(Color.rgb(54,53,57));
+            gc.setStroke(Color.rgb(54,53,57));
             gc.setLineWidth(scale);
             double[] rawX = jw.getShapeX();
             double[] rawY = jw.getShapeY();

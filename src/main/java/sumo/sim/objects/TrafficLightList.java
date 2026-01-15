@@ -220,4 +220,10 @@ public class TrafficLightList implements GenericList {
 
         return gyr;
     }
+
+    public void adaptiveUpdate() {
+        for (TrafficLightWrap tl : trafficlights) {
+            tl.adaptiveStateUpdate(streetList);
+        }
+    }
 }
