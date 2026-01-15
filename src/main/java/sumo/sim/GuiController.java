@@ -841,7 +841,7 @@ public class GuiController {
      */
     @FXML
     protected void onAdaptiveTrafficLight(){
-        if(!(adaptiveTrafficLightCheck.isSelected())) {
+        if(adaptiveTrafficLightCheck.isSelected()) {
             wrapperController.setAdaptiveOn(true);
 
             logger.log(Level.INFO, "Adaptive Traffic Light Enabled");

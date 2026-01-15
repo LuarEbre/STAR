@@ -176,7 +176,11 @@ public class TrafficLightWrap extends SelectableObject {
 
         String[] currentState = getCurrentState(); //G,1,Y,2,R,3
 
-        TrafficLightPhase bestPhase = null;
+        if(phases.isEmpty()){
+            return;
+        }
+
+        TrafficLightPhase bestPhase = phases.getFirst();
 
         double bestScore = -1;
 
@@ -203,7 +207,7 @@ public class TrafficLightWrap extends SelectableObject {
             }
         }
 
-        if(bestPhase.getIndex() == currentPhase || bestPhase == null) {
+        if(bestPhase.getIndex() == currentPhase) {
             setPhaseDuration(duration + 3);
         } else {
             logger.log(Level.INFO, "TL: " + id + " changed state " + currentState + " to " + bestPhase.getState());
