@@ -48,7 +48,8 @@ public class WrapperController {
 
     private String currentMap = "Frankfurt";
     private long stepCounter = 0;
-    //private XML netXml;
+    private String currentMap = "Frankfurt";
+    private volatile boolean isUiUpdatePending = false; // readable on all threads
 
     // config
     private SumoMapConfig mapConfig;
@@ -137,12 +138,12 @@ public class WrapperController {
      * Starts/Continues the simulation.
      * If the connection is closed it will terminate immediate.
      */
-    public void start() { // maybe with connection as argument? closing connection opened prior
+    private void start() { // maybe with connection as argument? closing connection opened prior
         if (executor != null && !executor.isShutdown()) {
             return;
         }
-        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly
-        executor.scheduleAtFixedRate(() -> {
+        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly, waits for previous step
+        executor.scheduleWithFixedDelay(() -> {
             if (paused || terminated) return;
 
             if (connection.isClosed()) {
@@ -272,6 +273,7 @@ public class WrapperController {
     public void doStepUpdate() {
         // updating gui and simulation
         try {
+            // updating all lists
             connection.do_timestep();
             if(filterApplied) {
                 this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
@@ -283,9 +285,23 @@ public class WrapperController {
 
             sl.updateStreets();
 
-            simTime = (double) connection.do_job_get(Simulation.getTime());
-            if (!terminated) {
-                Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
+            // safes disappeared vehicles for data export
+            /*for (VehicleWrap v : vl.getVehicles()) {
+                if (!v.exists() && !allTimeVehicles.contains(v)) {
+                    allTimeVehicles.add(v);
+                }
+            }*/
+
+            if (!isUiUpdatePending) {
+                // only update if gui is done with rendering a single step
+                isUiUpdatePending = true;
+                Platform.runLater(() -> {
+                    try {
+                        guiController.doSimStep();
+                    } finally {
+                        isUiUpdatePending = false; // gui is done
+                    }
+                });
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Sim Step", e);
@@ -360,8 +376,8 @@ public class WrapperController {
         }
     }
 
-    public void addRoute(String start, String end, String id) {
-        rl.addRoute(start,end,id);
+    public boolean addRoute(String start, String end, String id) {
+        return rl.addRoute(start,end,id);
     }
 
     public void updateRoutes() {
@@ -390,6 +406,17 @@ public class WrapperController {
         if (vl != null && vl.getVehicles() != null) {
             exportVehicles.addAll(vl.getVehicles());
         }
+
+        try {
+            if (file.getName().endsWith(".pdf")) {
+                DataExport.exportAsPDF(file, exportVehicles, sl.getStreets(), tl.getTrafficlights());
+            } else {
+                DataExport.exportAsCSV(file, exportVehicles, sl.getStreets(), tl.getTrafficlights(), this.simTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
 
         try {
             if (file.getName().endsWith(".pdf")) {
