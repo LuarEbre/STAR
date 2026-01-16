@@ -4,19 +4,19 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
-import sumo.sim.*;
+import sumo.sim.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * author
@@ -27,10 +27,12 @@ public class WrapperController {
     private SumoTraciConnection connection;
     private final GuiController guiController;
     private final SumoMapManager mapManager;
+
     // lists
     private StreetList sl;
     private TrafficLightList tl;
     private VehicleList vl;
+    private VehicleList filteredVehicles;
     private JunctionList jl;
     private TypeList typel;
     private RouteList rl;
@@ -41,10 +43,11 @@ public class WrapperController {
     private int delay = 50;
     private boolean paused;
     private double simTime;
+    private boolean adaptiveOn;
 
     private String currentMap = "Frankfurt";
     private long stepCounter = 0;
-    //private XML netXml;
+    private volatile boolean isUiUpdatePending = false; // readable on all threads
 
     // config
     private SumoMapConfig mapConfig;
@@ -52,6 +55,17 @@ public class WrapperController {
     public static String currentRou = null;
     public String sumoBinary;
 
+    // filtering
+    private boolean filterApplied;
+    private Color colorFilter;
+    private Double lowerSpeedFilter, upperSpeedFilter;
+    private String routeFilter, typeFilter;
+
+    // data export
+    /*private final List<VehicleWrap> allTimeVehicles = new ArrayList<>();
+    private int stepCounter = 0;
+    private final int exportSamplingRate = 100;
+    */
     //Logger
     private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
@@ -60,7 +74,7 @@ public class WrapperController {
      *
      * @param guiController
      */
-    public WrapperController(GuiController guiController,  SumoMapManager mapManager) {
+    public WrapperController(GuiController guiController, SumoMapManager mapManager) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
         sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
@@ -68,13 +82,13 @@ public class WrapperController {
                 : "src/main/resources/Binaries/sumo";
 
         // config knows both .rou and .net XMLs
-        mapConfig = mapManager.getConfig("Frankfurt"); // Frankfurt, TestMap
+        mapConfig = mapManager.getConfig("Frankfurt1"); // Frankfurt, TestMap
         String configFile = mapConfig.getConfigPath().toString();
         currentNet = mapConfig.getNetPath().toString();
         currentRou = mapConfig.getRouPath().toString();
 
         // create new connection with the binary and map config file
-        this.connection = new SumoTraciConnection(sumoBinary,configFile);
+        this.connection = new SumoTraciConnection(sumoBinary, configFile);
         this.guiController = guiController;
         this.mapManager = mapManager;
         this.terminated = false;
@@ -94,11 +108,19 @@ public class WrapperController {
             logger.log(Level.INFO, "Connected to Sumo");
 
             vl = new VehicleList(connection);
+            filteredVehicles = new VehicleList(connection);
             sl = new StreetList(this.connection);
             tl = new TrafficLightList(connection, sl);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
             rl = new RouteList(currentRou, connection, this);
+
+            // initialize filter values
+            colorFilter = null;
+            lowerSpeedFilter = null;
+            upperSpeedFilter = null;
+            routeFilter = null;
+            typeFilter = null;
 
             tl.updateAllCurrentState(); // important for rendering
             start();
@@ -114,12 +136,12 @@ public class WrapperController {
      * Starts/Continues the simulation.
      * If the connection is closed it will terminate immediate.
      */
-    public void start() { // maybe with connection as argument? closing connection opened prior
+    private void start() { // maybe with connection as argument? closing connection opened prior
         if (executor != null && !executor.isShutdown()) {
             return;
         }
-        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly
-        executor.scheduleAtFixedRate(() -> {
+        executor = Executors.newSingleThreadScheduledExecutor(); // creates scheduler thread, runs repeatedly, waits for previous step
+        executor.scheduleWithFixedDelay(() -> {
             if (paused || terminated) return;
 
             if (connection.isClosed()) {
@@ -133,7 +155,7 @@ public class WrapperController {
                 terminate();
             }
 
-            }, 0, delay, TimeUnit.MILLISECONDS); // initial delay, delay, unit
+        }, 0, delay, TimeUnit.MILLISECONDS); // initial delay, delay, unit
     }
 
     /**
@@ -174,11 +196,12 @@ public class WrapperController {
 
     /**
      * Changes delay based on "delay" argument and reruns executor thread with new delay.
+     *
      * @param delay
      */
     public void changeDelay(int delay) {
         this.delay = delay;
-        if (!executor.isShutdown() && executor!= null) {
+        if (!executor.isShutdown() && executor != null) {
             try {
                 executor.shutdown();
                 if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
@@ -206,6 +229,40 @@ public class WrapperController {
      */
     public void stopSim() {
         paused = true;
+
+        /*try {
+
+            String desktopPath = System.getProperty("user.home") + "/Schreibtisch/";
+
+            // testfiles
+            File pdfFile = new File(desktopPath + "SUMO_Test_Report.pdf");
+            File csvFile = new File(desktopPath + "SUMO_Test_Data.csv");
+
+            System.out.println(">>> TEST: Start export zo desktop...");
+
+            this.generateExport(pdfFile);
+            this.generateExport(csvFile);
+
+            System.out.println(">>> TEST: export done!");
+        } catch (Exception e) {
+            System.err.println(">>> TEST: error: " + e.getMessage());
+            e.printStackTrace();
+        }*/
+
+    }
+
+    public void applyFilter(Color color, Double lower, Double upper, String route, String type) {
+        colorFilter = color;
+        lowerSpeedFilter = lower;
+        upperSpeedFilter = upper;
+        routeFilter = route;
+        typeFilter = type;
+        if (color == null && lower == null && upper == null && route == null && type == null) {
+            this.filterApplied = false;
+        } else {
+            this.filteredVehicles.setVehicles(this.filterVehicles());
+            this.filterApplied = true;
+        }
     }
 
     /**
@@ -215,14 +272,40 @@ public class WrapperController {
     public void doStepUpdate() {
         // updating gui and simulation
         try {
+            // updating all lists
             connection.do_timestep();
+            if (filterApplied) {
+                this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
+            }
             vl.updateAllVehicles();
-            tl.updateAllCurrentState();
-            sl.updateStreets();
 
+            //adaptive Traffic Lights
+            if (!adaptiveOn) {
+                tl.updateAllCurrentState();
+            } else {
+                tl.adaptiveUpdate();
+            }
+
+            sl.updateStreets();
             simTime = (double) connection.do_job_get(Simulation.getTime());
-            if (!terminated) {
-                Platform.runLater(guiController::doSimStep); // gui sim step (connected with wrapperCon)
+
+            // safes disappeared vehicles for data export
+            /*for (VehicleWrap v : vl.getVehicles()) {
+                if (!v.exists() && !allTimeVehicles.contains(v)) {
+                    allTimeVehicles.add(v);
+                }
+            }*/
+
+            if (!isUiUpdatePending) {
+                // only update if gui is done with rendering a single step
+                isUiUpdatePending = true;
+                Platform.runLater(() -> {
+                    try {
+                        guiController.doSimStep();
+                    } finally {
+                        isUiUpdatePending = false; // gui is done
+                    }
+                });
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Sim Step", e);
@@ -244,14 +327,15 @@ public class WrapperController {
 
             // time to close and open old port
             try {
-                Thread.sleep(500); }
-            catch (InterruptedException e) {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // should have something here
                 logger.log(Level.SEVERE, "Failed to stop thread.");
             }
 
             // load new config
             try {
-                mapConfig= mapManager.getConfig(mapName);
+                mapConfig = mapManager.getConfig(mapName);
                 currentNet = mapConfig.getNetPath().toString();
                 currentRou = mapConfig.getRouPath().toString();
 
@@ -282,10 +366,11 @@ public class WrapperController {
 
     /**
      * Used by {@link GuiController} to add Vechicles
+     *
      * @param amount How many Vehicles will spawn
-     * @param type Sets type based on existing types in .rou XML
-     * @param route Sets route
-     * @param color Color based on Hex code
+     * @param type   Sets type based on existing types in .rou XML
+     * @param route  Sets route
+     * @param color  Color based on Hex code
      */
     public void addVehicle(int amount, String type, String route, Color color) {
         if (executor != null && !executor.isShutdown()) {
@@ -299,31 +384,62 @@ public class WrapperController {
         }
     }
 
-    public void addRoute(String start, String end, String id) {
-        rl.addRoute(start,end,id);
+    public boolean addRoute(String start, String end, String id) {
+        return rl.addRoute(start, end, id);
     }
 
     public void updateRoutes() {
         Platform.runLater(guiController::initializeDropDowns);
     }
+
     /**
      * Spread the amount of vehicles determined by the stress test setting evenly across all existing routes
+     *
      * @param amount number of cars (set in Stress Test Menu)
-     * @param color {@link Color}
-     * @param type Type ID (defaults to "DEFAULT_VEHTYPE" if null)
+     * @param color  {@link Color}
+     * @param type   Type ID (defaults to "DEFAULT_VEHTYPE" if null)
      */
     public void StressTest(int amount, Color color, String type) {
         Map<String, List<String>> Routes = rl.getAllRoutes();
-        int amount_per = amount/Routes.size();
+        int amount_per = amount / Routes.size();
         type = (type == null) ? "DEFAULT_VEHTYPE" : type;
 
         logger.log(Level.INFO, "Stress testing for " + amount);
 
-        for(String key : Routes.keySet()) {
-            addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
+        for (String key : Routes.keySet()) {
+            addVehicle(amount_per, type, key, color);
         }
     }
 
+    /* public void generateExport(File file) {
+        // collect archieved and acitve vehicles
+        List<VehicleWrap> exportVehicles = new ArrayList<>(allTimeVehicles);
+        if (vl != null && vl.getVehicles() != null) {
+            exportVehicles.addAll(vl.getVehicles());
+        }
+        try {
+            if (file.getName().endsWith(".pdf")) {
+                DataExport.exportAsPDF(file, exportVehicles, sl.getStreets(), tl.getTrafficlights());
+            } else {
+                DataExport.exportAsCSV(file, exportVehicles, sl.getStreets(), tl.getTrafficlights(), this.simTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } */
+
+    private CopyOnWriteArrayList<VehicleWrap> filterVehicles() {
+        return this.vl.getVehicles().stream()
+                .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
+                .filter(v -> this.routeFilter == null || v.getRouteID().equals(this.routeFilter))
+                .filter(v -> this.colorFilter == null || v.getColor().equals(this.colorFilter))
+                .filter(v -> {
+                    boolean aboveMin = (this.lowerSpeedFilter == null || v.getSpeed() >= this.lowerSpeedFilter);
+                    boolean belowMax = (this.upperSpeedFilter == null || v.getSpeed() <= this.upperSpeedFilter);
+                    return aboveMin && belowMax;
+                })
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+    }
 
     /**
      * Sets the duration of the phase the traffic light is currently on.
@@ -370,13 +486,13 @@ public class WrapperController {
     public String getChosenMap(){
         List<String> maps = mapManager.getNames();
         for(String key : maps) {
-           if(mapManager.getConfig(key).isChosen()) {
-               return key;
-           }
+            if(mapManager.getConfig(key).isChosen()) {
+                return key;
+            }
         }
         // if no map is selected (error) automatically choose Map1
-        mapSwitch("Frankfurt");
-        return "Frankfurt";
+        mapSwitch("Frankfurt1");
+        return "Frankfurt1";
     }
 
     public SelectableObject getSelectedObject() {
@@ -396,6 +512,7 @@ public class WrapperController {
     public JunctionList getJunctions() { return jl; }
     public StreetList getStreets() { return sl; }
     public VehicleList getVehicles() { return vl; }
+    public VehicleList getFilteredVehicles() { return filteredVehicles; }
     public TrafficLightList getTrafficLights() { return tl; }
     public RouteList getRoutes()  { return rl; }
     public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
@@ -404,6 +521,9 @@ public class WrapperController {
     public boolean isPaused() { return paused; }
     public String getCurrentMap() { return currentMap; }
     public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
+    public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
+    public SumoTraciConnection getConnection() { return connection; }
+    public boolean isFilterApplied() { return filterApplied; }
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
@@ -413,6 +533,7 @@ public class WrapperController {
     public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
     public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
     public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
+    public int getAllFilteredVehicleCount() { return (filteredVehicles != null) ? filteredVehicles.getVehicles().size() : 0; }
 
 
 }

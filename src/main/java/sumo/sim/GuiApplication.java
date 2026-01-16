@@ -57,7 +57,7 @@ public class GuiApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load());
 
         Platform.runLater(() -> {
-            var iconStream = getClass().getResourceAsStream("/Gui/Icons/STAR.png");
+            var iconStream = getClass().getResourceAsStream("/Gui/Icons/starlogo.png");
             if (iconStream != null) {
                 Image appIcon = new Image(iconStream);
                 stage.getIcons().add(appIcon);
