@@ -89,7 +89,7 @@ public class GuiController {
     private ComboBox<String> filterMenuColorSelector;
     @FXML
     private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
-            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, filterColor, filterSpeed, filterRoute, filterType, applyFilter;
+            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, filterColor, filterSpeed, filterRoute, filterType, applyFilter,adaptiveTrafficLightCheck;
     @FXML
     private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped,
             TotalTimeSpentStopped, MeanSpeed, SpeedSD, vehicleID, vehicleType, route, color, currentSpeed,

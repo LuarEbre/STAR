@@ -4,6 +4,7 @@ import de.tudresden.sumo.cmd.Edge;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
 import sumo.sim.util.ExportableData;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class Street extends SelectableObject implements ExportableData {
     private XML xml;
     // Data Export
     private double sumDensity = 0.0;
-    private long densityTicks = 0;
+    private long stepStartOrReset = 0;
     private double maxDensity = 0;
 
 
@@ -81,9 +82,9 @@ public class Street extends SelectableObject implements ExportableData {
         // header for rows
         return new String[] {
                 "Street ID",
-                "Avg Density (Veh/km)",
+                "Avg Density",
                 "Peak Denisty",
-                "Duration (Ticks)",
+                "measurement",
                 "from",
                 "to"
         };
@@ -91,12 +92,14 @@ public class Street extends SelectableObject implements ExportableData {
 
     @Override
     public String[] getRowData() {
+        long durationCounter = WrapperController.globalStepCounter - this.stepStartOrReset;
+        if (durationCounter < 0) durationCounter = 0;
         // data for columns
         return new String[]{
                 this.id,
                 String.format(java.util.Locale.US, "%.2f", getAverageDensity()),
                 String.format(java.util.Locale.US, "%.2f", this.maxDensity),
-                String.valueOf(this.densityTicks),
+                String.valueOf(durationCounter),
                 this.fromJunction != null ? this.fromJunction : "unknown",
                 this.toJunction != null ? this.toJunction : "unknown"
         };
@@ -130,11 +133,7 @@ public class Street extends SelectableObject implements ExportableData {
             throw new RuntimeException(e);
         }
     }
-    public void resetDataTracking() {
-        this.sumDensity = 0.0;
-        this.densityTicks = 0;
-        this.maxDensity = 0.0;
-    }
+
     /**
      *
      */
@@ -167,7 +166,7 @@ public class Street extends SelectableObject implements ExportableData {
             calcDensity();
             //this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
             this.sumDensity = this.sumDensity + this.density;
-            this.densityTicks++;
+            this.stepStartOrReset++;
                 if(this.density > this.maxDensity) {
                     this.maxDensity = this.density;
                 }
@@ -177,6 +176,19 @@ public class Street extends SelectableObject implements ExportableData {
             //this.noise = 0;
         }
     }
+    public void resetDataTracking() {
+        this.sumDensity = 0.0;
+        this.maxDensity = 0.0;
+        this.stepStartOrReset = WrapperController.globalStepCounter;
+    }
+    public double getAverageDensity() {
+        long durationCounter = WrapperController.globalStepCounter - this.stepStartOrReset;
+        if (durationCounter <= 0) {
+            return 0.0;
+        }
+        return this.sumDensity / durationCounter;
+    }
+
 
     public void calculateBounds() {
         minX = Double.MAX_VALUE;
@@ -201,7 +213,7 @@ public class Street extends SelectableObject implements ExportableData {
     }
 
     // setter
-    public void setDensity(double den) { this.density = den; }
+
     // getter
     public Street getStreetBasedOnLane(String laneID){
        for (LaneWrap lane : lanes) {
@@ -211,44 +223,14 @@ public class Street extends SelectableObject implements ExportableData {
        }
         return null;
     }
-    /**
-     * @return The {@link ArrayList} of {@link LaneWrap} objects contained in this street.
-     */
-    public ArrayList<LaneWrap> getLanes() { return lanes; }
-    /**
-     * @return This street's ID.
-     */
-    public String getId() { return id; }
-    /**
-     * @return ID of the junction where this street begins.
-     */
-    public String getFromJunction() { return fromJunction; }
-    /**
-     * @return ID of the junction where this street ends.
-     */
-    public String getToJunction() { return toJunction; }
-    /**
-     * @return {@link Street} itself.
-     */
-    public Street getStreet() { return this; }
-    /**
-     * Sets the current traffic density on this street.
-     * @param den The new density value
-     */
-    public void setDensity(double den) { this.density = den; }
-    /**
-     * @return Current traffic density on this street.
-     */
-    public double getDensity() { return density; }
 
+    public void setDensity(double den) { this.density = den; }
     public double getMinX() { return minX; }
     public double getMaxX() { return maxX; }
     public double getMinY() { return minY; }
     public double getMaxY() { return maxY; }
     public double getSumDensity() {return sumDensity; }
-    public long getDensityTicks() {return densityTicks; }
     public double getMaxDensity() {return maxDensity;}
-    public double getAverageDensity() {return (densityTicks > 0) ? (sumDensity / densityTicks) : 0;}
     public double getMeanPositionX() { return meanPositionX; }
     public double getMeanPositionY() { return meanPositionY; }
     public ArrayList<LaneWrap> getLanes() { return lanes; }
@@ -258,4 +240,4 @@ public class Street extends SelectableObject implements ExportableData {
     public Street getStreet() { return this; }
     public double getDensity() { return density; }
 }
-}
+
