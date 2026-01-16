@@ -4,6 +4,7 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import sumo.sim.DataExport;
 import sumo.sim.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.ExportableData;
@@ -15,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 
 /**
  * author
@@ -53,9 +56,10 @@ public class WrapperController {
     private boolean adaptiveOn;
 
     private String currentMap = "Frankfurt";
-    private long stepCounter;
+
     //private XML netXml;
     private long stepCounter = 0;
+    public static long globalStepCounter = 0;
     private volatile boolean isUiUpdatePending = false; // readable on all threads
 
     // config
@@ -256,6 +260,7 @@ public class WrapperController {
      * All important updates are done here -> e.g. vl.updateAllVehicles()
      */
     public void doStepUpdate() {
+        WrapperController.globalStepCounter = this.stepCounter;
         // updating gui and simulation
         try {
             // updating all lists
@@ -263,6 +268,9 @@ public class WrapperController {
             if (filterApplied) {
                 this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
             }
+            /*if (this.stepCounter > 0) {
+                sl.updateStreets();
+            }*/
             vl.updateAllVehicles();
             // safes disappeared vehicles for data export
             for (VehicleWrap v : vl.getVehicles()) {
@@ -278,7 +286,7 @@ public class WrapperController {
                 tl.adaptiveUpdate();
             }
 
-            sl.updateStreets();
+
             simTime = (double) connection.do_job_get(Simulation.getTime());
             if (!isUiUpdatePending) {
                 // only update if gui is done with rendering a single step
@@ -396,7 +404,7 @@ public class WrapperController {
     public void generateExport(File file, boolean useFilterCheckbox) {
         if (sl != null) {
             for (Street s : sl.getStreets()) {
-                s.updateStreet(); // includes the ticks/updating
+                s.updateStreet(); // includes maxDensity calculation/stepStartOrReset counter
             }
         }
         if (tl != null) {
@@ -541,6 +549,7 @@ public class WrapperController {
     public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
     public SumoTraciConnection getConnection() { return connection; }
     public boolean isFilterApplied() { return filterApplied; }
+    public long getStepCounter() {return this.stepCounter;}
 
     // safe getter
     public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null

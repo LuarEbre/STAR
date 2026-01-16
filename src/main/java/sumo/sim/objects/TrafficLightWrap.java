@@ -273,7 +273,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
     public void setPhaseNumber(int index) {
         try {
             con.do_job_set(Trafficlight.setPhase(id,index));
-            triggerReset("Changed phasse to " + index);
+            triggerReset("Changed phase to " + index);
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set phase number of Traffic Light", e);
             throw new RuntimeException(e);
@@ -305,6 +305,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
         //getPhaseNumber(); // -> only applies to phase currently active -> should display phase in gui for reference?
         try {
             con.do_job_set(Trafficlight.setPhaseDuration(id, phaseDuration));
+            triggerReset("Set duration temporaly to " + phaseDuration + "s");
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set phase duration of Traffic Light", e);
             throw new RuntimeException(e);
@@ -337,7 +338,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
                 con.do_job_set(Trafficlight.setCompleteRedYellowGreenDefinition(id, program));
                 phases.get(phaseIndex).setDuration(newDuration);
             }
-            triggerReset("Duaration of phase " + phaseIndex + " changed to " + newDuration);
+            triggerReset("Set duration at phase index " + phaseIndex + "permanently to " + newDuration);
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set phase duration of Traffic Light", e);
             return;
@@ -530,11 +531,14 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
      * controlled by this traffic light.
      */
     public void triggerReset(String change) {
+        System.out.println("Debug message " + this.id + " : " + change);
+
         if (controlledStreets != null) {
             for (Street s : controlledStreets) {
                 s.resetDataTracking();
             }
-            changeTlHistory.add(change);
+            this.changeTlHistory.clear();
+            this.changeTlHistory.add(change);
             logger.log(Level.INFO, "Reset controlled streets due to manual traffic light setting change.", this.id);
         }
     }
