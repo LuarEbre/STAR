@@ -20,6 +20,7 @@ public class StreetList implements GenericList {
     private final ArrayList<Street> streets = new ArrayList<>();
     private int count;
     private final SumoTraciConnection connection;
+    private final WrapperController controller;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(StreetList.class.getName());
@@ -28,19 +29,21 @@ public class StreetList implements GenericList {
      * Initializes the {@link Street} objects inside the List via {@link XML#readAllEdges()}
      * @param con an instance of {@link SumoTraciConnection}
      */
-    public StreetList(SumoTraciConnection con) {
+    public StreetList(SumoTraciConnection con, WrapperController controller) {
         try {
+            this.connection = con;
+            this.controller = controller;
+
             XML xml = new XML(WrapperController.getCurrentNet());
             Map<String, String[]> data = xml.readAllEdges();
 
-            this.connection = con;
             for (Map.Entry<String, String[]> entry : data.entrySet()) {
                 String id = entry.getKey();
                 String from = entry.getValue()[0];
                 String to = entry.getValue()[1];
                 try {
                     // if id is not known -> error , needs to be checked in other lists too
-                    Street s = new Street(id, from, to, con);
+                    Street s = new Street(id, from, to, con, this.controller);
                     streets.add(s);
                     count++;
                 } catch (RuntimeException e) {

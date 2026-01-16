@@ -21,32 +21,7 @@ import java.util.logging.Logger;
  */
 public class VehicleWrap extends SelectableObject implements ExportableData {
 
-    @Override
-    public String getExportCategory() {return "Vehicles: "; }
-    @Override
-    public String[] getColumnHeaders() {
-        return new String[] {
-                "ID",
-                "Avg Speed",
-                "Stops",
-                "Waiting Time",
-                "Max Speed"
-        };
-    }
-    @Override
-    public String[] getRowData() {
-        double avg = Double.isFinite(avgSpeed) ? avgSpeed : 0.0;
-        double max = Double.isFinite(maxSpeed) ? maxSpeed : 0.0;
-        double wait = Double.isFinite(waitingTime) ? waitingTime : 0.0;
 
-        return new String[] {
-                id,
-                String.format(Locale.US, "%.2f m/s", avg),
-                String.valueOf(numberOfStops),
-                String.format(Locale.US, "%.0f s", wait),
-                String.format(Locale.US, "%.2f m/s", max)
-        };
-    }
     // currently, to set the currentStreet of a vehicle as a Street, each car would have to have a reference to Street_List
     // therefore it could be beneficial to just use a String of EdgeID
     private Street currentStreet;
@@ -75,6 +50,7 @@ public class VehicleWrap extends SelectableObject implements ExportableData {
     private boolean currentlyStopped;
     private boolean exists; // check for despawning in gui?
     private boolean queued;
+    private long entryStep = -1;
 
     // could be used for selecting in the GUI later on
     private boolean selected;
@@ -108,6 +84,57 @@ public class VehicleWrap extends SelectableObject implements ExportableData {
         this.activeLastFrame = false;
         this.currentlyStopped = false;
         this.queued = true;
+    }
+    /**
+     * Returns the export category for vehicle data.
+     * @return A string header for the vehicle data section.
+     */
+    @Override
+    public String getExportCategory() {return "Vehicles: "; }
+    /**
+     * Defines the table headers for the vehicle export.
+     * @return An array of strings including the new Route column.
+     */
+    @Override
+    public String[] getColumnHeaders() {
+        return new String[] {
+                "ID",
+                "Route",
+                "Avg Speed",
+                "Stops",
+                "Waiting Time",
+                "Max Speed"
+        };
+    }
+    /**
+     * Formats the vehicle's performance metrics and route information for export.
+     * <p>
+     * Handles non-finite double values (NaN/Infinity) by defaulting to 0.0
+     * to ensure export stability.
+     * @return A string array containing formatted vehicle statistics.
+     */
+    @Override
+    public String[] getRowData() {
+        double avg = 0.0;
+        if (Double.isFinite(avgSpeed)) {
+            avg = avgSpeed;
+        }
+        double max = 0.0;
+        if (Double.isFinite(maxSpeed)) {
+            max = maxSpeed;
+        }
+        double wait = 0.0;
+        if (Double.isFinite(waitingTime)) {
+            wait = waitingTime;
+        }
+        return new String[] {
+                id,
+                this.routeID,
+                String.format(Locale.US, "%.2f m/s", avg),
+                String.valueOf(numberOfStops),
+                String.format(Locale.US, "%.0f s", wait),
+                String.format(Locale.US, "%.2f m/s", max)
+        };
     }
 
     /**
@@ -153,7 +180,32 @@ public class VehicleWrap extends SelectableObject implements ExportableData {
             this.exists = false;
         }
     }
-
+    /**
+     * Compares this vehicle with another object for equality.
+     * <p>
+     * Two vehicles are considered equal if they have the same SUMO ID.
+     * This ensures consistent behavior when using vehicles in collections like Sets.
+     * @param v The object to compare with.
+     * @return {@code true} if the IDs are identical; {@code false} otherwise.
+     */
+    //methods from java used in wrappercontroller for performance upgrade/hashing
+    @Override
+    public boolean equals(Object v) {
+        if (this == v) return true;
+        if (v == null || getClass() != v.getClass()) return false;
+        VehicleWrap that = (VehicleWrap) v;
+        return id.equals(that.id); // compares sumo id
+    }
+    /**
+     * Generates a hash code for this vehicle based on its unique ID.
+     * <p>
+     * This is required to maintain the contract with {@link #equals(Object)},
+     * @return The hash code of the vehicle's ID.
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode(); // hashing with id
+    }
     /**
      * Allows for setting individual vehicle's speed.
      * @param speed desired speed in m/s
@@ -166,7 +218,12 @@ public class VehicleWrap extends SelectableObject implements ExportableData {
             throw new RuntimeException(e);
         }
     }
-
+    public void setEntryStep(long step) {
+        this.entryStep = step;
+    }
+    public long getEntryStep() {
+        return this.entryStep;
+    }
     /**
      * @return The current speed of the vehicle in m/s.
      */

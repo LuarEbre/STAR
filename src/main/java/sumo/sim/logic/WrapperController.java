@@ -12,10 +12,10 @@ import sumo.sim.util.Util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 
 /**
  * author
@@ -59,7 +58,6 @@ public class WrapperController {
 
     //private XML netXml;
     private long stepCounter = 0;
-    public static long globalStepCounter = 0;
     private volatile boolean isUiUpdatePending = false; // readable on all threads
 
     // config
@@ -75,8 +73,7 @@ public class WrapperController {
     private String routeFilter, typeFilter;
 
     // data export
-    private CopyOnWriteArrayList<VehicleWrap> allTimeVehicles = new CopyOnWriteArrayList<>();
-
+    private Set<VehicleWrap> allTimeVehicles = java.util.concurrent.ConcurrentHashMap.newKeySet();
     //Logger
     private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
@@ -115,13 +112,13 @@ public class WrapperController {
 
         try {
             connection.runServer(8813); // preventing random port
-
             logger.log(Level.INFO, "Connected to Sumo");
 
+            this.stepCounter = 0;
             vl = new VehicleList(connection);
             filteredVehicles = new VehicleList(connection);
-            sl = new StreetList(this.connection);
-            tl = new TrafficLightList(connection, sl);
+            sl = new StreetList(this.connection, this);
+            tl = new TrafficLightList(connection, sl, this);
             jl = new JunctionList(connection, sl);
             typel = new TypeList(connection);
             rl = new RouteList(currentRou, connection, this);
@@ -134,6 +131,10 @@ public class WrapperController {
             typeFilter = null;
 
             tl.updateAllCurrentState(); // important for rendering
+            if (sl != null && sl.getStreets() != null) {
+                sl.getStreets().forEach(Street::resetDataTracking);
+                logger.log(Level.INFO, "Reset stepCounter for data tarcking.");
+            }
             start();
 
         } catch (Exception e) {
@@ -260,32 +261,29 @@ public class WrapperController {
      * All important updates are done here -> e.g. vl.updateAllVehicles()
      */
     public void doStepUpdate() {
-        WrapperController.globalStepCounter = this.stepCounter;
         // updating gui and simulation
         try {
             // updating all lists
             connection.do_timestep();
-            if (filterApplied) {
-                this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
-            }
-            /*if (this.stepCounter > 0) {
-                sl.updateStreets();
-            }*/
+            this.stepCounter++;
+            sl.updateStreets();
             vl.updateAllVehicles();
             // safes disappeared vehicles for data export
             for (VehicleWrap v : vl.getVehicles()) {
-                if (v.getSpeed() > 0 && !allTimeVehicles.contains(v)) {
-                    allTimeVehicles.add(v);
+                if (v.getSpeed() > 0) {
+                    if (allTimeVehicles.add(v)) {
+                        //hashing for performance upgrade
+                        v.setEntryStep(this.getStepCounter());
+                        logger.log(Level.INFO, "Car registered at step: " + this.getStepCounter());
+                    }
                 }
             }
-            stepCounter++;
             //adaptive Traffic Lights
             if (!adaptiveOn) {
                 tl.updateAllCurrentState();
             } else {
                 tl.adaptiveUpdate();
             }
-
 
             simTime = (double) connection.do_job_get(Simulation.getTime());
             if (!isUiUpdatePending) {
@@ -400,7 +398,20 @@ public class WrapperController {
             addVehicle(amount_per, type, key, color);
         }
     }
-
+    /**
+     * Orchestrates the data export process for the simulation report in CSV or PDF format.
+     * <p>
+     * This method performs the following steps:
+     * <ul>
+     * <li>Updates the latest statistics for all streets and traffic lights.</li>
+     * <li>Filters the vehicle list based on UI criteria (type, route, color, speed) if the filter is active.</li>
+     * <li>Aggregates active streets (density > 0) and traffic light data.</li>
+     * <li>Determines the file format by extension and delegates to the {@link DataExport} utility.</li>
+     * </ul>
+     * @param file The target file where the report will be saved.
+     * @param useFilterCheckbox Flag indicating whether the current UI filters should be applied
+     * to the vehicle data.
+     */
     public void generateExport(File file, boolean useFilterCheckbox) {
         if (sl != null) {
             for (Street s : sl.getStreets()) {
@@ -410,7 +421,6 @@ public class WrapperController {
         if (tl != null) {
             tl.updateTLs(); // updates tl
         }
-
         List<ExportableData> exportList = new ArrayList<>();
             if (useFilterCheckbox) {
                 // if filter apllied lists gets filterd
@@ -425,12 +435,17 @@ public class WrapperController {
                     })
                     .collect(Collectors.toList());
                 exportList.addAll(filtered);
+
             } else {
                 // if no filter applied list contains active and archived vehicles
                 exportList.addAll(this.allTimeVehicles);
-        }
+
+            }
         if (sl != null) {
-            exportList.addAll(sl.getStreets());
+            List<Street> activeStreets = sl.getStreets().stream()
+                    .filter(s -> s.getAverageDensity() > 0.0) //checking density
+                    .collect(Collectors.toList());
+            exportList.addAll(activeStreets);
         }
         // traffic lights
         if (tl != null) {
