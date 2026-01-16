@@ -474,6 +474,7 @@ public class GuiController {
         try {
             color = Color.web(filterMenuColorSelector.getValue());
         } catch(Exception e) {
+            logger.log(Level.WARNING, "Failed to get color value. Setting to Null");
             color = null;
             if(filterColor.isSelected()) return;
         }
@@ -1352,7 +1353,7 @@ public class GuiController {
                         this.updateDataPane();
                     }
                 } catch (NullPointerException e) {
-                   System.err.println(e);
+                    logger.log(Level.WARNING, "Failed to Select Vehicle or Trafficlight.", e);
                 }
             }
         });
