@@ -34,6 +34,7 @@ public class Street extends SelectableObject implements ExportableData {
     private double sumDensity = 0.0;
     private long stepStartOrReset = 0;
     private double maxDensity = 0;
+    private WrapperController controller;
 
 
     private double meanPositionX;
@@ -58,7 +59,8 @@ public class Street extends SelectableObject implements ExportableData {
      * @param to Junction ID
      * @param con an instance of {@link SumoTraciConnection}
      */
-    public Street(String id, String from, String to, SumoTraciConnection con) {
+    public Street(String id, String from, String to, SumoTraciConnection con, WrapperController controller) {
+        this.controller = controller;
         this.id = id;
         this.con = con;
         this.fromJunction = from;
@@ -76,7 +78,6 @@ public class Street extends SelectableObject implements ExportableData {
         //header
         return "Traffic Density";
     }
-
     @Override
     public String[] getColumnHeaders() {
         // header for rows
@@ -89,10 +90,10 @@ public class Street extends SelectableObject implements ExportableData {
                 "to"
         };
     }
-
     @Override
     public String[] getRowData() {
-        long durationCounter = WrapperController.globalStepCounter - this.stepStartOrReset;
+        long currentStep = this.controller.getStepCounter();
+        long durationCounter = currentStep - this.stepStartOrReset;
         if (durationCounter < 0) durationCounter = 0;
         // data for columns
         return new String[]{
@@ -166,7 +167,6 @@ public class Street extends SelectableObject implements ExportableData {
             calcDensity();
             //this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
             this.sumDensity = this.sumDensity + this.density;
-            this.stepStartOrReset++;
                 if(this.density > this.maxDensity) {
                     this.maxDensity = this.density;
                 }
@@ -176,19 +176,30 @@ public class Street extends SelectableObject implements ExportableData {
             //this.noise = 0;
         }
     }
+    /**
+     * Resets traffic data tracking for this street.
+     * <p>
+     * Clears cumulative density values and synchronizes the start step
+     * with the current simulation step to begin a new measurement interval.
+     */
     public void resetDataTracking() {
+        //reset steps/measurement after traffic light changes
         this.sumDensity = 0.0;
         this.maxDensity = 0.0;
-        this.stepStartOrReset = WrapperController.globalStepCounter;
+        this.stepStartOrReset = this.controller.getStepCounter();
     }
+    /**
+     * Calculates the average traffic density since the last reset.
+     * * @return The average density as a double, or 0.0 if no steps
+     * have passed since the last reset.
+     */
     public double getAverageDensity() {
-        long durationCounter = WrapperController.globalStepCounter - this.stepStartOrReset;
-        if (durationCounter <= 0) {
-            return 0.0;
-        }
+        long currentStep = this.controller.getStepCounter();
+        long durationCounter = currentStep - this.stepStartOrReset;
+
+        if (durationCounter <= 0) return 0.0;
         return this.sumDensity / durationCounter;
     }
-
 
     public void calculateBounds() {
         minX = Double.MAX_VALUE;

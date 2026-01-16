@@ -12,8 +12,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for exporting simulation data into different file formats.
+ * <p>
+ * This class provides static methods to generate comprehensive reports in PDF and CSV format.
+ * It uses the {@link ExportableData} interface to dynamically handle various types of
+ * simulation objects such as vehicles, streets, and traffic lights.
+ */
 public class DataExport {
 
+    /**
+     * Exports the collected simulation data as a formatted PDF report.
+     * <p>
+     * The method organizes data into categories, creates tables with dynamic column widths,
+     * and handles document styling including fonts, colors, and metadata headers.
+     * Line breaks within data strings are automatically removed to maintain table integrity.
+     * @param file       The target file to save the PDF.
+     * @param exportPdf  List of objects implementing {@link ExportableData} to be exported.
+     * @param simSteps   The total number of simulation steps performed.
+     * @param simTime    The total simulation runtime in seconds.
+     * @throws Exception If an error occurs during file creation or PDF generation.
+     */
     public static void exportDataAsPDF(File file, List<ExportableData> exportPdf, long simSteps, double simTime) throws Exception {
         // format
         Document document = new Document(PageSize.A4);
@@ -80,12 +99,21 @@ public class DataExport {
         }
         document.close();
     }
-
+    /**
+     * Exports the collected simulation data as a semi-colon separated CSV file.
+     * <p>
+     * Data is grouped by category. To ensure CSV validity, the method replaces
+     * existing semi-colons within data strings with commas and converts
+     * line breaks into spaces.
+     * @param file       The target file to save the CSV.
+     * @param exportCsv  List of objects implementing {@link ExportableData} to be exported.
+     * @param simSteps   The total number of simulation steps performed.
+     * @param simTime    The total simulation runtime in seconds.
+     * @throws Exception If an error occurs during file writing.
+     */
     public static void exportDataAsCsv(File file, List<ExportableData> exportCsv, long simSteps, double simTime) throws Exception {
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)))) {
-            writer.println("SUMO Simulation Report");
-            writer.println("Simulation runtime: " + String.format(java.util.Locale.US, "%.2f s", simTime));
-            writer.println("Steps: " + simSteps);
+            writer.println("CSV META DATA;Runtime;" + simTime + ";Steps;" + simSteps);
             writer.println();
 
             Map<String, List<ExportableData>> grouped = exportCsv.stream()
@@ -100,7 +128,13 @@ public class DataExport {
 
                 for (ExportableData item : items) {
                     String row = java.util.Arrays.stream(item.getRowData())
-                            .map(s -> s == null ? "" : s.trim().replace(";", ","))
+                            .map(s -> {
+                                if (s == null) return "";
+                                return s.trim()
+                                        .replace(";", ",")
+                                        .replace("\n", " ")
+                                        .replace("\r", "");
+                            })
                             .collect(Collectors.joining(";"));
                     writer.println(row);
                 }
