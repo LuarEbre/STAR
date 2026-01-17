@@ -22,7 +22,6 @@ public class TrafficLightList {
     private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final StreetList streetList;
-    private final WrapperController controller;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLightList.class.getName());
@@ -32,12 +31,11 @@ public class TrafficLightList {
      * creates all TrafficLights as Objects in an ArrayList
      *
      * @param con SumoTraciConnection
-     * @param s1 StreetList
+     * @param sl StreetList
      */
-    public TrafficLightList(SumoTraciConnection con, StreetList s1, WrapperController controller) {
+    public TrafficLightList(SumoTraciConnection con, StreetList sl, WrapperController controller) {
         this.con = con;
-        this.streetList = s1;
-        this.controller = controller;
+        this.streetList = sl;
         try {
             XML xml = new XML(WrapperController.getCurrentNet());
             Map<String, Map<String,String>> TLData = xml.getTrafficLightsData();
@@ -46,7 +44,7 @@ public class TrafficLightList {
                 String id = entry.getKey();
                 Map<String, String> attributes = entry.getValue();
                 try {
-                    TrafficLightWrap tl = new TrafficLightWrap(id, attributes, con, this.controller, this.streetList);
+                    TrafficLightWrap tl = new TrafficLightWrap(id, attributes, con, controller, this.streetList);
                     trafficlights.add(tl);
 
                 } catch (Exception e) {

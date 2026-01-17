@@ -97,7 +97,7 @@ public class StreetList {
      * @return The densest Street inside the List
      */
     public Street getDensest(){
-        Street densest = new Street("", connection);
+        Street densest = new Street("", con);
         densest.setDensity(0);
 
         for (Street s : streets) {

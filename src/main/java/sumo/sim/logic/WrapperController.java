@@ -54,7 +54,7 @@ public class WrapperController {
     private boolean paused;
     private double simTime;
     private boolean adaptiveOn;
-    private volatile boolean isUiUpdatePending = false; // readable on all threads
+    private volatile boolean isUIUpdatePending = false; // readable on all threads
     private long stepCounter;
 
 
@@ -118,8 +118,8 @@ public class WrapperController {
             this.stepCounter = 0;
             vehicleList = new VehicleList(connection);
             filteredVehicles = new VehicleList(connection);
-            streetList = new StreetList(this.connection);
-            trafficLightList = new TrafficLightList(connection, streetList);
+            streetList = new StreetList(this.connection, this);
+            trafficLightList = new TrafficLightList(connection, streetList, this);
             junctionList = new JunctionList(connection);
             typeList = new TypeList(connection);
             routeList = new RouteList(currentRou, connection, this);
@@ -289,7 +289,7 @@ public class WrapperController {
 
             streetList.updateStreets();
             simTime = (double) connection.do_job_get(Simulation.getTime());
-            if (!isUiUpdatePending) {
+            if (!isUIUpdatePending) {
                 // only update if gui is done with rendering a single step
                 isUIUpdatePending = true;
                 Platform.runLater(() -> {
@@ -423,9 +423,6 @@ public class WrapperController {
             for (Street s : streetList.getStreets()) {
                 s.updateStreet(); // includes maxDensity calculation/stepStartOrReset counter
             }
-        }
-        if (trafficLightList != null) {
-            trafficLightList.updateTLs(); // updates tl
         }
 
         List<ExportableData> exportList = new ArrayList<>();
