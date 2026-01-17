@@ -1,5 +1,6 @@
 package sumo.sim.objects;
 
+import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoTLSController;
@@ -121,42 +122,6 @@ public class TrafficLightWrap extends SelectableObject {
         }
     }
 
-    /**
-     * Adaptive States based on Density of Controlled Lanes
-     * Replaces setCurrentState if adaptive is checked
-     */
-    public void adaptiveStateUpdate(StreetList  streetList) {
-        int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
-        // -> state differs from index to index (index is controlled lanes that have tl)
-        String currentState;
-        // links.get(0).from
-        double densityOfAllLanes = 0.0;
-
-        try {
-            for(String lane : this.incomingLanes) {
-                Street s = streetList.getStreetBasedOnLane(lane);
-                densityOfAllLanes += s.getDensity();
-            }
-
-            if(densityOfAllLanes >= 100.0 && this.duration > 1) {
-                this.setPhaseDuration(this.duration - 1);
-            }
-            currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
-
-        } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
-            throw new RuntimeException(e);
-        }
-        stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
-        for (int i = 0; i < stateArray.length; i+=2 ) {
-            int sumoIndex = i/2; // to not skip values
-            stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
-            stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
-            //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
-            // [G, lane_G ,y , lane_y , r, lane_r ] format
-        }
-    }
-
     // setter
 
     /**
@@ -188,6 +153,62 @@ public class TrafficLightWrap extends SelectableObject {
             stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
             //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
             // [G, lane_G ,y , lane_y , r, lane_r ] format
+        }
+    }
+
+    // setter
+
+    /**
+     * Adaptive States based on Density of Controlled Lanes
+     * Replaces setCurrentState if adaptive is checked
+     */
+    public void adaptiveStateUpdate() {
+
+        if (phases == null || phases.isEmpty()) return;
+
+        int currentPhase = getPhaseNumber();
+
+        TrafficLightPhase bestPhase = null;
+        double bestScore = -1;
+
+        for (TrafficLightPhase phase : phases) {
+
+            double score = 0;
+            List<Integer> greenLanesIndex = phase.getGreenLanes();
+            List<String> greenLanesID = new ArrayList<>();
+
+            for(Integer greenLaneIndex : greenLanesIndex){
+                greenLanesID.add(controlledLinks.get(greenLaneIndex).from);
+            }
+
+            for (String laneID : greenLanesID) {
+
+                try {
+                    double veh = (int) con.do_job_get(Lane.getLastStepVehicleNumber(laneID));
+                    double len = (double) con.do_job_get(Lane.getLength(laneID));
+
+                    double maxVeh = len / 7.5;
+                    double density = veh / Math.max(1.0, maxVeh);
+
+                    score += density;
+
+                } catch (Exception e) {
+                    logger.fine("Cannot read lane " + laneID);
+                }
+            }
+
+            if (bestPhase == null || score > bestScore) {
+                bestPhase = phase;
+                bestScore = score;
+            }
+        }
+
+        if (bestPhase == null) return;
+
+        if (bestPhase.getIndex() == currentPhase) {
+            setPhaseDuration(getNextSwitch() + 5);
+        } else {
+            setPhaseNumber(bestPhase.getIndex());
         }
     }
 

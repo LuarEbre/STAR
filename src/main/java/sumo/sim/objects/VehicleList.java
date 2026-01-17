@@ -4,10 +4,14 @@ import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
+import sumo.sim.data.CSV;
+import sumo.sim.logic.Type;
+
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -230,4 +234,27 @@ public class VehicleList {
     }
     public int getActiveCount() { return activeCount; }
 
+    public double getSpeedStdDevFiltered() {
+        int activeVehicles = getExistingVehCount();
+        if(activeVehicles == 0) return 0.0;
+        double meanspeed = this.getMeanSpeed();
+        double sumofsquares = 0;
+        for(VehicleWrap v : vehicles) {
+            if(v.exists()) {
+                double diff = v.getSpeed() - meanspeed;
+                sumofsquares += diff*diff;
+            }
+        }
+        return Math.sqrt(sumofsquares/activeVehicles);
+    }
+
+    public int getVehiclesAmountByType(Type type) {
+        List<VehicleWrap> vehiclesWithType = new ArrayList<>();
+        for(VehicleWrap v : vehicles) {
+            if(v.getType().equals(type.getId())) {
+                vehiclesWithType.add(v);
+            }
+        }
+        return vehiclesWithType.size();
+    }
 }
