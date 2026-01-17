@@ -8,7 +8,6 @@ import sumo.sim.gui.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
