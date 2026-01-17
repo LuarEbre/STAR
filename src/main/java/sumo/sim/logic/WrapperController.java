@@ -23,19 +23,20 @@ import java.util.stream.Collectors;
  */
 
 public class WrapperController {
+
     // connections
     private SumoTraciConnection connection;
     private final GuiController guiController;
     private final SumoMapManager mapManager;
 
-    // lists
-    private StreetList sl;
-    private TrafficLightList tl;
-    private VehicleList vl;
+    // Object lists
+    private StreetList streetList;
+    private TrafficLightList trafficLightList;
+    private VehicleList vehicleList;
     private VehicleList filteredVehicles;
-    private JunctionList jl;
-    private TypeList typel;
-    private RouteList rl;
+    private JunctionList junctionList;
+    private TypeList typeList;
+    private RouteList routeList;
 
     // simulation
     private boolean terminated;
@@ -46,8 +47,7 @@ public class WrapperController {
     private boolean adaptiveOn;
 
     private String currentMap = "Frankfurt";
-    private long stepCounter = 0;
-    private volatile boolean isUiUpdatePending = false; // readable on all threads
+    private volatile boolean isUIUpdatePending = false; // readable on all threads
 
     // config
     private SumoMapConfig mapConfig;
@@ -61,11 +61,6 @@ public class WrapperController {
     private Double lowerSpeedFilter, upperSpeedFilter;
     private String routeFilter, typeFilter;
 
-    // data export
-    /*private final List<VehicleWrap> allTimeVehicles = new ArrayList<>();
-    private int stepCounter = 0;
-    private final int exportSamplingRate = 100;
-    */
     //Logger
     private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
@@ -103,17 +98,17 @@ public class WrapperController {
         connection.addOption("start", "true");
 
         try {
-            connection.runServer(8813); // preventing random port
+            connection.runServer(8813);
 
             logger.log(Level.INFO, "Connected to Sumo");
 
-            vl = new VehicleList(connection);
+            vehicleList = new VehicleList(connection);
             filteredVehicles = new VehicleList(connection);
-            sl = new StreetList(this.connection);
-            tl = new TrafficLightList(connection, sl);
-            jl = new JunctionList(connection, sl);
-            typel = new TypeList(connection);
-            rl = new RouteList(currentRou, connection, this);
+            streetList = new StreetList(this.connection);
+            trafficLightList = new TrafficLightList(connection, streetList);
+            junctionList = new JunctionList(connection, streetList);
+            typeList = new TypeList(connection);
+            routeList = new RouteList(currentRou, connection, this);
 
             // initialize filter values
             colorFilter = null;
@@ -122,7 +117,7 @@ public class WrapperController {
             routeFilter = null;
             typeFilter = null;
 
-            tl.updateAllCurrentState(); // important for rendering
+            trafficLightList.updateAllCurrentState(); // important for rendering
             start();
 
         } catch (Exception e) {
@@ -136,7 +131,7 @@ public class WrapperController {
      * Starts/Continues the simulation.
      * If the connection is closed it will terminate immediate.
      */
-    private void start() { // maybe with connection as argument? closing connection opened prior
+    private void start() {
         if (executor != null && !executor.isShutdown()) {
             return;
         }
@@ -180,6 +175,7 @@ public class WrapperController {
                 executor.shutdownNow();
             }
         }
+
         // Close Sumo connection
         if (connection != null && !connection.isClosed()) {
             try {
@@ -219,37 +215,22 @@ public class WrapperController {
     /**
      * Sets the paused parameter to false, so that the simulation can continue.
      */
-    public void startSim() {
-        paused = false;
-    }
+    public void startSim() { paused = false; }
 
     /**
      * Sets the paused parameter to true. The simulation will be halted.
      */
-    public void stopSim() {
-        paused = true;
+    public void stopSim() { paused = true; }
 
-        /*try {
-
-            String desktopPath = System.getProperty("user.home") + "/Schreibtisch/";
-
-            // testfiles
-            File pdfFile = new File(desktopPath + "SUMO_Test_Report.pdf");
-            File csvFile = new File(desktopPath + "SUMO_Test_Data.csv");
-
-            System.out.println(">>> TEST: Start export zo desktop...");
-
-            this.generateExport(pdfFile);
-            this.generateExport(csvFile);
-
-            System.out.println(">>> TEST: export done!");
-        } catch (Exception e) {
-            System.err.println(">>> TEST: error: " + e.getMessage());
-            e.printStackTrace();
-        }*/
-
-    }
-
+    /**
+     * Applies a filter and then sets {@link WrapperController#filteredVehicles} to a list of only Vehicles pertaining to that filter <br>
+     * parameter = null -> do not filter for this
+     * @param color
+     * @param lower
+     * @param upper
+     * @param route
+     * @param type
+     */
     public void applyFilter(Color color, Double lower, Double upper, String route, String type) {
         colorFilter = color;
         lowerSpeedFilter = lower;
@@ -275,17 +256,18 @@ public class WrapperController {
             connection.do_timestep();
             if (filterApplied) {
                 this.applyFilter(colorFilter, lowerSpeedFilter, upperSpeedFilter, routeFilter, typeFilter);
+                this.filteredVehicles.determineActiveVehicleCount();
             }
-            vl.updateAllVehicles();
+            vehicleList.updateAllVehicles();
 
             //adaptive Traffic Lights
             if (!adaptiveOn) {
-                tl.updateAllCurrentState();
+                trafficLightList.updateAllCurrentState();
             } else {
-                tl.adaptiveUpdate();
+                trafficLightList.adaptiveUpdate();
             }
 
-            sl.updateStreets();
+            streetList.updateStreets();
             simTime = (double) connection.do_job_get(Simulation.getTime());
 
             // safes disappeared vehicles for data export
@@ -295,14 +277,14 @@ public class WrapperController {
                 }
             }*/
 
-            if (!isUiUpdatePending) {
+            if (!isUIUpdatePending) {
                 // only update if gui is done with rendering a single step
-                isUiUpdatePending = true;
+                isUIUpdatePending = true;
                 Platform.runLater(() -> {
                     try {
                         guiController.doSimStep();
                     } finally {
-                        isUiUpdatePending = false; // gui is done
+                        isUIUpdatePending = false; // gui is done
                     }
                 });
             }
@@ -328,7 +310,7 @@ public class WrapperController {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                // should have something here
+                // TODO: Add exception
             }
 
             // load new config
@@ -374,7 +356,7 @@ public class WrapperController {
         if (executor != null && !executor.isShutdown()) {
             executor.execute(() -> {
                 // execution queue
-                vl.addVehicle(amount, type, route, color);
+                vehicleList.addVehicle(amount, type, route, color);
                 logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
             });
         } else {
@@ -383,7 +365,7 @@ public class WrapperController {
     }
 
     public boolean addRoute(String start, String end, String id) {
-        return rl.addRoute(start, end, id);
+        return routeList.addRoute(start, end, id);
     }
 
     public void updateRoutes() {
@@ -398,36 +380,25 @@ public class WrapperController {
      * @param type   Type ID (defaults to "DEFAULT_VEHTYPE" if null)
      */
     public void StressTest(int amount, Color color, String type) {
-        Map<String, List<String>> Routes = rl.getAllRoutes();
+        Map<String, List<String>> Routes = routeList.getAllRoutes();
         int amount_per = amount / Routes.size();
         type = (type == null) ? "DEFAULT_VEHTYPE" : type;
 
         logger.log(Level.INFO, "Stress testing for " + amount);
 
         for (String key : Routes.keySet()) {
-            addVehicle(amount_per, "DEFAULT_VEHTYPE", key, color);
+            addVehicle(amount_per, type, key, color);
         }
     }
 
-    /* public void generateExport(File file) {
-        // collect archieved and acitve vehicles
-        List<VehicleWrap> exportVehicles = new ArrayList<>(allTimeVehicles);
-        if (vl != null && vl.getVehicles() != null) {
-            exportVehicles.addAll(vl.getVehicles());
-        }
-        try {
-            if (file.getName().endsWith(".pdf")) {
-                DataExport.exportAsPDF(file, exportVehicles, sl.getStreets(), tl.getTrafficlights());
-            } else {
-                DataExport.exportAsCSV(file, exportVehicles, sl.getStreets(), tl.getTrafficlights(), this.simTime);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    } */
-
+    /**
+     * Filters the current vehicle list based on active criteria (type, route, color, and speed).
+     * <p>If a filter parameter is null, it is ignored.</p>
+     * @return {@link CopyOnWriteArrayList} thread-safe list of vehicles matching the applied filters.
+     */
     private CopyOnWriteArrayList<VehicleWrap> filterVehicles() {
-        return this.vl.getVehicles().stream()
+        // collect streamed data to temporary List first
+        List<VehicleWrap> temp = this.vehicleList.getVehicles().stream()
                 .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
                 .filter(v -> this.routeFilter == null || v.getRouteID().equals(this.routeFilter))
                 .filter(v -> this.colorFilter == null || v.getColor().equals(this.colorFilter))
@@ -436,8 +407,13 @@ public class WrapperController {
                     boolean belowMax = (this.upperSpeedFilter == null || v.getSpeed() <= this.upperSpeedFilter);
                     return aboveMin && belowMax;
                 })
-                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+                .collect(Collectors.toList());
+
+        // return CopyOnWriteArray with same Objects
+        return new CopyOnWriteArrayList<>(temp);
     }
+
+    // setter
 
     /**
      * Sets the duration of the phase the traffic light is currently on.
@@ -445,16 +421,16 @@ public class WrapperController {
      * @param duration
      */
     public void setTlSettings(String tlid, int duration) {
-        tl.getTL(tlid).setPhaseDuration(duration);
+        trafficLightList.getTL(tlid).setPhaseDuration(duration);
         //double check = tl.getTL(tlid).getDuration();
     }
 
     public void setTrafficLightDurationPermanently(String id, int phaseIndex,  double newDuration ) {
-        tl.getTL(id).setPhaseDurationPermanently(phaseIndex, newDuration);
+        trafficLightList.getTL(id).setPhaseDurationPermanently(phaseIndex, newDuration);
     }
 
     public void setTrafficLightPhase(String id, int phaseIndex) {
-        tl.getTL(id).setPhaseNumber(phaseIndex);
+        trafficLightList.getTL(id).setPhaseNumber(phaseIndex);
     }
 
     // getter
@@ -466,7 +442,7 @@ public class WrapperController {
      * @return e.g.: [g,r,y,80] -> state , last element is duration
      */
     public String[] getTlStateDuration(String tlID) {
-        TrafficLightWrap trafLight = tl.getTL(tlID);
+        TrafficLightWrap trafLight = trafficLightList.getTL(tlID);
         String [] ret = new String[trafLight.getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
         int j = 0;
         for (int i=0; i<ret.length-2; i++) {
@@ -479,57 +455,34 @@ public class WrapperController {
         return ret; // [g,r,y,80] -> state , last element is duration
     }
 
-    public String getChosenMap(){
-        List<String> maps = mapManager.getNames();
-        for(String key : maps) {
-            if(mapManager.getConfig(key).isChosen()) {
-                return key;
-            }
-        }
-        // if no map is selected (error) automatically choose Map1
-        mapSwitch("Frankfurt1");
-        return "Frankfurt1";
-    }
-
-    public SelectableObject getSelectedObject() {
-        // works because only one object can be selected at a time
-        for(VehicleWrap v : vl.getVehicles()) if (v.isSelected()) return v;
-        for(TrafficLightWrap tl : tl.getTrafficlights()) if (tl.isSelected()) return tl;
-        return null;
-    }
-
-    public double getTLDuration(String tlID) {return tl.getTL(tlID).getDuration(); }
-    public double getTLNextSwitch(String tlID) { return tl.getTL(tlID).getNextSwitch(); }
-    public String getTLStateString(String tlID) {return tl.getTL(tlID).getCurrentStateString(); }
-    public String[] getTLCurrentState(String id) {return tl.getTL(id).getCurrentState();}
+    public double getTLDuration(String tlID) {return trafficLightList.getTL(tlID).getDuration(); }
+    public double getTLNextSwitch(String tlID) { return trafficLightList.getTL(tlID).getNextSwitch(); }
+    public String getTLStateString(String tlID) {return trafficLightList.getTL(tlID).getCurrentStateString(); }
+    public String[] getTLCurrentState(String id) {return trafficLightList.getTL(id).getCurrentState();}
     public static String getCurrentNet(){ return currentNet; }
     public double getTime() { return simTime; }
     public int getDelay() { return delay; }
-    public JunctionList getJunctions() { return jl; }
-    public StreetList getStreets() { return sl; }
-    public VehicleList getVehicles() { return vl; }
+    public JunctionList getJunctions() { return junctionList; }
+    public StreetList getStreets() { return streetList; }
+    public VehicleList getVehicles() { return vehicleList; }
     public VehicleList getFilteredVehicles() { return filteredVehicles; }
-    public TrafficLightList getTrafficLights() { return tl; }
-    public RouteList getRoutes()  { return rl; }
-    public String getPhaseAtIndex(String id, int index) {return tl.getTL(id).getPhaseAtIndex(index);}
-    public int getCurrentTLPhaseIndex(String id) {return tl.getTL(id).getPhaseNumber();}
-    public List<TrafficLightPhase> getTrafficLightPhases(String id){ return tl.getTL(id).getTrafficLightPhases();}
+    public TrafficLightList getTrafficLights() { return trafficLightList; }
+    public RouteList getRoutes()  { return routeList; }
+    public String getPhaseAtIndex(String id, int index) {return trafficLightList.getTL(id).getPhaseAtIndex(index);}
+    public int getCurrentTLPhaseIndex(String id) {return trafficLightList.getTL(id).getPhaseNumber();}
+    public List<TrafficLightPhase> getTrafficLightPhases(String id){ return trafficLightList.getTL(id).getTrafficLightPhases();}
     public boolean isPaused() { return paused; }
     public String getCurrentMap() { return currentMap; }
-    public void setCurrentMap(String currentMap) { this.currentMap = currentMap; }
     public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
     public SumoTraciConnection getConnection() { return connection; }
-    public boolean isFilterApplied() { return filterApplied; }
 
     // safe getter
-    public String[] getTypeList() { return (typel != null) ? typel.getAllTypes() : new String[0]; } // returns empty array if null
-    public String[] getRouteList() { return (rl != null) ? rl.getAllRoutesID() : new String[0]; }
-    public String[] getTLids() { return (tl != null) ? tl.getIDs() : new String[0]; }
-    public String[] getSelectableStreets() {return sl.getSelectableStreets(); }
-    public boolean isRouteListEmpty() { return (rl == null) || rl.isRouteListEmpty(); }
-    public int updateCountVehicle() { return (vl != null) ? vl.getExistingVehCount() : 0; }
-    public int getAllVehicleCount() { return (vl != null) ? vl.getCount() : 0; }
+    public String[] getTypeList() { return (typeList != null) ? typeList.getAllTypes() : new String[0]; } // returns empty array if null
+    public String[] getRouteList() { return (routeList != null) ? routeList.getAllRoutesID() : new String[0]; }
+    public String[] getTLids() { return (trafficLightList != null) ? trafficLightList.getIDs() : new String[0]; }
+    public boolean isRouteListEmpty() { return (routeList == null) || routeList.isRouteListEmpty(); }
+    public int getExistingVehicleCount() { return (vehicleList != null) ? vehicleList.getExistingVehCount() : 0; }
+    public int getAllVehicleCount() { return (vehicleList != null) ? vehicleList.getCount() : 0; }
     public int getAllFilteredVehicleCount() { return (filteredVehicles != null) ? filteredVehicles.getVehicles().size() : 0; }
-
 
 }

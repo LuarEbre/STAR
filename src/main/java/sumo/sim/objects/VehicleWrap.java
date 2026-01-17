@@ -18,23 +18,17 @@ import java.util.logging.Logger;
  */
 public class VehicleWrap extends SelectableObject {
 
-    // currently, to set the currentStreet of a vehicle as a Street, each car would have to have a reference to Street_List
-    // therefore it could be beneficial to just use a String of EdgeID
-    private Street currentStreet;
-
     // final values, set once and never updated after
     private final String id;
-    private String name; // name = id; -> but can be customized for searching
     private final String type;
     private final SumoTraciConnection con;
-    private Color color;
-    private String routeID; // which route the car is assigned to (could be of RouteWrap if implemented)
+    private final Color color;
+    private final String routeID;
 
+    // values which need to be calculated / updated per tick
     private double speed; // m/s
     private Point2D.Double position;
     private double angle;
-
-    // values which need to be calculated / updated per tick
     private double maxSpeed;
     private double accel; // m/s²
     private double avgSpeed;
@@ -42,13 +36,11 @@ public class VehicleWrap extends SelectableObject {
     private int waitingTime;
     private int activeTime;
     private int totalLifetime; // = waitingTime + activeTime;
-    private boolean activeLastFrame; // using oldSpeed could render activeLastFrame useless
-    private boolean currentlyStopped;
-    private boolean exists; // check for despawning in gui?
-    private boolean queued;
 
-    // could be used for selecting in the GUI later on
-    private boolean selected;
+    private boolean activeLastFrame;
+    private boolean currentlyStopped;
+    private boolean exists;
+    private boolean queued;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(VehicleWrap.class.getName());
@@ -78,6 +70,7 @@ public class VehicleWrap extends SelectableObject {
         this.totalLifetime = 0;
         this.activeLastFrame = false;
         this.currentlyStopped = false;
+        // assume any newly created Vehicle is queued, only setting to false if Vehicle is confirmed to exist
         this.queued = true;
     }
 
@@ -87,14 +80,15 @@ public class VehicleWrap extends SelectableObject {
      */
     public void updateVehicle() { // updates attributes each step, causes exception (if many cars are updated and delay is changed) needs fixing
         try {
+            // assume Vehicle currentl'y isn't stopped
             this.currentlyStopped = false;
             // retrieve previous frame's speed before updating the vehicle's speed
             double oldSpeed = this.speed;
             // determine whether vehicle has been active last frame via oldSpeed
             this.activeLastFrame = oldSpeed > 0;
             this.speed = (double)con.do_job_get(Vehicle.getSpeed(id)); // returns SumoCommand, which is then performed by do_job_get
-            SumoPosition2D pos2D = (SumoPosition2D)con.do_job_get(Vehicle.getPosition(id)); // casted on SumoPosition2d
-            this.position = new Point2D.Double(pos2D.x, pos2D.y); // SumoPosition values stored in Point2d object
+            SumoPosition2D pos2D = (SumoPosition2D)con.do_job_get(Vehicle.getPosition(id)); // cast to SumoPosition2D
+            this.position = new Point2D.Double(pos2D.x, pos2D.y); // SumoPosition values stored in Point2D object
             this.angle = (double)con.do_job_get(Vehicle.getAngle(id));
 
             // since time between calculating acceleration is always 1 second
@@ -114,13 +108,16 @@ public class VehicleWrap extends SelectableObject {
             if(this.speed == 0) {
                 this.currentlyStopped = true;
                 this.waitingTime++;
+                // if Vehicle is currently stopped but was active last frame increment numberOfStops
                 if(this.activeLastFrame) this.numberOfStops++;
             } else {
                 this.activeTime++;
             }
             this.totalLifetime++;
+
         } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to update specific vehicle", e);
+            String errorMessage = "Failed to update vehicle (" + this.id + ")";
+            logger.log(Level.FINE, errorMessage, e);
             this.exists = false;
         }
     }
@@ -181,10 +178,6 @@ public class VehicleWrap extends SelectableObject {
     /**
      * @return The duration (in seconds) the vehicle has been active (not stopped).
      */
-    public int getActiveTime() { return activeTime; }
-    /**
-     * @return The total lifetime of the vehicle.
-     */
     public int getTotalLifetime() { return totalLifetime; }
     /**
      * @return true if the vehicle is currently active on the road network.
@@ -202,8 +195,24 @@ public class VehicleWrap extends SelectableObject {
     /**
      * @return ID of the route this vehicle is following.
      */
+    /**
+     * @return The ID of the route this vehicle is following.
+     */
     public String getRouteID() { return routeID; }
+
+    /**
+     * @return True if the vehicle is currently stopped (speed is ~0).
+     */
     public boolean isCurrentlyStopped() { return this.currentlyStopped; }
+
+    /**
+     * Updates the queued status (waiting to enter the road network).
+     * @param queued True if waiting in the insertion queue.
+     */
     protected void setQueued(boolean queued) { this.queued = queued; }
+
+    /**
+     * @return True if the vehicle is waiting in the insertion queue.
+     */
     protected boolean isQueued()  { return this.queued; }
 }

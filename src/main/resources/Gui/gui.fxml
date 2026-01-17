@@ -62,7 +62,7 @@
                <children>
                   <TabPane fx:id="tabPane" layoutY="5.0" prefHeight="442.0" prefWidth="259.0" styleClass="dataTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                     <tabs>
-                      <Tab styleClass="Tab" text="Overall">
+                      <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Overall">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -157,7 +157,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                      <Tab styleClass="Tab" text="Selected">
+                      <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Selected">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -345,7 +345,7 @@
                                                 <Insets bottom="5.0" right="4.0" top="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField fx:id="TLposition" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                          <TextField fx:id="tlPosition" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                              <GridPane.margin>
                                                 <Insets bottom="5.0" left="4.0" top="5.0" />
                                              </GridPane.margin>
@@ -376,7 +376,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                        <Tab styleClass="Tab" text="Filtered">
+                        <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Filtered">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -474,7 +474,7 @@
                                  </children></AnchorPane>
                            </content>
                         </Tab>
-                        <Tab styleClass="Tab" text="Graphs">
+                        <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Graphs">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -502,7 +502,7 @@
                                                 <Insets left="3.0" right="3.0" />
                                              </padding>
                                           </LineChart>
-                                          <BarChart id="currentGYR" fx:id="currentGYR" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="105.0" prefWidth="229.0" title="Current Traffic Light Phases">
+                                          <BarChart id="currentGYR" fx:id="currentGYR" prefHeight="105.0" prefWidth="229.0" title="Current Traffic Light Phases">
                                             <xAxis>
                                               <CategoryAxis side="BOTTOM" />
                                             </xAxis>
@@ -524,10 +524,10 @@
             <!-- Menus from Top right buttons -->
             <AnchorPane fx:id="filtersMenuSelect" layoutX="661.0" layoutY="-9.0" prefHeight="305.0" prefWidth="280.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <CheckBox fx:id="filterColor" layoutX="171.0" layoutY="32.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="topMenuLabel" text="Color" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="30.0" />
-                  <CheckBox fx:id="filterSpeed" layoutX="169.0" layoutY="88.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="topMenuLabel" text="Speed" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="86.0" />
-                  <CheckBox fx:id="filterRoute" layoutX="169.0" layoutY="143.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="topMenuLabel" text="Route" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="142.0" />
-                  <CheckBox fx:id="filterType" layoutX="169.0" layoutY="199.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="topMenuLabel" text="Type" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="196.0" />
+                  <CheckBox fx:id="filterColor" layoutX="171.0" layoutY="32.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="viewLabel" text="Color" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="30.0" />
+                  <CheckBox fx:id="filterSpeed" layoutX="169.0" layoutY="88.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="viewLabel" text="Speed" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="86.0" />
+                  <CheckBox fx:id="filterRoute" layoutX="169.0" layoutY="143.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="viewLabel" text="Route" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="142.0" />
+                  <CheckBox fx:id="filterType" layoutX="169.0" layoutY="199.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="67.0" styleClass="viewLabel" text="Type" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="196.0" />
                   <Label layoutX="29.0" layoutY="5.0" prefHeight="17.0" prefWidth="39.0" styleClass="topMenuLabel" text="Color" />
                   <Label layoutX="26.0" layoutY="60.0" prefHeight="17.0" prefWidth="121.0" styleClass="topMenuLabel" text="Speed Range" />
                   <ComboBox fx:id="filterMenuColorSelector" layoutX="26.0" layoutY="48.0" prefHeight="25.0" prefWidth="123.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="25.0" />
@@ -614,12 +614,12 @@
        <!-- Main Buttons menu -->
        <AnchorPane fx:id="trafficLightMenu" layoutX="556.0" layoutY="92.0" prefHeight="375.0" prefWidth="259.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
-               <Label layoutX="28.0" layoutY="11.0" styleClass="addMenu-labels" text="Traffic Light Control">
+               <Label layoutX="31.0" layoutY="12.0" prefHeight="30.0" prefWidth="160.0" styleClass="addMenu-labels" text="Traffic Light Control" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="40.0">
                    <font>
-                       <Font name="System Bold" size="20.0" />
+                       <Font name="System Bold" size="16.0" />
                    </font>
                </Label>
-               <Separator layoutX="-1.0" layoutY="42.0" prefHeight="3.0" prefWidth="250.0" />
+               <Separator layoutX="-1.0" layoutY="42.0" prefHeight="3.0" prefWidth="250.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                <HBox layoutY="45.0" prefHeight="35.0" prefWidth="250.0" spacing="50.0" AnchorPane.bottomAnchor="295.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="44.8">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -645,7 +645,7 @@
                                     <VBox prefHeight="194.0" prefWidth="143.0" spacing="10.0">
                                        <children>
                                                  <Label styleClass="addMenu-labels" text="Duration" />
-                                          <CheckBox fx:id="toggleTrafficLightPermanently" mnemonicParsing="false" onAction="#onTogglePermanently" styleClass="whiteLabel" text="Permanently" />
+                                          <CheckBox fx:id="toggleTrafficLightPermanently" mnemonicParsing="false" onAction="#onTogglePermanently" styleClass="viewLabel" text="Permanently" />
                                           <Label styleClass="magentaLabel" text="Phase" />
                                        </children>
                                        <padding>
@@ -694,7 +694,7 @@
                   </Tab>
               </tabs>
             </TabPane>
-            <Button fx:id="applyButton" layoutX="151.0" layoutY="233.0" mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="10.0" prefWidth="79.0" text="Apply" />
+            <Button fx:id="applyButton" layoutX="151.0" layoutY="233.0" mnemonicParsing="false" onAction="#applyTLsettings" prefHeight="10.0" prefWidth="79.0" text="Apply" AnchorPane.rightAnchor="25.0" />
             <ListView fx:id="stateText" layoutX="5.0" layoutY="265.0" prefHeight="102.0" prefWidth="250.0" />
            </children>
        </AnchorPane>
@@ -705,46 +705,38 @@
            </children>
        </AnchorPane>
 
-       <AnchorPane fx:id="createMenu" layoutX="600.0" layoutY="50.0" prefHeight="320.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
+       <AnchorPane fx:id="createMenu" layoutX="600.0" layoutY="50.0" prefHeight="361.0" prefWidth="250.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
          <children>
             <Label layoutX="39.0" layoutY="22.0" styleClass="magentaLabel" text="Create Route">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <VBox layoutY="48.8" prefHeight="293.0" prefWidth="250.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="49.0">
-               <children>
-                  <Separator prefHeight="3.0" prefWidth="237.0" />
-                  <Label prefHeight="18.0" prefWidth="102.0" styleClass="magentaLabel" text="Start Street" />
-                  <Button fx:id="selectRouteStartButton" mnemonicParsing="false" onAction="#onSelectRouteStart" prefHeight="26.0" prefWidth="138.0" styleClass="menuButton" text="Select Start" />
-                  <Label layoutX="10.0" layoutY="10.0" prefHeight="18.0" prefWidth="114.0" styleClass="magentaLabel" text="End Street" />
-                  <Button mnemonicParsing="false" onAction="#onSelectRouteEnd" prefHeight="26.0" prefWidth="140.0" styleClass="menuButton" text="Select End" />
-                  <Label layoutX="60.0" layoutY="94.0" styleClass="magentaLabel" text="ID " />
-                  <TextField fx:id="routeCreateId" prefHeight="26.0" prefWidth="161.0" />
-                  <Label fx:id="routeStatus" prefHeight="18.0" prefWidth="226.0" styleClass="whiteLabel" text="Status: Choose Start/End!" />
-                  <Separator prefWidth="200.0" />
-                  <Button mnemonicParsing="false" onAction="#addRoute" prefHeight="41.0" prefWidth="180.0" styleClass="menuButton" text="Add" />
-               </children>
-               <padding>
-                  <Insets left="20.0" right="20.0" top="20.0" />
-               </padding>
-            </VBox>
+            <Label layoutX="25.0" layoutY="87.0" prefHeight="18.0" prefWidth="102.0" styleClass="magentaLabel" text="Start Street" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+            <Button fx:id="selectRouteStartButton" layoutX="29.0" layoutY="114.0" mnemonicParsing="false" onAction="#onSelectRouteStart" prefHeight="26.0" prefWidth="168.0" styleClass="menuButton" text="Select Start" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+            <Label layoutX="25.0" layoutY="146.0" prefHeight="18.0" prefWidth="114.0" styleClass="magentaLabel" text="End Street" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+            <Button layoutX="25.0" layoutY="174.0" mnemonicParsing="false" onAction="#onSelectRouteEnd" prefHeight="26.0" prefWidth="194.0" styleClass="menuButton" text="Select End" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+            <Label layoutX="32.0" layoutY="210.0" styleClass="magentaLabel" text="ID " AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+            <TextField fx:id="routeCreateId" layoutX="34.0" layoutY="235.0" prefHeight="26.0" prefWidth="161.0" styleClass="rightText" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+            <Label fx:id="routeStatus" layoutX="25.0" layoutY="269.0" prefHeight="18.0" prefWidth="215.0" styleClass="whiteLabel" text="Status: Choose Start/End!" AnchorPane.leftAnchor="25.0" />
+            <Button layoutX="39.0" layoutY="269.0" mnemonicParsing="false" onAction="#addRoute" prefHeight="35.0" prefWidth="200.0" styleClass="menuButton" text="Add" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+            <Separator layoutX="25.0" layoutY="71.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="64.0" />
          </children>
        </AnchorPane>
 
-       <AnchorPane fx:id="stressTestMenu" layoutX="511.0" layoutY="164.0" minWidth="100.0" prefHeight="150.0" prefWidth="200.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
+                   <AnchorPane fx:id="stressTestMenu" layoutX="502.0" layoutY="164.0" minWidth="100.0" prefHeight="305.0" prefWidth="259.0" styleClass="mainButtonMenu" visible="false" AnchorPane.bottomAnchor="114.0">
            <children>
-               <Separator layoutX="1.0" layoutY="131.0" prefHeight="3.0" prefWidth="198.0" />
-               <Label layoutX="14.0" layoutY="55.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Mode" />
-               <Button fx:id="startTestButton" layoutX="39.0" layoutY="185.0" mnemonicParsing="false" onAction="#startStressTest" prefHeight="26.0" prefWidth="122.0" styleClass="menuButton" text="Start Test" />
-               <ChoiceBox fx:id="stressTestMode" layoutX="88.0" layoutY="52.0" prefHeight="0.0" prefWidth="86.0" />
-               <ChoiceBox layoutX="88.0" layoutY="94.0" prefHeight="26.0" prefWidth="86.0" />
-               <Label layoutX="13.0" layoutY="98.0" prefHeight="18.0" prefWidth="74.0" styleClass="addMenu-labels" text="Types" />
-            <Spinner layoutX="111.0" layoutY="145.0" prefHeight="26.0" prefWidth="74.0" />
-            <Label layoutX="13.0" layoutY="149.0" prefHeight="18.0" prefWidth="106.0" styleClass="whiteLabel" text="Test Duration" />
-            <Label layoutX="62.0" layoutY="14.0" prefHeight="18.0" prefWidth="114.0" styleClass="magentaLabel" text="Stress Test">
+               <Separator layoutY="212.0" prefHeight="3.0" prefWidth="198.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <Label layoutX="25.0" layoutY="80.0" prefHeight="18.0" prefWidth="85.0" styleClass="addMenu-labels" text="Mode" AnchorPane.leftAnchor="25.0" />
+               <Button fx:id="startTestButton" layoutX="55.0" layoutY="190.0" mnemonicParsing="false" onAction="#startStressTest" prefHeight="35.0" prefWidth="209.0" styleClass="menuButton" text="Start Test" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" />
+               <ChoiceBox fx:id="stressTestMode" layoutX="112.0" layoutY="77.0" prefHeight="25.0" prefWidth="122.0" AnchorPane.rightAnchor="25.0" />
+               <ChoiceBox fx:id="stressTestTypeSelect" layoutX="113.0" layoutY="119.0" prefHeight="26.0" prefWidth="121.0" AnchorPane.rightAnchor="25.0" />
+               <Label layoutX="25.0" layoutY="123.0" prefHeight="18.0" prefWidth="74.0" styleClass="addMenu-labels" text="Type" AnchorPane.leftAnchor="25.0" />
+            <Spinner layoutX="160.0" layoutY="170.0" prefHeight="26.0" prefWidth="74.0" AnchorPane.rightAnchor="25.0" />
+            <Label layoutX="25.0" layoutY="174.0" prefHeight="18.0" prefWidth="106.0" styleClass="magentaLabel" text="Test Duration" AnchorPane.leftAnchor="25.0" />
+            <Label layoutX="78.0" layoutY="23.0" prefHeight="25.0" prefWidth="86.0" styleClass="magentaLabel" text="Stress Test" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="25.0">
                <font>
-                  <Font name="System Bold" size="16.0" />
+                  <Font name="System Bold" size="20.0" />
                </font>
             </Label>
            </children>
@@ -823,7 +815,7 @@
          <children>
             <Label fx:id="vehicleCount" alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="85.0" styleClass="whiteLabel" text="0">
                <HBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
+                  <Insets bottom="5.0" right="5.0" top="5.0" />
                </HBox.margin>
             </Label>
             <Pane fx:id="exitTopMenu" prefHeight="30.0" prefWidth="30.0" />
@@ -856,6 +848,6 @@
             </Label>
          </children>
       </HBox>
-      <AnchorPane fx:id="dragHandle" layoutX="146.0" onMouseDragged="#dragWindow" onMousePressed="#mouseClicked" opacity="0.0" prefHeight="30.0" prefWidth="495.0" />
+      <AnchorPane fx:id="dragHandle" layoutX="146.0" onMouseDragged="#dragWindow" onMousePressed="#mouseClicked" opacity="0.0" prefHeight="30.0" prefWidth="448.0" />
    </children>
 </AnchorPane>
