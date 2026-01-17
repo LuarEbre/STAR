@@ -727,3 +727,7 @@
     visibility: hidden;
     -fx-padding: 0; /* Removes the empty space it leaves behind */
 }
+
+#chartVbox {
+    -fx-background-fill: -fx-color-grey-dark;
+}
