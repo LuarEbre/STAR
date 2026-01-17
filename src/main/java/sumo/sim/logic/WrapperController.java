@@ -262,11 +262,11 @@ public class WrapperController {
             }
             vehicleList.updateAllVehicles();
 
-            tl.updateAllCurrentState();
+            trafficLightList.updateAllCurrentState();
 
             //adaptive Traffic Lights
             if (adaptiveOn && (simTime % 10 == 0)) {
-                for (TrafficLightWrap t : tl.getTrafficlights())
+                for (TrafficLightWrap t : trafficLightList.getTrafficlights())
                     t.adaptiveStateUpdate();
             }
 
@@ -483,7 +483,7 @@ public class WrapperController {
     public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
     public SumoTraciConnection getConnection() { return connection; }
     public boolean isFilterApplied() { return filterApplied; }
-    public TypeList getTypeListAsTypeList() {return typel;}
+    public TypeList getTypeListAsTypeList() {return typeList;}
 
     // safe getter
     public String[] getTypeList() { return (typeList != null) ? typeList.getAllTypes() : new String[0]; } // returns empty array if null

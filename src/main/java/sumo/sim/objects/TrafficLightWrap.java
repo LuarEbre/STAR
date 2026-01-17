@@ -1,5 +1,6 @@
 package sumo.sim.objects;
 
+import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoTLSController;
@@ -136,23 +137,11 @@ public class TrafficLightWrap extends SelectableObject {
      *</p>
      */
     public void setCurrentState() {
-        int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
         // -> state differs from index to index (index is controlled lanes that have tl)
         String currentState;
         // links.get(0).from
-        double densityOfAllLanes = 0.0;
-
         try {
-            for(String lane : this.incomingLanes) {
-                Street s = streetList.getStreetBasedOnLane(lane);
-                densityOfAllLanes += s.getDensity();
-            }
-
-            if(densityOfAllLanes >= 100.0 && this.duration > 1) {
-                this.setPhaseDuration(this.duration - 1);
-            }
             currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
-
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
             throw new RuntimeException(e);
