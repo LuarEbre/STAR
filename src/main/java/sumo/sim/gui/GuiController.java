@@ -25,6 +25,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javafx.scene.SnapshotParameters;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -98,8 +100,8 @@ public class GuiController {
     @FXML
     private ComboBox<String> filterMenuColorSelector;
     @FXML
-    private CheckBox dataView, showDensityAnchor, showButtons, showRouteHighlighting,
-            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, adaptiveTrafficLightCheck, filterColor, filterSpeed, filterRoute, filterType;
+    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
+            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, filterColor, filterSpeed, filterRoute, filterType,adaptiveTrafficLightCheck, applyFilter;
     @FXML
     private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped,
             TotalTimeSpentStopped, MeanSpeed, SpeedSD, vehicleID, vehicleType, route, color, currentSpeed,
@@ -139,6 +141,7 @@ public class GuiController {
     private final double panSensitivity; // sensitivity
 
     // sim
+    private VehicleList filteredVehicles;
     private WrapperController wrapperController;
     private SelectableObject selectedObject;
     private final int defaultDelay;
@@ -555,6 +558,59 @@ public class GuiController {
         tabPane.getSelectionModel().select(2);
         this.updateDataPane();
     }
+    /**
+     * Event handler for the PDF export button.
+     * <p>
+     * Opens a {@link FileChooser} dialog with a pre-formatted filename
+     * based on the current simulation step. If a location is selected,
+     * it triggers the PDF generation process in the controller,
+     * respecting the current state of the filter checkbox.
+     */
+    @FXML
+    private void onPdfExport () {
+        String headerPdfFile = String.format("Simulation Report %05d.pdf", this.wrapperController.getStepCounter());
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose Directory");
+        chooser.setInitialFileName(headerPdfFile);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Data", "*.pdf"));
+
+        String userHome = System.getProperty("user.home");
+        File desktop = new File(userHome, "Desktop");
+            if (desktop.exists() && desktop.isDirectory()) {
+            chooser.setInitialDirectory(desktop);
+            }
+        File pdfFile = chooser.showSaveDialog(null);
+            if( pdfFile != null) {
+                boolean usingFilter = applyFilter.isSelected();
+                this.wrapperController.generateExport(pdfFile, usingFilter);
+            }
+    }
+    /**
+     * Event handler for the CSV export button.
+     * <p>
+     * Opens a {@link FileChooser} dialog with a pre-formatted filename
+     * based on the current simulation step. If a location is selected,
+     * it triggers the PDF generation process in the controller,
+     * respecting the current state of the filter checkbox.
+     */
+    @FXML
+    private void onCsvExport() {
+        String headerCsvFile = String.format("Simulation Report %05d.csv", this.wrapperController.getStepCounter());
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose Directory");
+        chooser.setInitialFileName(headerCsvFile);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Data", "*.csv"));
+        String userHome = System.getProperty("user.home");
+        File desktop = new File(userHome, "Desktop");
+            if (desktop.exists() && desktop.isDirectory()) {
+                chooser.setInitialDirectory(desktop);
+            }
+        File csvFile = chooser.showSaveDialog(null);
+            if (csvFile != null) {
+                boolean usingFilter = applyFilter.isSelected();
+                this.wrapperController.generateExport(csvFile, usingFilter);
+            }
+    }
 
     @FXML
     private void mouseClicked(MouseEvent event) {
@@ -705,6 +761,11 @@ public class GuiController {
         if (exportPane != null) exportPane.setVisible(false);
 
         // still needs fix for small gap between buttons and menus at the top
+    }
+
+    private void enableButtons() {
+        stepButton.setDisable(false);
+        addButton.setDisable(false);
     }
 
     /**
@@ -1045,13 +1106,20 @@ public class GuiController {
     @FXML
     private void onDensityAnchorToggle() {
         sr.setShowDensityAnchor(showDensityAnchor.isSelected());
+        sr.updateStaticMap();
     }
 
     @FXML
-    private void onRouteHighlightingToggle() { sr.setShowRouteHighlighting(showRouteHighlighting.isSelected()); }
+    private void onRouteHighlightingToggle() {
+        sr.setShowRouteHighlighting(showRouteHighlighting.isSelected());
+        sr.updateStaticMap();
+    }
 
     @FXML
-    private void onTrafficLightIDToggle() { sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected()); }
+    private void onTrafficLightIDToggle() {
+        sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected());
+        sr.updateStaticMap();
+    }
 
     @FXML
     private void onTogglePermanently() {
@@ -1067,6 +1135,7 @@ public class GuiController {
     @FXML
     private void onDensityHeatmapToggle(){
         sr.setViewDensityOn(densityHeatmap.isSelected());
+        sr.updateStaticMap();
     }
 
     @FXML
@@ -1630,6 +1699,38 @@ public class GuiController {
         // Buttons / Menu resets0
         unselectButtons();
         closeAllMainButtonMenus();
+        enableButtons();
+
+        // reset view menu buttons
+        if (!dataView.isSelected()) {
+            onShowDataView();
+            dataView.setSelected(true);
+        }
+
+        if (!showButtons.isSelected()) {
+            onButtonToggle();
+            showButtons.setSelected(true);
+        }
+
+        if (showDensityAnchor.isSelected()) {
+            sr.setShowDensityAnchor(false);
+            showDensityAnchor.setSelected(false);
+        }
+
+        if(!showRouteHighlighting.isSelected()) {
+            sr.setShowRouteHighlighting(true);
+            showRouteHighlighting.setSelected(true);
+        }
+
+        if(!showTrafficLightIDs.isSelected()) {
+            sr.setShowTrafficLightIDs(true);
+            showTrafficLightIDs.setSelected(true);
+        }
+
+        if(!densityHeatmap.isSelected()) {
+            sr.setShowDensityAnchor(false);
+            densityHeatmap.setSelected(false);
+        }
 
         // Graph Reset
         activeVehiclesSeries.getData().clear();
