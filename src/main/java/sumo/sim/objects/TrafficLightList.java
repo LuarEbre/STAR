@@ -29,11 +29,11 @@ public class TrafficLightList {
      * creates all TrafficLights as Objects in an ArrayList
      *
      * @param con SumoTraciConnection
-     * @param s1 StreetList
+     * @param sl StreetList
      */
-    public TrafficLightList(SumoTraciConnection con, StreetList s1) {
+    public TrafficLightList(SumoTraciConnection con, StreetList sl, WrapperController controller) {
         this.con = con;
-        this.streetList = s1;
+        this.streetList = sl;
         try {
             XML xml = new XML(WrapperController.getCurrentNet());
             Map<String, Map<String,String>> TLData = xml.getTrafficLightsData();
@@ -42,7 +42,7 @@ public class TrafficLightList {
                 String id = entry.getKey();
                 Map<String, String> attributes = entry.getValue();
                 try {
-                    TrafficLight tl = new TrafficLight(id, attributes, con);
+                    TrafficLight tl = new TrafficLight(id, attributes, con, controller, this.streetList);
                     trafficlights.add(tl);
 
                 } catch (Exception e) {

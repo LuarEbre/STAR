@@ -246,6 +246,11 @@ public class VehicleList {
         return Math.sqrt(sumofsquares/activeVehicles);
     }
 
+    /**
+     * Returns the amount of Vehicles that are of a certain type
+     * @param type Vehicle Type
+     * @return amount of Vehicles int
+     */
     public int getVehiclesAmountByType(Type type) {
         List<Vehicle> vehiclesWithType = new ArrayList<>();
         for(Vehicle v : vehicles) {
