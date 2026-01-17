@@ -6,8 +6,11 @@ import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
+import sumo.sim.util.ExportableData;
+
 import java.awt.geom.Point2D;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,7 +19,8 @@ import java.util.logging.Logger;
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link VehicleWrap#avgSpeed},{@link VehicleWrap#accel},
  * {@link VehicleWrap#totalLifetime} and properties critical for rendering such as {@link VehicleWrap#color}
  */
-public class VehicleWrap extends SelectableObject {
+public class VehicleWrap extends SelectableObject implements ExportableData {
+
 
     // final values, set once and never updated after
     private final String id;
@@ -73,6 +77,57 @@ public class VehicleWrap extends SelectableObject {
         // assume any newly created Vehicle is queued, only setting to false if Vehicle is confirmed to exist
         this.queued = true;
     }
+    /**
+     * Returns the export category for vehicle data.
+     * @return A string header for the vehicle data section.
+     */
+    @Override
+    public String getExportCategory() {return "Vehicles: "; }
+    /**
+     * Defines the table headers for the vehicle export.
+     * @return An array of strings including the new Route column.
+     */
+    @Override
+    public String[] getColumnHeaders() {
+        return new String[] {
+                "ID",
+                "Route",
+                "Avg Speed",
+                "Stops",
+                "Waiting Time",
+                "Max Speed"
+        };
+    }
+    /**
+     * Formats the vehicle's performance metrics and route information for export.
+     * <p>
+     * Handles non-finite double values (NaN/Infinity) by defaulting to 0.0
+     * to ensure export stability.
+     * @return A string array containing formatted vehicle statistics.
+     */
+    @Override
+    public String[] getRowData() {
+        double avg = 0.0;
+        if (Double.isFinite(avgSpeed)) {
+            avg = avgSpeed;
+        }
+        double max = 0.0;
+        if (Double.isFinite(maxSpeed)) {
+            max = maxSpeed;
+        }
+        double wait = 0.0;
+        if (Double.isFinite(waitingTime)) {
+            wait = waitingTime;
+        }
+        return new String[] {
+                id,
+                this.routeID,
+                String.format(Locale.US, "%.2f m/s", avg),
+                String.valueOf(numberOfStops),
+                String.format(Locale.US, "%.0f s", wait),
+                String.format(Locale.US, "%.2f m/s", max)
+        };
+    }
 
     /**
      * Gets called each step by the Simulation, updates all SUMO internal values using {@link SumoTraciConnection#do_job_get(SumoCommand)}
@@ -121,7 +176,6 @@ public class VehicleWrap extends SelectableObject {
             this.exists = false;
         }
     }
-
     /**
      * Allows for setting individual vehicle's speed.
      * @param speed desired speed in m/s
@@ -134,7 +188,6 @@ public class VehicleWrap extends SelectableObject {
             throw new RuntimeException(e);
         }
     }
-
     /**
      * @return The current speed of the vehicle in m/s.
      */
