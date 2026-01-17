@@ -702,3 +702,32 @@
     visibility: hidden;
     -fx-padding: 0; /* Removes the empty space it leaves behind */
 }
+
+#typeAmountChart .chart-legend {
+    visibility: hidden;
+        -fx-padding: 0;
+}
+
+#typeAmountChart .chart-vertical-grid-lines,
+#typeAmountChart .chart-horizontal-grid-lines {
+    -fx-stroke: transparent;
+}
+
+#typeAmountChart .axis {
+    -fx-tick-label-fill: -fx-color-white;
+}
+
+#typeAmountChart .axis-label,
+#typeAmountChart .chart-title,
+#typeAmountChart .chart-legend-item {
+    -fx-text-fill: -fx-color-white;
+}
+
+#typeAmountChart .chart-legend {
+    visibility: hidden;
+    -fx-padding: 0; /* Removes the empty space it leaves behind */
+}
+
+#chartVbox {
+    -fx-background-fill: -fx-color-grey-dark;
+}
