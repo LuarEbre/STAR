@@ -365,9 +365,6 @@ public class WrapperController {
                 // execution queue
                 vehicleList.addVehicle(amount, type, route, color);
             });
-            logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
-        } else {
-            //new Thread(() -> vl.addVehicle(amount, type, route, color)).start();
         }
     }
 
