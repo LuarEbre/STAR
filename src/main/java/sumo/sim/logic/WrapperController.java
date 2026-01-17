@@ -5,7 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import sumo.sim.gui.GuiController;
-import sumo.sim.DataExport;
+import sumo.sim.data.DataExport;
 import sumo.sim.objects.*;
 import sumo.sim.util.ExportableData;
 import sumo.sim.util.SimulationException;
@@ -13,19 +13,15 @@ import sumo.sim.util.Util;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
