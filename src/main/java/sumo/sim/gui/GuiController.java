@@ -1122,11 +1122,6 @@ public class GuiController {
             case "Medium Test" -> wrapperController.StressTest(2500, Color.YELLOW, type);
             case "Heavy Test" -> wrapperController.StressTest(5000, Color.RED, type);
         }
-        switch (mode) {
-            case "Light Test" -> logger.log(Level.INFO, "Vehicles added: " + 1000 + " Vehicles added.");
-            case "Medium Test" -> logger.log(Level.INFO, "Vehicles added: " + 2500 + " Vehicles added.");
-            case "Heavy Test" -> logger.log(Level.INFO, "Vehicles added: " + 5000 + " Vehicles added.");
-        }
 
         if(wasRunning) wrapperController.startSim();
     }
