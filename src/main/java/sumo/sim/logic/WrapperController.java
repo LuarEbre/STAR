@@ -388,7 +388,7 @@ public class WrapperController {
         int amount_per = amount / Routes.size();
         type = (type == null) ? "DEFAULT_VEHTYPE" : type;
 
-        logger.log(Level.INFO, "Stress testing for " + amount);
+        logger.log(Level.INFO, "Stress testing for " + amount + " vehicles");
 
         for (String key : Routes.keySet()) {
             addVehicle(amount_per, type, key, color);
