@@ -12,5 +12,12 @@
   <route id="r_6" edges="E0 E1 E2 E3 E4 E5 E6 -E0" color="red" />
   <route id="r_7" edges="E0 E1 E2 E8 E9" color="orange" />
   <route id="r_8" edges="-E9 E12 E13 E14 E5 E7 E8 E9" color="green" />
-  <vType id="lkw_40t" vClass="truck" guiShape="truck" color="blue" length="2.0" width="2.5" minGap="2.5" maxSpeed="25.0" accel="1.2" decel="1.5" sigma="0.2" tau="1.5" speedFactor="0.95" />
+  <vType id="truck_40t" vClass="truck" guiShape="truck" color="blue" length="2.0" width="2.5" minGap="2.5" maxSpeed="25.0" accel="1.2" decel="1.5" sigma="0.2" tau="1.5" speedFactor="0.95" />
+    <vType id="casual" vClass="passenger" length="5.0" accel="2.6" decel="4.5" maxSpeed="25" />
+    <vType id="emergency" vClass="passenger" length="6.5" accel="2.6" apparentDecel="4.5" emergencyDecel="9.0" decel="4.5" maxSpeed="75" speedFactor="1.5" speedDev="0.1" impatience="1.0" sigma="0"/>
+    <vType id="slow" vClass="passenger" speedFactor="0.6" speedDev="0.1" length="5.0" accel="2.6" decel="4.5" maxSpeed="15" />
+    <vType id="fast" vClass="passenger" speedFactor="1.1" length="5.0" accel="10.6" decel="7.5" maxSpeed="100" />
+    <vType id="erratic" vClass="passenger" speedFactor="1.0" length="5.0" accel="15.0" decel="10.0" maxSpeed="15.0" sigma="0.66" tau="2.0" />
+    <vType id="beginner" vClass="passenger" length="5.0" accel="1.6" decel="5.5" maxSpeed="10" sigma="0.4" tau="3.0" speedFactor="0.9" />
+    <vType id="aggressive" vClass="passenger" length="6.5" accel="5.6" emergencyDecel="5.0" decel="1.5" maxSpeed="20.0" speedFactor="1.1" speedDev="0.4" impatience="1.0" sigma="0.3"/>
 </routes>
