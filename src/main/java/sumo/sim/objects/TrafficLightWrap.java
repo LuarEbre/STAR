@@ -1,14 +1,12 @@
 package sumo.sim.objects;
 
-import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoTLSController;
 import de.tudresden.sumo.objects.SumoTLSPhase;
 import de.tudresden.sumo.objects.SumoTLSProgram;
 import it.polito.appeal.traci.SumoTraciConnection;
-import sumo.sim.SimulationRenderer;
+import sumo.sim.gui.SimulationRenderer;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
 
@@ -34,21 +32,12 @@ public class TrafficLightWrap extends SelectableObject {
     private final SumoTraciConnection con;
     private final String id;
     private final Set<Street> controlledStreets;
+    private List<TrafficLightPhase> phases; // G = green priority , g , y, r , u = red_yellow , o = off;
 
-    //Logger
+    // Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLightWrap.class.getName());
 
-    private String type; // types: static, actuated, delay based, offline, special, rail signal
-    // program :
-    // offset : adjusts start time of phase cycle
-    // program id :
-    // <tlLogic id="J11" type="static" programID="0" offset="0"> ---> can have multiple of this with same TL id diff p id
-    //        <phase duration="42" state="GGrrrGGg"/>
-    //
-    // </tlLogic>
-
-    private List<TrafficLightPhase> phases; // G = green priority , g , y, r , u = red_yellow , o = off;
-    //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
+    // rendering
     private int duration; // time
     private final Point2D.Double position; // position as a junction
     private String [] stateArray;
@@ -109,13 +98,14 @@ public class TrafficLightWrap extends SelectableObject {
 
             if (programsMap != null && !programsMap.isEmpty()) {
                 // check if existent
-                SumoTLSProgram prog = programsMap.values().iterator().next();
+                SumoTLSProgram prog = programsMap.values().iterator().next(); // gets next available program
                 if (this.phases == null) {
                     this.phases = new ArrayList<>(); // if there is already a list
                 }
                 this.phases.clear(); // empty list
 
                 int index = 0;
+                // iterate sumo tl phase
                 for (SumoTLSPhase p : prog.phases) {
                     String rawString = p.toString(); // phase : "Grryrr#3#3" etc.
                     String cleanState = rawString.split("#")[0]; // cutting of everything after #
@@ -126,10 +116,10 @@ public class TrafficLightWrap extends SelectableObject {
             }
 
         } catch (Exception e) {
-            // needs catching
+            logger.log(Level.SEVERE, "Failed to load TL phases", e);
+            throw new RuntimeException(e);
         }
     }
-
 
     // setter
 
@@ -150,8 +140,19 @@ public class TrafficLightWrap extends SelectableObject {
         // -> state differs from index to index (index is controlled lanes that have tl)
         String currentState;
         // links.get(0).from
+        double densityOfAllLanes = 0.0;
+
         try {
+            for(String lane : this.incomingLanes) {
+                Street s = streetList.getStreetBasedOnLane(lane);
+                densityOfAllLanes += s.getDensity();
+            }
+
+            if(densityOfAllLanes >= 100.0 && this.duration > 1) {
+                this.setPhaseDuration(this.duration - 1);
+            }
             currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
+
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
             throw new RuntimeException(e);
@@ -165,6 +166,8 @@ public class TrafficLightWrap extends SelectableObject {
             // [G, lane_G ,y , lane_y , r, lane_r ] format
         }
     }
+
+    // setter
 
     /**
      * Adaptive States based on Density of Controlled Lanes
@@ -219,7 +222,6 @@ public class TrafficLightWrap extends SelectableObject {
             setPhaseNumber(bestPhase.getIndex());
         }
     }
-
 
     /**
      * Sets the active phase of the traffic light to the specified index.
@@ -455,16 +457,4 @@ public class TrafficLightWrap extends SelectableObject {
         }
     }
 
-    /**
-     * Updates TL phase
-     */
-    public void updateTL() {
-        try {
-            //this.phase = (int) con.do_job_get(Trafficlight.getPhase(this.id));
-        } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to update phase of Traffic Light", e);
-            throw new RuntimeException(e);
-        }
-
-    }
 }
