@@ -48,7 +48,6 @@ public class GuiApplication extends Application {
     public void start(Stage stage) throws IOException {
         // link to gui.fxml (more than one possible)
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/gui.fxml"));
-        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Gui/Title/title.fxml")); // experimental
 
         Scene scene = new Scene(fxmlLoader.load());
 

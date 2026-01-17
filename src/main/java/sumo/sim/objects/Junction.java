@@ -1,11 +1,8 @@
 package sumo.sim.objects;
 
-import de.tudresden.sumo.cmd.Junction;
 import de.tudresden.sumo.objects.SumoGeometry;
 import de.tudresden.sumo.objects.SumoPosition2D;
 import it.polito.appeal.traci.SumoTraciConnection;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
@@ -20,7 +17,7 @@ import static java.lang.Math.abs;
  * @author simonr
  * @author LeleZss
  */
-public class JunctionWrap {
+public class Junction {
     // connection
     private final String id;
     private final SumoTraciConnection con;
@@ -33,23 +30,23 @@ public class JunctionWrap {
 
 
     //Logger
-    private static final Logger logger = java.util.logging.Logger.getLogger(JunctionWrap.class.getName());
+    private static final Logger logger = java.util.logging.Logger.getLogger(Junction.class.getName());
 
     /**
-     * Constructor for JunctionWrap.
+     * Constructor for Junction.
      * Initializes all parameters
      *
      * @param id
      * @param con
      */
-    public JunctionWrap(String id, SumoTraciConnection con) {
+    public Junction(String id, SumoTraciConnection con) {
         this.id = id;
         this.con = con;
         try {
-            SumoPosition2D pos2D = (SumoPosition2D) this.con.do_job_get(Junction.getPosition(id)); // position
+            SumoPosition2D pos2D = (SumoPosition2D) this.con.do_job_get(de.tudresden.sumo.cmd.Junction.getPosition(id)); // position
             this.position = new Point2D.Double(pos2D.x, pos2D.y);
 
-            SumoGeometry geometry = (SumoGeometry) this.con.do_job_get(Junction.getShape(id)); // return SumoGeometry
+            SumoGeometry geometry = (SumoGeometry) this.con.do_job_get(de.tudresden.sumo.cmd.Junction.getShape(id)); // return SumoGeometry
             LinkedList<SumoPosition2D> coords = geometry.coords;
             int numPoints = coords.size();
             this.shapeX = new double[numPoints];

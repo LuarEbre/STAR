@@ -6,10 +6,8 @@ import de.tudresden.sumo.cmd.Trafficlight;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +17,7 @@ import java.util.logging.Logger;
  * @author simonr
  */
 public class TrafficLightList {
-    private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
+    private final ArrayList<TrafficLight> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final StreetList streetList;
 
@@ -44,7 +42,7 @@ public class TrafficLightList {
                 String id = entry.getKey();
                 Map<String, String> attributes = entry.getValue();
                 try {
-                    TrafficLightWrap tl = new TrafficLightWrap(id, attributes, con);
+                    TrafficLight tl = new TrafficLight(id, attributes, con);
                     trafficlights.add(tl);
 
                 } catch (Exception e) {
@@ -64,7 +62,7 @@ public class TrafficLightList {
      * Updates the State for all TrafficLights
      */
     public void updateAllCurrentState() {
-        for (TrafficLightWrap tl : trafficlights) {
+        for (TrafficLight tl : trafficlights) {
             tl.setCurrentState();
         }
     }
@@ -74,7 +72,7 @@ public class TrafficLightList {
      */
     public void setAllControlledStreets() {
         try {
-            for (TrafficLightWrap tl : trafficlights) {
+            for (TrafficLight tl : trafficlights) {
                 SumoStringList string = (SumoStringList) con.do_job_get(Trafficlight.getControlledLanes(tl.getId()));
                 for (String s : string) {
                     String[] parts = s.split("_");
@@ -88,21 +86,21 @@ public class TrafficLightList {
     }
 
     public void deselectAll() {
-        for(TrafficLightWrap tl : trafficlights) {
+        for(TrafficLight tl : trafficlights) {
             tl.deselect();
         }
     }
 
     public void adaptiveUpdate() {
-        for (TrafficLightWrap tl : trafficlights) {
+        for (TrafficLight tl : trafficlights) {
             tl.adaptiveStateUpdate();
         }
     }
 
     // getter
 
-    public TrafficLightWrap getTL(String id) {
-        for (TrafficLightWrap tl : trafficlights) {
+    public TrafficLight getTL(String id) {
+        for (TrafficLight tl : trafficlights) {
             if (tl.getId().equals(id)) { // searching for TrafficLight object
                 return tl;
             }
@@ -113,7 +111,7 @@ public class TrafficLightList {
     public String[] getIDs() {
         String [] ret = new String[trafficlights.size()];
         int i = 0;
-        for (TrafficLightWrap tl : trafficlights) {
+        for (TrafficLight tl : trafficlights) {
             ret[i] = tl.getId();
             i++;
         }
@@ -126,7 +124,7 @@ public class TrafficLightList {
         gyr.put("Y", 0);
         gyr.put("R", 0);
 
-        for (TrafficLightWrap tl : trafficlights) {
+        for (TrafficLight tl : trafficlights) {
             String temp = tl.getCurrentStateString();
 
             if(temp.contains("g") || temp.contains("G")) {
@@ -145,7 +143,7 @@ public class TrafficLightList {
         return gyr;
     }
 
-    public ArrayList<TrafficLightWrap> getTrafficlights() {
+    public ArrayList<TrafficLight> getTrafficlights() {
         return trafficlights;
     }
     public int getCount() { return trafficlights.size(); }

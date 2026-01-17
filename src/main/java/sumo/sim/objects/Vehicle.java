@@ -1,7 +1,6 @@
 package sumo.sim.objects;
 
 
-import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoPosition2D;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
@@ -12,11 +11,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A wrapper of {@link Vehicle} allowing for instancing of individual vehicles
- * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link VehicleWrap#avgSpeed},{@link VehicleWrap#accel},
- * {@link VehicleWrap#totalLifetime} and properties critical for rendering such as {@link VehicleWrap#color}
+ * A wrapper of {@link de.tudresden.sumo.cmd.Vehicle} allowing for instancing of individual vehicles
+ * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link Vehicle#avgSpeed},{@link Vehicle#accel},
+ * {@link Vehicle#totalLifetime} and properties critical for rendering such as {@link Vehicle#color}
  */
-public class VehicleWrap extends SelectableObject {
+public class Vehicle extends SelectableObject {
 
     // final values, set once and never updated after
     private final String id;
@@ -43,17 +42,17 @@ public class VehicleWrap extends SelectableObject {
     private boolean queued;
 
     //Logger
-    private static final Logger logger = java.util.logging.Logger.getLogger(VehicleWrap.class.getName());
+    private static final Logger logger = java.util.logging.Logger.getLogger(Vehicle.class.getName());
 
     /**
-     * Constructor initializes most values to 0 before they can be set by {@link VehicleWrap#updateVehicle()}
+     * Constructor initializes most values to 0 before they can be set by {@link Vehicle#updateVehicle()}
      * @param id Vehicle ID
      * @param con an instance of {@link SumoTraciConnection}
      * @param type Vehicle Type
      * @param route Vehicle Route
      * @param color Vehicle Color
      */
-    public VehicleWrap(String id , SumoTraciConnection con, String type, String route, Color color) {
+    public Vehicle(String id , SumoTraciConnection con, String type, String route, Color color) {
         super();
         this.id = id;
         this.type = type;
@@ -86,10 +85,10 @@ public class VehicleWrap extends SelectableObject {
             double oldSpeed = this.speed;
             // determine whether vehicle has been active last frame via oldSpeed
             this.activeLastFrame = oldSpeed > 0;
-            this.speed = (double)con.do_job_get(Vehicle.getSpeed(id)); // returns SumoCommand, which is then performed by do_job_get
-            SumoPosition2D pos2D = (SumoPosition2D)con.do_job_get(Vehicle.getPosition(id)); // cast to SumoPosition2D
+            this.speed = (double)con.do_job_get(de.tudresden.sumo.cmd.Vehicle.getSpeed(id)); // returns SumoCommand, which is then performed by do_job_get
+            SumoPosition2D pos2D = (SumoPosition2D)con.do_job_get(de.tudresden.sumo.cmd.Vehicle.getPosition(id)); // cast to SumoPosition2D
             this.position = new Point2D.Double(pos2D.x, pos2D.y); // SumoPosition values stored in Point2D object
-            this.angle = (double)con.do_job_get(Vehicle.getAngle(id));
+            this.angle = (double)con.do_job_get(de.tudresden.sumo.cmd.Vehicle.getAngle(id));
 
             // since time between calculating acceleration is always 1 second
             // a = delta v / delta t simplifies to a = delta v
@@ -128,7 +127,7 @@ public class VehicleWrap extends SelectableObject {
      */
     public void setSpeed(double speed) {
         try {
-            con.do_job_set(Vehicle.setSpeed(id, speed));
+            con.do_job_set(de.tudresden.sumo.cmd.Vehicle.setSpeed(id, speed));
         } catch (Exception e) {
             logger.log(Level.FINE, "Failed to set speed of specific Vehicle", e);
             throw new RuntimeException(e);
