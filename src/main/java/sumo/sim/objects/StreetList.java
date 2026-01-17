@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 public class StreetList {
     private final ArrayList<Street> streets = new ArrayList<>();
+    private SumoTraciConnection connection;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(StreetList.class.getName());
@@ -28,7 +29,7 @@ public class StreetList {
         try {
             XML xml = new XML(WrapperController.getCurrentNet());
             Map<String, String[]> data = xml.readAllEdges();
-
+            this.connection = con;
             for (Map.Entry<String, String[]> entry : data.entrySet()) {
                 String id = entry.getKey();
                 String from = entry.getValue()[0];
@@ -70,13 +71,6 @@ public class StreetList {
             }
         }
         return null;
-    }
-
-    /**
-     * @return {@link List} of {@link Street}
-     */
-    public List<Street> getStreets() {
-        return streets;
     }
 
     public String[] getSelectableStreets() {
@@ -124,14 +118,5 @@ public class StreetList {
         }
         mean /= streets.size();
         return mean;
-    }
-
-    /**
-     * Allows for batch updating of Streets
-     */
-    public void updateStreets(){
-        for (Street s : streets) {
-            s.updateStreet();
-        }
     }
 }

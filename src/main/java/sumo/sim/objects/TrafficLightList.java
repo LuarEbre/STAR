@@ -95,7 +95,7 @@ public class TrafficLightList {
 
     public void adaptiveUpdate() {
         for (TrafficLightWrap tl : trafficlights) {
-            tl.adaptiveStateUpdate(streetList);
+            tl.adaptiveStateUpdate();
         }
     }
 

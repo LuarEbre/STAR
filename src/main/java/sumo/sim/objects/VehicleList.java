@@ -6,7 +6,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
 import sumo.sim.data.CSV;
 import sumo.sim.logic.Type;
-import sumo.sim.util.GenericList;
+
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -256,11 +256,5 @@ public class VehicleList {
             }
         }
         return vehiclesWithType.size();
-    }
-
-    public void deselectAll() {
-        for(VehicleWrap v : vehicles) {
-            v.deselect();
-        }
     }
 }
