@@ -5,7 +5,6 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Trafficlight;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
-import sumo.sim.util.GenericList;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
  * Class for managing all TrafficLights
  * @author simonr
  */
-public class TrafficLightList implements GenericList {
+public class TrafficLightList {
     private final ArrayList<TrafficLightWrap> trafficlights = new ArrayList<>(); // List of TrafficLights
     private final SumoTraciConnection con; // main connection created in main wrapper
     private final StreetList streetList;
@@ -62,95 +61,12 @@ public class TrafficLightList implements GenericList {
     }
 
     /**
-     * Get an TrafficLight by ID
-     * @param id ID of TrafficLight
-     * @return TrafficLightWrap
-     */
-    public TrafficLightWrap getTL(String id) {
-        for (TrafficLightWrap tl : trafficlights) {
-            if (tl.getId().equals(id)) { // searching for TrafficLight object
-                return tl;
-            }
-        }
-        return null; // if not existent
-    }
-
-    /**
-     * Get all TrafficLights as an ArrayList
-     * @return allTrafficLight
-     */
-    public ArrayList<TrafficLightWrap> getTrafficlights() {
-        return trafficlights;
-    }
-
-    /**
-     * Get amount of TrafficLights in TrafficLightList
-     * @return amount of TrafficLights
-     */
-    public int getCount() { return trafficlights.size(); }
-
-    /**
-     * Get all IDs of TrafficLights in TrafficLightList
-     * @return String[] IDs
-     */
-    public String[] getIDs() {
-        int counter = 0;
-        String [] ret = new String[trafficlights.size()];
-        int i = 0;
-        for (TrafficLightWrap tl : trafficlights) {
-            ret[i] = tl.getId();
-            i++;
-        }
-        return ret;
-    }
-
-    /**
-     * Prints all TrafficLights in TrafficLightList
-     */
-    public void printALL() { // for the demo
-        System.out.println("");
-        for (TrafficLightWrap tl : trafficlights) {
-            Point2D.Double pos = tl.getPosition();
-            System.out.printf(
-                    // forces US locale, making double values be separated via period, rather than comma
-                    Locale.US,
-                    // print using format specifiers, 2 decimal places for double values, using leading 0s to pad for uniform spacing
-                    "Traffic Light %s: position = (%06.2f | %06.2f)%n",
-                    tl.getId(),
-                    pos.x,
-                    pos.y
-            );
-        }
-    }
-
-    /**
      * Updates the State for all TrafficLights
      */
     public void updateAllCurrentState() {
         for (TrafficLightWrap tl : trafficlights) {
             tl.setCurrentState();
         }
-    }
-
-    /**
-     * Appends all TrafficLights Attributes in a String and returns it
-     * @return String of Data
-     */
-    public String getTrafficLightsData() {
-        StringBuilder sb = new StringBuilder();
-
-        for (TrafficLightWrap tl : trafficlights) {
-            Point2D.Double pos = tl.getPosition();
-
-            sb.append(tl.getId()).append(",");
-            sb.append(pos.x).append(",");
-            sb.append(pos.y).append(",");
-            sb.append(tl.getPhaseNumber()).append(",");
-
-            sb.append("\n");
-
-        }
-        return sb.toString();
     }
 
     /**
@@ -171,29 +87,37 @@ public class TrafficLightList implements GenericList {
         }
     }
 
-    /**
-     * Print all currently Controlled Streets of every TrafficLight
-     */
-    public void printAllControlledStreets() {
-        for (TrafficLightWrap tl : trafficlights) {
-            tl.printControlledStreets();
-        }
-    }
-
-    /**
-     * Does the update_TL method for every TrafficLight in TrafficLightList
-     * This updates their attributes to current Simulation data
-     */
-    public void updateTLs() {
-        for(TrafficLightWrap tl : trafficlights ){
-            tl.updateTL();
-        }
-    }
-
     public void deselectAll() {
         for(TrafficLightWrap tl : trafficlights) {
             tl.deselect();
         }
+    }
+
+    public void adaptiveUpdate() {
+        for (TrafficLightWrap tl : trafficlights) {
+            tl.adaptiveStateUpdate(streetList);
+        }
+    }
+
+    // getter
+
+    public TrafficLightWrap getTL(String id) {
+        for (TrafficLightWrap tl : trafficlights) {
+            if (tl.getId().equals(id)) { // searching for TrafficLight object
+                return tl;
+            }
+        }
+        return null; // if not existent
+    }
+
+    public String[] getIDs() {
+        String [] ret = new String[trafficlights.size()];
+        int i = 0;
+        for (TrafficLightWrap tl : trafficlights) {
+            ret[i] = tl.getId();
+            i++;
+        }
+        return ret;
     }
 
     public HashMap<String, Integer> getCurrentGYR() {
@@ -220,4 +144,10 @@ public class TrafficLightList implements GenericList {
 
         return gyr;
     }
+
+    public ArrayList<TrafficLightWrap> getTrafficlights() {
+        return trafficlights;
+    }
+    public int getCount() { return trafficlights.size(); }
+
 }

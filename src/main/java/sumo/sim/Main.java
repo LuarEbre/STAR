@@ -1,6 +1,8 @@
 package sumo.sim;
 
 import javafx.application.Application;
+import sumo.sim.gui.GuiApplication;
+import sumo.sim.util.StarLogger;
 
 public class Main {
     /**

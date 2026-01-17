@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.gui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,7 +28,6 @@ import java.util.Objects;
  */
 //GUI application
 public class GuiApplication extends Application {
-    private static GuiController guiController; // static because you dont instance guiCon -> javafx instances the controller
     private WrapperController wrapper;
 
     //Logger
@@ -44,7 +43,6 @@ public class GuiApplication extends Application {
      *     between GUI and Simulation
      * </p>
      * @param stage , visible JavaFX frame acting as root element and containing all FXML (GUI) objects
-     * @throws IOException
      */
     @Override
     public void start(Stage stage) throws IOException {
@@ -66,8 +64,10 @@ public class GuiApplication extends Application {
 
         // link to css file
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Gui/gui.css")).toExternalForm());
+
         scene.setCursor(new ImageCursor(new Image("/Gui/Icons/cursor.png",  128, 128, true, true))); // changes cursor style
-        guiController = fxmlLoader.getController();
+        // static because you dont instance guiCon -> javafx instances the controller
+        GuiController guiController = fxmlLoader.getController();
 
         // stage (frame)
         stage.setFullScreen(true); //needs escape button to close the appl.
@@ -96,6 +96,9 @@ public class GuiApplication extends Application {
         guiController.setStageAndManager(stage, mapManager);
     }
 
+    /**
+     * Forces termination of all threads
+     */
     @Override
     public void stop() throws Exception {
         if (this.wrapper != null) {

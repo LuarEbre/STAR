@@ -23,7 +23,6 @@ public class Street extends SelectableObject {
     private String toJunction;
 
     // attributes
-    private double maxSpeed; // same attributes as in .net
     private double density;
     private double minX,minY,maxX,maxY; // for rendering optimization
     private double meanPositionX;
@@ -173,6 +172,5 @@ public class Street extends SelectableObject {
     public String getId() { return id; }
     public String getFromJunction() { return fromJunction; }
     public String getToJunction() { return toJunction; }
-    public Street getStreet() { return this; }
     public double getDensity() { return density; }
 }
