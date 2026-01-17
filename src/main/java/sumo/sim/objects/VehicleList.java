@@ -4,7 +4,6 @@ import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
-import sumo.sim.data.CSV;
 import sumo.sim.logic.Type;
 
 
@@ -248,6 +247,11 @@ public class VehicleList {
         return Math.sqrt(sumofsquares/activeVehicles);
     }
 
+    /**
+     * Returns the amount of Vehicles that are of a certain type
+     * @param type Vehicle Type
+     * @return amount of Vehicles int
+     */
     public int getVehiclesAmountByType(Type type) {
         List<VehicleWrap> vehiclesWithType = new ArrayList<>();
         for(VehicleWrap v : vehicles) {

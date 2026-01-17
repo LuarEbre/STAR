@@ -478,7 +478,7 @@
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <VBox prefHeight="408.0" prefWidth="259.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
+                                    <VBox fx:id="chartVbox" prefHeight="408.0" prefWidth="259.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="10.0">
                                        <children>
                                           <LineChart id="activeVehicleGraph" fx:id="activeVehiclesChart" createSymbols="false" horizontalZeroLineVisible="false" prefHeight="92.0" prefWidth="259.0" styleClass="starLineChart" title="Active Vehicles">
                                             <xAxis>
@@ -618,7 +618,7 @@
                   <Insets />
                </opaqueInsets>
             </VBox>
-            <AnchorPane fx:id="exportPane" layoutX="305.0" layoutY="141.0" prefHeight="130.0" prefWidth="160.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="exportPane" layoutX="305.0" layoutY="141.0" prefHeight="159.0" prefWidth="160.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <CheckBox fx:id="applyFilter" layoutX="75.0" layoutY="102.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="200.0" styleClass="viewLabel" text="Apply Filter" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="85.0" />
                   <Button fx:id="csvExportButton" onAction="#onCsvExport" layoutX="75.0" layoutY="49.0" mnemonicParsing="false" styleClass="menuButton" text="Export to CSV" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="50.0" />
