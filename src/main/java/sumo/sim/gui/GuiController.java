@@ -1591,7 +1591,11 @@ public class GuiController {
         renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
             @Override
             public void handle(long timestamp) {
-                renderUpdate();
+                try{
+                    renderUpdate();
+                } catch (RenderingException e) {
+                    return;
+                }
             }
         };
         renderLoop.start(); // runs 60 frames per second
