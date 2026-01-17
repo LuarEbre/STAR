@@ -74,12 +74,22 @@ public class GuiApplication extends Application {
         stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyCode.F11.equals(event.getCode())) {
                 stage.setFullScreen(!stage.isFullScreen());
+                try {
+                    guiController.updateStaticMap();
+                } catch (Exception e) {
+                    return;
+                }
             }
         });
 
         stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyCode.ENTER.equals(event.getCode()) && event.isAltDown()) {
                 stage.setFullScreen(!stage.isFullScreen());
+                try {
+                    guiController.updateStaticMap();
+                } catch (Exception e) {
+                    return;
+                }
             }
         });
 

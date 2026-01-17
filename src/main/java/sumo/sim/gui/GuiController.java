@@ -15,12 +15,19 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.image.PixelReader;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.image.WritableImage;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javafx.scene.SnapshotParameters;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -68,12 +75,12 @@ public class GuiController {
     @FXML
     private ColorPicker colorSelector;
     @FXML
-    private VBox fileMenuSelect;
+    private VBox fileMenuSelect, chartVbox;
     @FXML
     private ToggleButton playButton, selectButton, addButton, stressTestButton, trafficLightButton, createButton;
 
     @FXML
-    private Button stepButton, addVehicleButton, startTestButton, map1select, map2select;
+    private Button stepButton, addVehicleButton, startTestButton, map1select, map2select, exportChartsButton;
 
     private ButtonBase[] allButtons;
 
@@ -487,7 +494,7 @@ public class GuiController {
     /**
      * Helper method to return a {@link Color} object's hexcode as a {@link String}
      * @param c the color to convert
-     * @return hex string (e.g. "#FF0000 for red)
+     * @return hex string (e.g. #FF0000 for red)
      */
     private String toHexString(Color c) {
         return String.format("#%02X%02X%02X",
@@ -987,6 +994,55 @@ public class GuiController {
         topMenuButtonToggle(filtersMenuSelect);
     }
 
+    /**
+     * Takes a Snapshot of current Graphs
+     * Downloads them via FileChooser
+     */
+    @FXML
+    private void onExportCharts() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Charts exportieren");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PNG Bild", "*.png")
+        );
+        fileChooser.setInitialFileName("charts.png");
+
+        Stage stage = (Stage) chartVbox.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file == null) {
+            return;
+        }
+
+        if (!file.getName().toLowerCase().endsWith(".png")) {
+            file = new File(file.getAbsolutePath() + ".png");
+        }
+
+        WritableImage writableImage = chartVbox.snapshot(new SnapshotParameters(), null);
+
+        BufferedImage bufferedImage = new BufferedImage(
+                (int) writableImage.getWidth(),
+                (int) writableImage.getHeight(),
+                BufferedImage.TYPE_INT_ARGB
+        );
+
+        PixelReader reader = writableImage.getPixelReader();
+        for (int y = 0; y < writableImage.getHeight(); y++) {
+            for (int x = 0; x < writableImage.getWidth(); x++) {
+                bufferedImage.setRGB(x, y, reader.getArgb(x, y));
+            }
+        }
+
+        try {
+            ImageIO.write(bufferedImage, "png", file);
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Error writing charts.png", ex);
+        } finally {
+            writableImage = null;
+            bufferedImage = null;
+        }
+    }
+
 
     /**
      * Equivalent to {@link #onFiltersPressed()}
@@ -1139,6 +1195,9 @@ public class GuiController {
         if(wasRunning) wrapperController.startSim();
     }
 
+    public void updateStaticMap() {
+        this.sr.updateStaticMap();
+    }
 
     @FXML
     private void applyTLsettings() {
@@ -1604,7 +1663,11 @@ public class GuiController {
         renderLoop = new AnimationTimer() { // javafx class -> directly runs on javafx thread
             @Override
             public void handle(long timestamp) {
-                renderUpdate();
+                try{
+                    renderUpdate();
+                } catch (RenderingException e) {
+                    return;
+                }
             }
         };
         renderLoop.start(); // runs 60 frames per second
@@ -1764,6 +1827,8 @@ public class GuiController {
         meanStreetDensitySeries.getData().clear();
         meanDensityChart.getData().add(meanStreetDensitySeries);
 
+        meanDensityChart.getData().clear();
+
         meanDensityChart.setAnimated(false);
 
         //typeChart Initial
@@ -1839,6 +1904,7 @@ public class GuiController {
         }
 
         wrapperController.addVehicle(amount, type, route, color);
+        logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
         String hex = this.toHexString(color);
         if(!filterMenuColorSelector.getItems().contains(hex)) {
             filterMenuColorSelector.getItems().add(hex);
