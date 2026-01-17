@@ -22,8 +22,8 @@ public class CSV {
 
     public void addToCSV(String[] newData) {
         try {
-            for(int i = 0; i < newData.length; i++){
-                fw.write(newData[i]);
+            for (String newDatum : newData) {
+                fw.write(newDatum);
                 fw.write("\n");
             }
 

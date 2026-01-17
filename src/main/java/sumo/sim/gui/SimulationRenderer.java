@@ -1,6 +1,5 @@
-package sumo.sim;
+package sumo.sim.gui;
 
-import de.tudresden.sumo.cmd.Vehicle;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.ScrollEvent;
@@ -11,7 +10,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.paint.Paint;
 import sumo.sim.objects.*;
+import sumo.sim.util.RenderingException;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.logging.Logger;
@@ -34,7 +35,6 @@ public class SimulationRenderer {
     private boolean selectMode;
     private boolean createRouteMode;
     private boolean filterApplied;
-    private boolean showSelectablePoints;
     private boolean pickedARoute;
     private boolean viewDensityOn;
 
@@ -50,8 +50,8 @@ public class SimulationRenderer {
     private double zoom;
     private double camX;
     private double camY;
-    private double scale; // should depend on how big the map is -> difference between max and min?
-    private double rotation;
+    private final double scale; // should depend on how big the map is -> difference between max and min?
+    private final double rotation;
 
     // lists
     private final JunctionList jl;
@@ -70,7 +70,7 @@ public class SimulationRenderer {
     private double viewMaxY;
 
     //Logger
-    private static final Logger logger = java.util.logging.Logger.getLogger(SimulationRenderer.class.getName());
+    //private static final Logger logger = java.util.logging.Logger.getLogger(SimulationRenderer.class.getName());
 
     /**
      * Constructs a new SimulationRenderer called by {@link GuiController}
@@ -135,7 +135,6 @@ public class SimulationRenderer {
         for (JunctionWrap j: jl.getJunctions()) {
             j.calculateBounds();
         }
-        //scale = 1;
     }
 
     /**
@@ -162,10 +161,19 @@ public class SimulationRenderer {
         renderDynamicMap();
 
     }
-    // [ mxx , mxy , tx ]
-    // [ myx , myy , ty ]
-    // [  0  ,  0  ,  1 ]
-    // m matrix , t translate, first letter: target; second letter: source ( which to mult)
+
+    /**
+     * Calculates the visible space for rendering
+     */
+    private void updateViewportBounds() {
+        double viewWidthWorld = mapStatic.getWidth() / zoom;
+        double viewHeightWorld = mapStatic.getHeight() / zoom;
+
+        this.viewMinX = camX - (viewWidthWorld / 2);
+        this.viewMaxX = camX + (viewWidthWorld / 2);
+        this.viewMinY = camY - (viewHeightWorld / 2);
+        this.viewMaxY = camY + (viewHeightWorld / 2);
+    }
 
     /**
      * <p>
@@ -187,37 +195,29 @@ public class SimulationRenderer {
     private void transform() {
         this.currentTransform.setToIdentity();
         this.currentTransform.appendTranslation(mapStatic.getWidth() / 2, mapStatic.getHeight() / 2); // moves 0,0 to map middle : add/sub
-        // [ 1 , 0 , width ]        [ x + w ] <-- this is our point x -> + is to the right on x
-        // [ 0 , 1 , height ]  *    [ y+h ]  <-- this is our point y
-        // [ 0 , 0 , 1 ]            [ 1 ] <-- homogeneuos (added 1 row )
         this.currentTransform.appendRotation(rotation);
         this.currentTransform.appendScale(zoom, -zoom); // - y because sumo y coords are reversed : mul / div
-        // [ xSc , 0 , 0 ]        [ x * xSc ]  Scales our point with xSc and ySc
-        // [ 0 , ySC , 0 ]  *    [ y * ySc ]
-        // [ 0 , 0 , 1 ]            [ 1 ]
         this.currentTransform.appendTranslation(-camX, -camY); // centralizes our view
         gcStatic.setTransform(currentTransform); // applies new matrix to gc matrix
     }
 
-    // could throw rendering exception
-    private void renderDynamicMap() {
-        gcDynamic.setTransform(new Affine());
-        gcDynamic.clearRect(0, 0, mapDynamic.getWidth(), mapDynamic.getHeight());
-        gcDynamic.setTransform(currentTransform);
-
-        try {
-            renderVehicle();
-            renderTrafficLight();
-
-            if (showDensityAnchor) renderDensityAnchor();
-            if (showTrafficLightIDs && seeTrafficLightIDs) displayTrafficLights();
-            if (this.selectMode) renderSelectableObjects();
-
-        } catch (Exception e) {
-
-        }
-    }
-
+    /**
+     * Renders the static elements of the map (background, streets, junctions) onto the static canvas.
+     * <p>
+     * This method performs the following steps:
+     * <ol>
+     * <li>Resets the transformation matrix of the static {@link javafx.scene.canvas.GraphicsContext} to clear the view.</li>
+     * <li>Fills the entire canvas with a specific background color (#86858E) to serve as a base layer.</li>
+     * <li>Applies the {@code currentTransform} matrix</li>
+     * <li>Calls {@link #renderStreets()} and {@link #renderJunctions()}.</li>
+     * </ol>
+     * </p>
+     *
+     * <p>
+     * <b>Note:</b> This method is intended for the static layer, which contains elements that do not change position
+     * frequently. It should be called during initialization or when the view transform changes.
+     * </p>
+     */
     private void renderStaticMap() {
         // initialize gcStatic
         gcStatic.setTransform(new Affine()); // transformation matrix, clears canvas
@@ -225,6 +225,13 @@ public class SimulationRenderer {
         gcStatic.fillRect(0, 0, mapStatic.getWidth(), mapStatic.getHeight()); // covers whole screen (edge detection)
         gcStatic.setTransform(currentTransform);
 
+        // rendering of all static elements
+        renderStreets();
+        renderJunctions();
+    }
+
+    private void renderStreets() {
+        // select currently picked Route
         List<String> currentRoute = (pickedARoute && RouteID != null) ? rl.getAllRoutes().get(RouteID) : null;
 
         for (Street s : sl.getStreets()) {
@@ -243,34 +250,20 @@ public class SimulationRenderer {
             String streetId = s.getId();
 
             // map color
+            gcStatic.setFill(Color.BLACK);
+            gcStatic.setStroke(Color.BLACK);
             gcStatic.setLineWidth(scale);
 
-            // Route highlighting
             if (currentRoute != null && !currentRoute.isEmpty() && showRouteHighlighting) {
-                String startId = currentRoute.getFirst();
-                if (streetId.equals(startId)) {
-                    gcStatic.setStroke(Color.GREEN);
-                }
-                else if (currentRoute.contains(streetId)) {
-                    gcStatic.setStroke(Color.RED);
-                }
-                else {
-                    gcStatic.setStroke(Color.rgb(0,0,0,0.6));
-                }
-
+               renderCurrentRoute(streetId, currentRoute); // Route highlighting
             } else if (viewDensityOn) {
-                // density rendering, colors lanes based on density
-                double dens = s.getDensity(); // density of current street
-                if (dens >=100.0) gcStatic.setStroke(Color.rgb(163, 29, 45, 0.6));
-                else if (dens < 100.0 && dens >= 50.0) gcStatic.setStroke(Color.rgb(217, 126, 22, 0.6));
-                else if (dens < 50.0 && dens >= 20.0)  gcStatic.setStroke(Color.rgb(231, 240, 58, 0.6));
-                else gcStatic.setStroke(Color.rgb(96, 219, 68, 0.6));
-
+               renderStreetDensity(s); // Density
             } else {
                 gcStatic.setStroke(Color.rgb(0,0,0,0.6)); // standard street color
             }
 
-            for (LaneWrap l : s.getLanes()) { // lanes of streets
+            // rendering lanes
+            for (LaneWrap l : s.getLanes()) {
 
                 double[] rawX = l.getShapeX();
                 double[] rawY = l.getShapeY();
@@ -286,7 +279,32 @@ public class SimulationRenderer {
                 }
             }
         }
+    }
 
+    private void renderCurrentRoute(String streetId, List<String> currentRoute) {
+        String startId = currentRoute.getFirst();
+        if (streetId.equals(startId)) {
+            gcStatic.setStroke(Color.GREEN);
+        }
+        else if (currentRoute.contains(streetId)) {
+            gcStatic.setStroke(Color.RED);
+        }
+        else {
+            gcStatic.setStroke(Color.BLACK);
+        }
+
+    }
+
+    private void renderStreetDensity(Street s) {
+        // density rendering, colors lanes based on density
+        double dens = s.getDensity(); // density of current street
+        if (dens >=100.0) gcStatic.setStroke(Color.rgb(163, 29, 45, 0.6));
+        else if (dens < 100.0 && dens >= 50.0) gcStatic.setStroke(Color.rgb(217, 126, 22, 0.6));
+        else if (dens < 50.0 && dens >= 20.0)  gcStatic.setStroke(Color.rgb(231, 240, 58, 0.6));
+        else gcStatic.setStroke(Color.rgb(96, 219, 68, 0.6));
+    }
+
+    private void renderJunctions() {
         for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
             if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX // skip if not visible
                     || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
@@ -305,65 +323,45 @@ public class SimulationRenderer {
             if (rawX.length >= 3) {
                 gcStatic.fillPolygon(rawX, rawY, rawX.length); // fills polygon
                 //gcStatic.strokePolygon(rawX, rawY, rawX.length); // border
-            } else if (rawX.length == 2) {
-                //gc.strokeLine(screenX[0], screenY[0], screenX[1], screenY[1]);
             } else {
                 gcStatic.fillOval(rawX[0] - 2, rawY[0] - 2, 4, 4);
             }
-
-        }
-    }
-  
-    private void renderSelectableObjects() {
-        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
-        gcDynamic.setFill(Color.rgb(66,245,245,0.5));
-        if(!this.filterApplied) {
-            for (VehicleWrap v : vl.getVehicles()) {
-                if (v.exists()) {
-                    gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
-                }
-            }
-        } else {
-            for (VehicleWrap v : filteredVehicles.getVehicles()) {
-                if (v.exists()) {
-                    gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
-                }
-            }
-        }
-        for(TrafficLightWrap tl : tls.getTrafficlights()) {
-            gcDynamic.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
         }
     }
 
-    public Point2D.Double screenToWorld(double x, double y) {
+    // could throw rendering exception
+    private void renderDynamicMap() {
+        gcDynamic.setTransform(new Affine());
+        gcDynamic.clearRect(0, 0, mapDynamic.getWidth(), mapDynamic.getHeight());
+        gcDynamic.setTransform(currentTransform);
+
         try {
-            javafx.geometry.Point2D worldPos = currentTransform.inverseTransform(x, y);
-            return new java.awt.geom.Point2D.Double(worldPos.getX(), worldPos.getY());
+            renderVehicle();
+            renderTrafficLight();
+
+            if (showDensityAnchor) renderDensityAnchor();
+            if (showTrafficLightIDs && seeTrafficLightIDs) displayTrafficLights();
+            if (this.selectMode) renderSelectableObjects();
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            // throw new RenderingException(e);
         }
     }
 
     /**
-     * Calculates the visible space for rendering
+     * draws a "density anchor" on the road network, this shows the average car position, which is helpful for visualizing congestion
      */
-    private void updateViewportBounds() {
-        double viewWidthWorld = mapStatic.getWidth() / zoom;
-        double viewHeightWorld = mapStatic.getHeight() / zoom;
-
-        this.viewMinX = camX - (viewWidthWorld / 2);
-        this.viewMaxX = camX + (viewWidthWorld / 2);
-        this.viewMinY = camY - (viewHeightWorld / 2);
-        this.viewMaxY = camY + (viewHeightWorld / 2);
-    }
-
-
-    protected void setSelectablePoints(boolean p) {
-        this.showSelectablePoints = p;
-    }
-
-    protected boolean getSelectablePoints() {
-        return showSelectablePoints;
+    private void renderDensityAnchor() {
+        Point2D.Double meanPos = vl.getMeanPosition();
+        if (meanPos != null) {
+            double width = 5;
+            // subtracting half the width to account for oval center
+            gcDynamic.setFill(Color.rgb(220, 35, 15, 0.8));
+            gcDynamic.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
+            width += 2;
+            gcDynamic.setFill(Color.rgb(220, 35, 15, 0.2));
+            gcDynamic.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
+        }
     }
 
     /**
@@ -400,9 +398,28 @@ public class SimulationRenderer {
         }
     }
 
-    private void displaySelectablePoints() {
 
+    private void renderSelectableObjects() {
+        float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
+        gcDynamic.setFill(Color.rgb(66,245,245,0.5));
+        if(!this.filterApplied) {
+            for (VehicleWrap v : vl.getVehicles()) {
+                if (v.exists()) {
+                    gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
+            }
+        } else {
+            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+                if (v.exists()) {
+                    gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
+                }
+            }
+        }
+        for(TrafficLightWrap tl : tls.getTrafficlights()) {
+            gcDynamic.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
+        }
     }
+
 
     /**
      * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(VehicleWrap, double, double)} for every vehicle (still on the map)
@@ -466,23 +483,6 @@ public class SimulationRenderer {
         }
     }
 
-    /**
-     * draws a "density anchor" on the road network, this shows the average car position, which is helpful for visualizing congestion
-     */
-    private void renderDensityAnchor() {
-        Point2D.Double meanPos = vl.getMeanPosition();
-        if (meanPos != null) {
-            double width = 5;
-            // subtracting half the width to account for oval center
-            gcDynamic.setFill(Color.rgb(220, 35, 15, 0.8));
-            gcDynamic.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
-            width += 2;
-            gcDynamic.setFill(Color.rgb(220, 35, 15, 0.2));
-            gcDynamic.fillOval(meanPos.x-width/2, meanPos.y-width/2, width, width);
-        }
-    }
-
-    // optimization necessary
 
     /**
      * Renders the status of traffic lights by drawing colored lines at the end of controlled lanes.
@@ -519,42 +519,66 @@ public class SimulationRenderer {
                             break; // lane found
                         }
                     }
-
-                    double[] rawX = l.getShapeX();
-                    double[] rawY = l.getShapeY();
-
-                    double endX = rawX[rawX.length - 1]; // 3
-                    double endY = rawY[rawX.length - 1]; // 2
-
-                    double prevX = rawX[rawX.length - 2]; // 2
-                    double prevY = rawY[rawX.length - 2]; // 1
-
-                    //(P_prev -> P_end) direction vector (target-start)
-                    double dx = endX - prevX; // 1
-                    double dy = endY - prevY; // 1
-
-                    // normalize length to 1 , because value can be really high
-                    double length = Math.sqrt(dx * dx + dy * dy); // 1+1=2
-
-                    double ndx = dx / length;
-                    double ndy = dy / length; // 0.5
-                    // length of vector is now exactly 1 , can change size here?
-
-                    double perpX = -ndy; // rotates 90 degree to the left when negating x and switching x and y
-                    double perpY = ndx;
-
-                    double halfWidth = 2.0 / 2.0; // pre-determined -> should adjust with lane width
-
-                    double lineX1 = endX + (perpX * halfWidth); // line X2/Y2 <---"-"-*-"+"---> lineX1/Y1 , (* = endpoint)
-                    double lineY1 = endY + (perpY * halfWidth);
-
-                    double lineX2 = endX - (perpX * halfWidth);
-                    double lineY2 = endY - (perpY * halfWidth);
-
-                    gcDynamic.strokeLine(lineX1, lineY1, lineX2, lineY2);
+                    calculateTrafficLightRender(l, gcDynamic);
                 }
             }
 
+        }
+    }
+
+    private void calculateTrafficLightRender(LaneWrap l, GraphicsContext gc) {
+        double[] rawX = l.getShapeX();
+        double[] rawY = l.getShapeY();
+
+        double endX = rawX[rawX.length - 1]; // 3
+        double endY = rawY[rawX.length - 1]; // 2
+
+        double prevX = rawX[rawX.length - 2]; // 2
+        double prevY = rawY[rawX.length - 2]; // 1
+
+        //(P_prev -> P_end) direction vector (target-start)
+        double dx = endX - prevX; // 1
+        double dy = endY - prevY; // 1
+
+        // normalize length to 1 , because value can be really high
+        double length = Math.sqrt(dx * dx + dy * dy); // 1+1=2
+
+        double ndx = dx / length;
+        double ndy = dy / length; // 0.5
+        // length of vector is now exactly 1 , can change size here?
+
+        double perpX = -ndy; // rotates 90 degree to the left when negating x and switching x and y
+        double perpY = ndx;
+
+        double halfWidth = 2.0 / 2.0; // pre-determined -> should adjust with lane width
+
+        double lineX1 = endX + (perpX * halfWidth); // line X2/Y2 <---"-"-*-"+"---> lineX1/Y1 , (* = endpoint)
+        double lineY1 = endY + (perpY * halfWidth);
+
+        double lineX2 = endX - (perpX * halfWidth);
+        double lineY2 = endY - (perpY * halfWidth);
+
+        gc.strokeLine(lineX1, lineY1, lineX2, lineY2);
+    }
+
+    /**
+     * Converts screen coordinates to sumo world coordinates.
+     * <p>
+     * This method applies the inverse of the current transformation matrix ({@code currentTransform})
+     * to the given screen coordinates. This is useful for mapping mouse clicks or cursor positions
+     * on the canvas back to their logical positions within the simulation map.
+     * </p>
+     *
+     * @param x the x-coordinate on the screen
+     * @param y the y-coordinate on the screen
+     * @return a {@link java.awt.geom.Point2D.Double} representing the corresponding location in the world/simulation space
+     */
+    public Point2D.Double screenToWorld(double x, double y) {
+        try {
+            javafx.geometry.Point2D worldPos = currentTransform.inverseTransform(x, y);
+            return new java.awt.geom.Point2D.Double(worldPos.getX(), worldPos.getY());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -656,38 +680,7 @@ public class SimulationRenderer {
 
                 }
                 // render TL
-                double[] rawX = l.getShapeX();
-                double[] rawY = l.getShapeY();
-
-                double endX = rawX[rawX.length - 1]; // 3
-                double endY = rawY[rawX.length - 1]; // 2
-
-                double prevX = rawX[rawX.length - 2]; // 2
-                double prevY = rawY[rawX.length - 2]; // 1
-
-                //(P_prev -> P_end) direction vector (target-start)
-                double dx = endX - prevX; // 1
-                double dy = endY - prevY; // 1
-
-                // normalize length to 1 , because value can be really high
-                double length = Math.sqrt(dx * dx + dy * dy); // 1+1=2
-
-                double ndx = dx / length;
-                double ndy = dy / length; // 0.5
-                // length of vector is now exactly 1 , can change size here?
-
-                double perpX = -ndy; // rotates 90 degree to the left when negating x and switching x and y
-                double perpY = ndx;
-
-                double halfWidth = 2.0 / 2.0; // pre-determined -> should adjust with lane width
-
-                double lineX1 = endX + (perpX * halfWidth); // line X2/Y2 <---"-"-*-"+"---> lineX1/Y1 , (* = endpoint)
-                double lineY1 = endY + (perpY * halfWidth);
-
-                double lineX2 = endX - (perpX * halfWidth);
-                double lineY2 = endY - (perpY * halfWidth);
-
-                gcTL.strokeLine(lineX1, lineY1, lineX2, lineY2);
+                calculateTrafficLightRender(l, gcTL);
             }
 
         }

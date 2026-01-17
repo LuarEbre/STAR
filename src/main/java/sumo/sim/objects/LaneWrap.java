@@ -14,10 +14,11 @@ import java.util.logging.Logger;
  */
 public class LaneWrap {
 
+    // connection
     private final String laneID;
-    private final SumoTraciConnection connection;
-    private final String edgeID;
-    private int index; // which TL state index -> if -1 -> no incoming lane for tl
+    private final SumoTraciConnection con;
+
+    // rendering
     private final double[] shapeX;
     private final double[] shapeY;
     private final double width;
@@ -34,18 +35,15 @@ public class LaneWrap {
      */
     public LaneWrap(String laneID,SumoTraciConnection connection, String edgeID) {
         this.laneID = laneID;
-        this.connection = connection;
-        this.edgeID = edgeID;
-        this.index = -1; // if no change -> no index for tl
-        //System.out.println("Lane:"+laneID+"edge: "+edgeID);
+        this.con = connection;
         SumoGeometry geometry;
         try {
-            geometry = (SumoGeometry) this.connection.do_job_get(Lane.getShape(laneID));
+            geometry = (SumoGeometry) this.con.do_job_get(Lane.getShape(laneID));
             LinkedList<SumoPosition2D> coords = geometry.coords;
             int numPoints = coords.size();
             shapeX = new double[numPoints];
             shapeY = new double[numPoints];
-            length = (double) this.connection.do_job_get(Lane.getLength(laneID));
+            length = (double) this.con.do_job_get(Lane.getLength(laneID));
 
             for (int i = 0; i < numPoints; i++) {
                 SumoPosition2D point = coords.get(i);
@@ -60,37 +58,18 @@ public class LaneWrap {
         }
     }
 
-    /**
-     * @return this Lane's ID.
-     */
+    // getter
     public String getLaneID() {
         return laneID;
     }
-    /**
-     * @return Array of Y coordinates defining the shape of this lane.
-     */
     public double[] getShapeX(){
         return shapeX;
     }
-    /**
-     * @return Array of Y coordinates defining the shape of this lane.
-     */
     public double[] getShapeY(){
         return shapeY;
     }
-    /**
-     * @return Width of this lane.
-     */
     public double getWidth(){
         return width;
     }
-
     public double getLength(){return length;}
-
-    public LaneWrap getLane(String laneID){
-        if(laneID.equals(this.laneID)){
-            return this;
-        }
-        return null;
-    }
 }

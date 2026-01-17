@@ -3,7 +3,6 @@ package sumo.sim.objects;
 import it.polito.appeal.traci.SumoTraciConnection;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
-import sumo.sim.util.GenericList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +14,8 @@ import java.util.logging.Logger;
  * Manages an {@link ArrayList} of {@link Street} objects.
  */
 
-public class StreetList implements GenericList {
-    // List of streets (like TL_List)
+public class StreetList {
     private final ArrayList<Street> streets = new ArrayList<>();
-    private int count;
-    private final SumoTraciConnection connection;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(StreetList.class.getName());
@@ -33,7 +29,6 @@ public class StreetList implements GenericList {
             XML xml = new XML(WrapperController.getCurrentNet());
             Map<String, String[]> data = xml.readAllEdges();
 
-            this.connection = con;
             for (Map.Entry<String, String[]> entry : data.entrySet()) {
                 String id = entry.getKey();
                 String from = entry.getValue()[0];
@@ -42,7 +37,6 @@ public class StreetList implements GenericList {
                     // if id is not known -> error , needs to be checked in other lists too
                     Street s = new Street(id, from, to, con);
                     streets.add(s);
-                    count++;
                 } catch (RuntimeException e) {
                     logger.log(Level.WARNING, "Failed to initialize Streets", e);
                     // System.out.println("Info: Skipping Ghost Edge '" + id + "' (not inside SUMO sim).");
@@ -55,9 +49,20 @@ public class StreetList implements GenericList {
     }
 
     /**
-     * Returns a single {@link Street} based on ID
-     * @param id Street ID
+     * Allows for batch updating of Streets
      */
+    public void updateStreets(){
+        for (Street s : streets) {
+            s.updateStreet();
+        }
+    }
+
+    // getter
+
+    public List<Street> getStreets() {
+        return streets;
+    }
+
     public Street getStreet(String id) {
         for (Street s : streets) {
             if (s.getId().equals(id)) {
@@ -65,56 +70,6 @@ public class StreetList implements GenericList {
             }
         }
         return null;
-    }
-
-    /**
-     * @return {@link List} of {@link Street}
-     */
-    public List<Street> getStreets() {
-        return streets;
-    }
-
-    public String[] getSelectableStreets() {
-        String[] ret = new String[streets.size()];
-        for (int i = 0; i < streets.size(); i++) {
-            ret[i] = streets.get(i).getId();
-            System.out.println("fsafa");
-        }
-        return ret;
-    }
-
-    /**
-     * Outdated method for debugging purposes, prints every Street's from and to Junction
-     */
-    public void testPrint() {
-        for (Street s : streets) {
-            System.out.println(s.getFromJunction());
-            System.out.println(s.getToJunction());
-        }
-    }
-
-    /**
-     * @return The densest Street inside the List
-     */
-    public Street getDensest(){
-        Street densest = new Street("", connection);
-        densest.setDensity(0);
-
-        for (Street s : streets) {
-            if(s.getDensity()>densest.getDensity()){
-                densest = s;
-            }
-        }
-        return densest;
-    }
-
-    /**
-     * Allows for batch updating of Streets
-     */
-    public void updateStreets(){
-        for (Street s : streets) {
-            s.updateStreet();
-        }
     }
 
     public Street getStreetBasedOnLane(String laneID){
