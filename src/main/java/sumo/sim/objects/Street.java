@@ -84,7 +84,7 @@ public class Street extends SelectableObject implements ExportableData {
         return new String[] {
                 "Street ID",
                 "Avg Density",
-                "Peak Denisty",
+                "Peak Density",
                 "measurement",
                 "from",
                 "to"
