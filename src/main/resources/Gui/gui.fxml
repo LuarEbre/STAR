@@ -620,10 +620,9 @@
             </VBox>
             <AnchorPane fx:id="exportPane" layoutX="305.0" layoutY="141.0" prefHeight="159.0" prefWidth="160.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <CheckBox layoutX="25.0" layoutY="88.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="200.0" styleClass="viewLabel" text="Apply Filter" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="88.0" />
-                  <Button layoutX="75.0" layoutY="49.0" mnemonicParsing="false" styleClass="menuButton" text="Export to CSV" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="50.0" />
-                  <Button layoutX="86.0" layoutY="14.0" mnemonicParsing="false" styleClass="menuButton" text="Export to PDF" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="15.0" />
-                  <Button fx:id="exportChartsButton" layoutX="25.0" layoutY="119.0" mnemonicParsing="false" onAction="#onExportCharts" styleClass="menuButton" text="Export Charts" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="119.0" />
+                  <CheckBox fx:id="applyFilter" layoutX="75.0" layoutY="102.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="200.0" styleClass="viewLabel" text="Apply Filter" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="85.0" />
+                  <Button fx:id="csvExportButton" onAction="#onCsvExport" layoutX="75.0" layoutY="49.0" mnemonicParsing="false" styleClass="menuButton" text="Export to CSV" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="50.0" />
+                  <Button fx:id="pdfExportButton" onAction="#onPdfExport" layoutX="86.0" layoutY="14.0" mnemonicParsing="false" styleClass="menuButton" text="Export to PDF" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="15.0" />
                </children>
             </AnchorPane>
 
@@ -706,9 +705,7 @@
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="128.0" prefWidth="259.0">
                            <children>
-                              <Label layoutX="21.0" layoutY="25.0" prefHeight="18.0" prefWidth="110.0" styleClass="addMenu-labels" text="Set Program " />
-                              <ChoiceBox layoutX="151.0" layoutY="21.0" prefHeight="26.0" prefWidth="100.0" />
-                              <CheckBox id="adaptiveTrafficLightCheck" fx:id="adaptiveTrafficLightCheck" layoutX="21.0" layoutY="62.0" mnemonicParsing="false" onAction="#onAdaptiveTrafficLight" styleClass="whiteLabel" text="Adaptive" />
+                              <CheckBox id="adaptiveTrafficLightCheck" fx:id="adaptiveTrafficLightCheck" layoutX="71.0" layoutY="47.0" mnemonicParsing="false" onAction="#onAdaptiveTrafficLight" prefHeight="22.0" prefWidth="82.0" styleClass="whiteLabel" text="Adaptive" />
                            </children>
                         </AnchorPane>
                      </content>
@@ -753,8 +750,6 @@
                <ChoiceBox fx:id="stressTestMode" layoutX="112.0" layoutY="77.0" prefHeight="25.0" prefWidth="122.0" AnchorPane.rightAnchor="25.0" />
                <ChoiceBox fx:id="stressTestTypeSelect" layoutX="113.0" layoutY="119.0" prefHeight="26.0" prefWidth="121.0" AnchorPane.rightAnchor="25.0" />
                <Label layoutX="25.0" layoutY="123.0" prefHeight="18.0" prefWidth="74.0" styleClass="addMenu-labels" text="Type" AnchorPane.leftAnchor="25.0" />
-            <Spinner layoutX="160.0" layoutY="170.0" prefHeight="26.0" prefWidth="74.0" AnchorPane.rightAnchor="25.0" />
-            <Label layoutX="25.0" layoutY="174.0" prefHeight="18.0" prefWidth="106.0" styleClass="magentaLabel" text="Test Duration" AnchorPane.leftAnchor="25.0" />
             <Label layoutX="78.0" layoutY="23.0" prefHeight="25.0" prefWidth="86.0" styleClass="magentaLabel" text="Stress Test" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="25.0">
                <font>
                   <Font name="System Bold" size="20.0" />
