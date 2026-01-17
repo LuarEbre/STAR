@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import sumo.sim.gui.GuiController;
 import sumo.sim.objects.*;
+import sumo.sim.util.SimulationException;
 import sumo.sim.util.Util;
 
 import java.util.HashMap;
@@ -295,12 +296,15 @@ public class WrapperController {
             logger.log(Level.WARNING, "adaptive Traffic Light got NullPointer as lane denstiy", npe);
             guiController.doSimStep();
 
+        } catch (SimulationException simE) {
+            logger.log(Level.WARNING, "Skipping simulation step due to error", simE);
+            guiController.doSimStep();
+            return; //skip this Step.
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Sim Step", e);
             terminate();
-            throw new RuntimeException(e);
         }
-
     }
 
     public void mapSwitch(String mapName) {
