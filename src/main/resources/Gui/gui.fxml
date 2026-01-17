@@ -620,9 +620,9 @@
             </VBox>
             <AnchorPane fx:id="exportPane" layoutX="305.0" layoutY="141.0" prefHeight="130.0" prefWidth="160.0" styleClass="topMenuBackground" visible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <CheckBox layoutX="75.0" layoutY="102.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="200.0" styleClass="viewLabel" text="Apply Filter" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="85.0" />
-                  <Button layoutX="75.0" layoutY="49.0" mnemonicParsing="false" styleClass="menuButton" text="Export to CSV" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="50.0" />
-                  <Button layoutX="86.0" layoutY="14.0" mnemonicParsing="false" styleClass="menuButton" text="Export to PDF" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="15.0" />
+                  <CheckBox fx:id="applyFilter" layoutX="75.0" layoutY="102.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="200.0" styleClass="viewLabel" text="Apply Filter" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="85.0" />
+                  <Button fx:id="csvExportButton" onAction="#onCsvExport" layoutX="75.0" layoutY="49.0" mnemonicParsing="false" styleClass="menuButton" text="Export to CSV" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="50.0" />
+                  <Button fx:id="pdfExportButton" onAction="#onPdfExport" layoutX="86.0" layoutY="14.0" mnemonicParsing="false" styleClass="menuButton" text="Export to PDF" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="15.0" />
                </children>
             </AnchorPane>
 

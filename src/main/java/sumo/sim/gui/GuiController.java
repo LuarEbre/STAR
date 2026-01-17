@@ -19,6 +19,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,6 +28,8 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 import javafx.scene.paint.Color;
@@ -89,8 +93,8 @@ public class GuiController {
     @FXML
     private ComboBox<String> filterMenuColorSelector;
     @FXML
-    private CheckBox dataView, showDensityAnchor, showButtons, showRouteHighlighting,
-            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, adaptiveTrafficLightCheck, filterColor, filterSpeed, filterRoute, filterType;
+    private CheckBox buttonView, dataView , showDensityAnchor, showButtons, showRouteHighlighting,
+            showTrafficLightIDs, densityHeatmap, toggleTrafficLightPermanently, filterColor, filterSpeed, filterRoute, filterType,adaptiveTrafficLightCheck;
     @FXML
     private TextField amountField, activeVehicles, VehiclesNotOnScreen, DepartedVehicles, VehiclesCurrentlyStopped,
             TotalTimeSpentStopped, MeanSpeed, SpeedSD, vehicleID, vehicleType, route, color, currentSpeed,
@@ -130,6 +134,7 @@ public class GuiController {
     private final double panSensitivity; // sensitivity
 
     // sim
+    private VehicleList filteredVehicles;
     private WrapperController wrapperController;
     private SelectableObject selectedObject;
     private final int defaultDelay;
@@ -545,6 +550,59 @@ public class GuiController {
         sr.setFilterApplied(false);
         tabPane.getSelectionModel().select(2);
         this.updateDataPane();
+    }
+    /**
+     * Event handler for the PDF export button.
+     * <p>
+     * Opens a {@link FileChooser} dialog with a pre-formatted filename
+     * based on the current simulation step. If a location is selected,
+     * it triggers the PDF generation process in the controller,
+     * respecting the current state of the filter checkbox.
+     */
+    @FXML
+    private void onPdfExport () {
+        String headerPdfFile = String.format("Simulation Report %05d.pdf", this.wrapperController.getStepCounter());
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose Directory");
+        chooser.setInitialFileName(headerPdfFile);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Data", "*.pdf"));
+
+        String userHome = System.getProperty("user.home");
+        File desktop = new File(userHome, "Desktop");
+            if (desktop.exists() && desktop.isDirectory()) {
+            chooser.setInitialDirectory(desktop);
+            }
+        File pdfFile = chooser.showSaveDialog(null);
+            if( pdfFile != null) {
+                boolean usingFilter = applyFilter.isSelected();
+                this.wrapperController.generateExport(pdfFile, usingFilter);
+            }
+    }
+    /**
+     * Event handler for the CSV export button.
+     * <p>
+     * Opens a {@link FileChooser} dialog with a pre-formatted filename
+     * based on the current simulation step. If a location is selected,
+     * it triggers the PDF generation process in the controller,
+     * respecting the current state of the filter checkbox.
+     */
+    @FXML
+    private void onCsvExport() {
+        String headerCsvFile = String.format("Simulation Report %05d.csv", this.wrapperController.getStepCounter());
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose Directory");
+        chooser.setInitialFileName(headerCsvFile);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Data", "*.csv"));
+        String userHome = System.getProperty("user.home");
+        File desktop = new File(userHome, "Desktop");
+            if (desktop.exists() && desktop.isDirectory()) {
+                chooser.setInitialDirectory(desktop);
+            }
+        File csvFile = chooser.showSaveDialog(null);
+            if (csvFile != null) {
+                boolean usingFilter = applyFilter.isSelected();
+                this.wrapperController.generateExport(csvFile, usingFilter);
+            }
     }
 
     @FXML
