@@ -1068,6 +1068,9 @@ public class GuiController {
         if(wasRunning) wrapperController.startSim();
     }
 
+    public void updateStaticMap() {
+        this.sr.updateStaticMap();
+    }
 
     @FXML
     private void applyTLsettings() {
@@ -1660,6 +1663,8 @@ public class GuiController {
 
         meanStreetDensitySeries.getData().clear();
         meanDensityChart.getData().add(meanStreetDensitySeries);
+
+        meanDensityChart.getData().clear();
 
         meanDensityChart.setAnimated(false);
 
