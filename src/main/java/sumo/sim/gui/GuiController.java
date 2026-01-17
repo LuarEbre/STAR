@@ -698,6 +698,11 @@ public class GuiController {
         // still needs fix for small gap between buttons and menus at the top
     }
 
+    private void enableButtons() {
+        stepButton.setDisable(false);
+        addButton.setDisable(false);
+    }
+
     /**
      * Closes specific menu and un-selects button
      * @param button
@@ -987,13 +992,20 @@ public class GuiController {
     @FXML
     private void onDensityAnchorToggle() {
         sr.setShowDensityAnchor(showDensityAnchor.isSelected());
+        sr.updateStaticMap();
     }
 
     @FXML
-    private void onRouteHighlightingToggle() { sr.setShowRouteHighlighting(showRouteHighlighting.isSelected()); }
+    private void onRouteHighlightingToggle() {
+        sr.setShowRouteHighlighting(showRouteHighlighting.isSelected());
+        sr.updateStaticMap();
+    }
 
     @FXML
-    private void onTrafficLightIDToggle() { sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected()); }
+    private void onTrafficLightIDToggle() {
+        sr.setShowTrafficLightIDs(showTrafficLightIDs.isSelected());
+        sr.updateStaticMap();
+    }
 
     @FXML
     private void onTogglePermanently() {
@@ -1009,6 +1021,7 @@ public class GuiController {
     @FXML
     private void onDensityHeatmapToggle(){
         sr.setViewDensityOn(densityHeatmap.isSelected());
+        sr.updateStaticMap();
     }
 
     @FXML
@@ -1565,6 +1578,38 @@ public class GuiController {
         // Buttons / Menu resets0
         unselectButtons();
         closeAllMainButtonMenus();
+        enableButtons();
+
+        // reset view menu buttons
+        if (!dataView.isSelected()) {
+            onShowDataView();
+            dataView.setSelected(true);
+        }
+
+        if (!showButtons.isSelected()) {
+            onButtonToggle();
+            showButtons.setSelected(true);
+        }
+
+        if (showDensityAnchor.isSelected()) {
+            sr.setShowDensityAnchor(false);
+            showDensityAnchor.setSelected(false);
+        }
+
+        if(!showRouteHighlighting.isSelected()) {
+            sr.setShowRouteHighlighting(true);
+            showRouteHighlighting.setSelected(true);
+        }
+
+        if(!showTrafficLightIDs.isSelected()) {
+            sr.setShowTrafficLightIDs(true);
+            showTrafficLightIDs.setSelected(true);
+        }
+
+        if(!densityHeatmap.isSelected()) {
+            sr.setShowDensityAnchor(false);
+            densityHeatmap.setSelected(false);
+        }
 
         // Graph Reset
         activeVehiclesSeries.getData().clear();
