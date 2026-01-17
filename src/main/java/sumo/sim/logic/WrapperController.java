@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +72,6 @@ public class WrapperController {
     private String routeFilter, typeFilter;
 
     // data export
-    private Set<VehicleWrap> allTimeVehicles = java.util.concurrent.ConcurrentHashMap.newKeySet();
     //Logger
     private static final Logger logger = Logger.getLogger(WrapperController.class.getName());
 
@@ -268,16 +266,7 @@ public class WrapperController {
             this.stepCounter++;
             sl.updateStreets();
             vl.updateAllVehicles();
-            // safes disappeared vehicles for data export
-            for (VehicleWrap v : vl.getVehicles()) {
-                if (v.getSpeed() > 0) {
-                    if (allTimeVehicles.add(v)) {
-                        //hashing for performance upgrade
-                        v.setEntryStep(this.getStepCounter());
-                        logger.log(Level.INFO, "Car registered at step: " + this.getStepCounter());
-                    }
-                }
-            }
+
             //adaptive Traffic Lights
             if (!adaptiveOn) {
                 tl.updateAllCurrentState();
@@ -333,7 +322,6 @@ public class WrapperController {
                 this.connection = new SumoTraciConnection(sumoBinary, mapConfig.getConfigPath().toString()); // new connection
                 this.simTime = 0;
                 this.stepCounter = 0;
-                allTimeVehicles.clear();
                 // prevents new sim from starting instantly
                 paused = true;
                 Platform.runLater(guiController::doSimStep);
@@ -422,25 +410,18 @@ public class WrapperController {
             tl.updateTLs(); // updates tl
         }
         List<ExportableData> exportList = new ArrayList<>();
+        List<VehicleWrap> storedVehicles;
             if (useFilterCheckbox) {
-                // if filter apllied lists gets filterd
-                List<VehicleWrap> filtered = this.allTimeVehicles.stream()
-                    .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
-                    .filter(v -> this.routeFilter == null || v.getRouteID().equals(this.routeFilter))
-                    .filter(v -> this.colorFilter == null || v.getColor().equals(this.colorFilter))
-                    .filter(v -> {
-                        boolean aboveMin = (this.lowerSpeedFilter == null || v.getSpeed() >= this.lowerSpeedFilter);
-                        boolean belowMax = (this.upperSpeedFilter == null || v.getSpeed() <= this.upperSpeedFilter);
-                        return aboveMin && belowMax;
-                    })
-                    .collect(Collectors.toList());
-                exportList.addAll(filtered);
-
+                storedVehicles = this.filterVehicles();
             } else {
-                // if no filter applied list contains active and archived vehicles
-                exportList.addAll(this.allTimeVehicles);
-
+                storedVehicles = this.vl.getVehicles();
             }
+        List<VehicleWrap> exportedVehicles = storedVehicles.stream()
+                .filter(v -> v.getTotalLifetime() > 0)
+                .collect(Collectors.toList());
+
+        exportList.addAll(exportedVehicles);
+
         if (sl != null) {
             List<Street> activeStreets = sl.getStreets().stream()
                     .filter(s -> s.getAverageDensity() > 0.0) //checking density

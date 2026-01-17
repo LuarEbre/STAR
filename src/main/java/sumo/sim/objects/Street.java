@@ -92,15 +92,13 @@ public class Street extends SelectableObject implements ExportableData {
     }
     @Override
     public String[] getRowData() {
-        long currentStep = this.controller.getStepCounter();
-        long durationCounter = currentStep - this.stepStartOrReset;
-        if (durationCounter < 0) durationCounter = 0;
+        long measurementSteps = getMeasurementDuration();
         // data for columns
         return new String[]{
                 this.id,
                 String.format(java.util.Locale.US, "%.2f", getAverageDensity()),
                 String.format(java.util.Locale.US, "%.2f", this.maxDensity),
-                String.valueOf(durationCounter),
+                String.valueOf(measurementSteps),
                 this.fromJunction != null ? this.fromJunction : "unknown",
                 this.toJunction != null ? this.toJunction : "unknown"
         };
@@ -176,6 +174,14 @@ public class Street extends SelectableObject implements ExportableData {
             //this.noise = 0;
         }
     }
+    //helper method
+    public long getMeasurementDuration() {
+        long duration = this.controller.getStepCounter() - this.stepStartOrReset;
+            if (duration < 0) {
+                duration = 0;
+            }
+        return duration;
+    }
     /**
      * Resets traffic data tracking for this street.
      * <p>
@@ -194,11 +200,10 @@ public class Street extends SelectableObject implements ExportableData {
      * have passed since the last reset.
      */
     public double getAverageDensity() {
-        long currentStep = this.controller.getStepCounter();
-        long durationCounter = currentStep - this.stepStartOrReset;
+        long duration = getMeasurementDuration();
 
-        if (durationCounter <= 0) return 0.0;
-        return this.sumDensity / durationCounter;
+        if (duration <= 0) return 0.0;
+        return this.sumDensity / duration;
     }
 
     public void calculateBounds() {
