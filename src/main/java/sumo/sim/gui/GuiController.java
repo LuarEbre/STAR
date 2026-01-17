@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.gui;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -18,7 +18,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -30,9 +29,11 @@ import javafx.util.Callback;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
+import sumo.sim.Main;
 import sumo.sim.logic.SumoMapManager;
 import sumo.sim.logic.WrapperController;
 import sumo.sim.objects.*;
+import sumo.sim.util.RenderingException;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.

@@ -4,7 +4,7 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
-import sumo.sim.GuiController;
+import sumo.sim.gui.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
