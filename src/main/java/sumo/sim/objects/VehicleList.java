@@ -4,14 +4,10 @@ import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
-import sumo.sim.data.CSV;
-import sumo.sim.util.GenericList;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +19,7 @@ import java.util.logging.Logger;
  * to iterate over vehicles while another thread tries to add or remove vehicles.
  * </p>
  */
-public class VehicleList implements GenericList {
+public class VehicleList {
     private CopyOnWriteArrayList<VehicleWrap> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
@@ -115,6 +111,30 @@ public class VehicleList implements GenericList {
     }
 
     /**
+     * Used in Select Mode to deselect all other Vehicles once a Vehicle has been found
+     */
+    public void deselectAll() {
+        for(VehicleWrap v : vehicles) {
+            v.deselect();
+        }
+    }
+
+    public void setVehicles(CopyOnWriteArrayList<VehicleWrap> vehicles) { this.vehicles = vehicles; }
+
+    // getter
+
+    /**
+     * @return number of vehicles on the road network
+     */
+    public int getExistingVehCount() {
+        int r = 0;
+        for (VehicleWrap v : vehicles) {
+            if (v.exists()) r++;
+        }
+        return r;
+    }
+
+    /**
      * @return HashSet of all active vehicle's IDs
      */
     private HashSet<String> getIDListAsHashSet() {
@@ -126,26 +146,6 @@ public class VehicleList implements GenericList {
             logger.log(Level.SEVERE, "Failed to get IDList", e);
             return null;
         }
-    }
-
-    /**
-     * Used in Select Mode to deselect all other Vehicles once a Vehicle has been found
-     */
-    public void deselectAll() {
-        for(VehicleWrap v : vehicles) {
-            v.deselect();
-        }
-    }
-
-    /**
-     * @return number of vehicles on the road network
-     */
-    public int getExistingVehCount() {
-        int r = 0;
-        for (VehicleWrap v : vehicles) {
-            if (v.exists()) r++;
-        }
-        return r;
     }
 
     /**
@@ -165,23 +165,6 @@ public class VehicleList implements GenericList {
         meanY /= this.activeCount;
         return new Point2D.Double(meanX, meanY);
     }
-
-    /**
-     * @return int - number of overall vehicles in the simulation (included yet-to-exist and past vehicles)
-     */
-    public int getCount() {
-        return count;
-    }
-
-    /**
-     * @return {@link VehicleWrap}'s internal {@link CopyOnWriteArrayList}
-     */
-    public CopyOnWriteArrayList<VehicleWrap> getVehicles() {
-        return vehicles;
-    }
-    public void setVehicles(CopyOnWriteArrayList<VehicleWrap> vehicles) { this.vehicles = vehicles; }
-
-    public int getActiveCount() { return activeCount; }
 
     public int getQueuedCount() {
         int count = 0;
@@ -238,4 +221,13 @@ public class VehicleList implements GenericList {
         }
         return Math.sqrt(sumofsquares/this.activeCount);
     }
+
+    public int getCount() {
+        return count;
+    }
+    public CopyOnWriteArrayList<VehicleWrap> getVehicles() {
+        return vehicles;
+    }
+    public int getActiveCount() { return activeCount; }
+
 }

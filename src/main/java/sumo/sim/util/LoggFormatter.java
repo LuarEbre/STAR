@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.util;
 
 import java.util.Date;
 import java.util.logging.Formatter;

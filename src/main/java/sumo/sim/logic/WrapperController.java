@@ -4,7 +4,7 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
-import sumo.sim.GuiController;
+import sumo.sim.gui.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
@@ -106,7 +106,7 @@ public class WrapperController {
             filteredVehicles = new VehicleList(connection);
             streetList = new StreetList(this.connection);
             trafficLightList = new TrafficLightList(connection, streetList);
-            junctionList = new JunctionList(connection, streetList);
+            junctionList = new JunctionList(connection);
             typeList = new TypeList(connection);
             routeList = new RouteList(currentRou, connection, this);
 

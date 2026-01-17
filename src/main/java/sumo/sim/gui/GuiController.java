@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.gui;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -29,9 +29,11 @@ import javafx.util.Callback;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
+import sumo.sim.Main;
 import sumo.sim.logic.SumoMapManager;
 import sumo.sim.logic.WrapperController;
 import sumo.sim.objects.*;
+import sumo.sim.util.RenderingException;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -942,8 +944,15 @@ public class GuiController {
             button.setDisable(!showButtons.isSelected());
             button.setVisible(showButtons.isSelected());
         }
-        //middlePane.heightProperty().
-        //staticMap.heightProperty().bind(middlePane.heightProperty().multiply(1.25));
+
+        if (showButtons.isSelected()) {
+            AnchorPane.setBottomAnchor(middlePane, 129.0);
+        } else {
+            AnchorPane.setBottomAnchor(middlePane, 0.0);
+        }
+
+        middlePane.getParent().layout(); // forces change
+        sr.updateStaticMap();
     }
 
     @FXML

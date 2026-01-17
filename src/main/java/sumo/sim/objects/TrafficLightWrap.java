@@ -1,14 +1,12 @@
 package sumo.sim.objects;
 
-import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoTLSController;
 import de.tudresden.sumo.objects.SumoTLSPhase;
 import de.tudresden.sumo.objects.SumoTLSProgram;
 import it.polito.appeal.traci.SumoTraciConnection;
-import sumo.sim.SimulationRenderer;
+import sumo.sim.gui.SimulationRenderer;
 import sumo.sim.data.XML;
 import sumo.sim.logic.WrapperController;
 
