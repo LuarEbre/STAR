@@ -50,7 +50,6 @@ public class VehicleWrap extends SelectableObject implements ExportableData {
     private boolean currentlyStopped;
     private boolean exists; // check for despawning in gui?
     private boolean queued;
-    private long entryStep = -1;
 
     // could be used for selecting in the GUI later on
     private boolean selected;
@@ -181,32 +180,6 @@ public class VehicleWrap extends SelectableObject implements ExportableData {
         }
     }
     /**
-     * Compares this vehicle with another object for equality.
-     * <p>
-     * Two vehicles are considered equal if they have the same SUMO ID.
-     * This ensures consistent behavior when using vehicles in collections like Sets.
-     * @param v The object to compare with.
-     * @return {@code true} if the IDs are identical; {@code false} otherwise.
-     */
-    //methods from java used in wrappercontroller for performance upgrade/hashing
-    @Override
-    public boolean equals(Object v) {
-        if (this == v) return true;
-        if (v == null || getClass() != v.getClass()) return false;
-        VehicleWrap that = (VehicleWrap) v;
-        return id.equals(that.id); // compares sumo id
-    }
-    /**
-     * Generates a hash code for this vehicle based on its unique ID.
-     * <p>
-     * This is required to maintain the contract with {@link #equals(Object)},
-     * @return The hash code of the vehicle's ID.
-     */
-    @Override
-    public int hashCode() {
-        return id.hashCode(); // hashing with id
-    }
-    /**
      * Allows for setting individual vehicle's speed.
      * @param speed desired speed in m/s
      */
@@ -217,12 +190,6 @@ public class VehicleWrap extends SelectableObject implements ExportableData {
             logger.log(Level.FINE, "Failed to set speed of specific Vehicle", e);
             throw new RuntimeException(e);
         }
-    }
-    public void setEntryStep(long step) {
-        this.entryStep = step;
-    }
-    public long getEntryStep() {
-        return this.entryStep;
     }
     /**
      * @return The current speed of the vehicle in m/s.
