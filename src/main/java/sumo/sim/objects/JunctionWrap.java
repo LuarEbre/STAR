@@ -20,19 +20,17 @@ import static java.lang.Math.abs;
  * @author simonr
  * @author LeleZss
  */
-public class JunctionWrap extends SimulationObject {
-    //private final String id;
-    private final Point2D.Double position;
+public class JunctionWrap {
+    // connection
+    private final String id;
     private final SumoTraciConnection con;
-    private String type; // dead end , tl
-    private boolean spawnable; // true -> to display start points
 
-    private double[] shapeX;
-    private double[] shapeY;
+    // rendering
+    private final Point2D.Double position;
+    private final double[] shapeX;
+    private final double[] shapeY;
     private double minX, maxX, minY, maxY;
 
-    private double distance = Integer.MAX_VALUE; //Used for Dijkstra Initialization
-    private String predecessor = null; //Used for Dijkstra
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(JunctionWrap.class.getName());
@@ -45,9 +43,8 @@ public class JunctionWrap extends SimulationObject {
      * @param con
      */
     public JunctionWrap(String id, SumoTraciConnection con) {
-        super(id);
+        this.id = id;
         this.con = con;
-        this.spawnable = false;
         try {
             SumoPosition2D pos2D = (SumoPosition2D) this.con.do_job_get(Junction.getPosition(id)); // position
             this.position = new Point2D.Double(pos2D.x, pos2D.y);
@@ -67,52 +64,10 @@ public class JunctionWrap extends SimulationObject {
             logger.log(Level.SEVERE, "Failed to load Junction Geometry", e);
             throw new RuntimeException(e);
         }
-        calculateBounds(shapeX, shapeY);
+
     }
 
     // rendering
-
-    @Override
-    public void draw(GraphicsContext gc, double zoom) {
-        gc.setFill(Color.BLACK);
-        // gc.setStroke(Color.BLACK);
-        // gc.setLineWidth(1.0);
-
-        if (shapeX.length >= 3) {
-            gc.fillPolygon(shapeX, shapeY, shapeX.length);
-        } else if (shapeX.length > 0) {
-            double size = 4.0;
-            gc.fillOval(shapeX[0] - size / 2, shapeY[0] - size / 2, size, size);
-        }
-    }
-
-    /**
-     * Set the Distance of one Junction.
-     * Only used for Route generation
-     * @param distance
-     */
-    public void setDistance(double distance) {
-        this.distance = distance;
-    }
-
-    /**
-     * Set the Predecessor of one Junction
-     * Only used for Route generation
-     * @param predecessor
-     */
-    public void setPredecessor(String predecessor) {
-        this.predecessor = predecessor;
-    }
-
-    /**
-     * Calculate and returns the distance of this junction to Junction u
-     * @param u
-     * @return distance to Junction u
-     */
-    public double distanceTo(JunctionWrap u) {
-        return abs((this.position.x + this.position.y) - (u.position.x + u.position.y));
-    }
-
 
     public void calculateBounds() {
         minX = Double.MAX_VALUE;
@@ -145,18 +100,11 @@ public class JunctionWrap extends SimulationObject {
     public String getID() {
         return id;
     }
-    public double getDistance() {
-        return distance;
-    }
-    public String getPredecessor() {
-        return predecessor;
-    }
     public double[] getShapeX() {
         return shapeX;
     }
     public double[] getShapeY() {
         return shapeY;
     }
-    public boolean isSpawnable() { return spawnable; }
 }
 

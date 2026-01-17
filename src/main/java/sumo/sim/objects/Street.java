@@ -171,6 +171,5 @@ public class Street extends SelectableObject {
     public String getId() { return id; }
     public String getFromJunction() { return fromJunction; }
     public String getToJunction() { return toJunction; }
-    public Street getStreet() { return this; }
     public double getDensity() { return density; }
 }
