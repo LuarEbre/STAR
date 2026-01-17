@@ -46,7 +46,7 @@ public class WrapperController {
     private double simTime;
     private boolean adaptiveOn;
 
-    private String currentMap = "Frankfurt";
+    private String currentMap;
     private volatile boolean isUIUpdatePending = false; // readable on all threads
 
     // config
@@ -78,6 +78,7 @@ public class WrapperController {
 
         // config knows both .rou and .net XMLs
         mapConfig = mapManager.getConfig("Frankfurt1"); // Frankfurt, TestMap
+        currentMap = mapConfig.getName();
         String configFile = mapConfig.getConfigPath().toString();
         currentNet = mapConfig.getNetPath().toString();
         currentRou = mapConfig.getRouPath().toString();
@@ -315,7 +316,7 @@ public class WrapperController {
 
             // load new config
             try {
-                mapConfig = mapManager.getConfig(mapName);
+                mapConfig = mapManager.getConfig(mapName); // gets map
                 currentNet = mapConfig.getNetPath().toString();
                 currentRou = mapConfig.getRouPath().toString();
 
@@ -357,8 +358,8 @@ public class WrapperController {
             executor.execute(() -> {
                 // execution queue
                 vehicleList.addVehicle(amount, type, route, color);
-                logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
             });
+            logger.log(Level.INFO, "Vehicles added: " + amount + " Vehicles added.");
         } else {
             //new Thread(() -> vl.addVehicle(amount, type, route, color)).start();
         }
