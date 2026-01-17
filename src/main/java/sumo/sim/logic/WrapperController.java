@@ -430,13 +430,13 @@ public class WrapperController {
         }
 
         List<ExportableData> exportList = new ArrayList<>();
-        List<VehicleWrap> storedVehicles;
+        List<Vehicle> storedVehicles;
             if (useFilterCheckbox) {
                 storedVehicles = this.filterVehicles();
             } else {
                 storedVehicles = this.vehicleList.getVehicles();
             }
-        List<VehicleWrap> exportedVehicles = storedVehicles.stream()
+        List<Vehicle> exportedVehicles = storedVehicles.stream()
                 .filter(v -> v.getTotalLifetime() > 0)
                 .collect(Collectors.toList());
 
