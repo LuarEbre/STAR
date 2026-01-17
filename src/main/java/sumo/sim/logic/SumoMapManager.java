@@ -73,12 +73,12 @@ public class SumoMapManager {
         } catch (Exception e) {
             // fail to create XML reader
             logger.log(Level.WARNING, "Failed to create XML reader", e);
-            throw new RuntimeException(e);
+            return;
         }
 
         Map<String, String> inputs = xml.getConfigInputs(); // all inputs in sumoconfig
         // filter only get net and route files (problem if multiple?)
-        String netFileString = inputs.get("net-file");
+        String netFileString = inputs.get("net-file"); // file of sumoconfig
         String rouFileString = inputs.get("route-files");
 
         if (netFileString !=null && rouFileString !=null) {
@@ -92,12 +92,12 @@ public class SumoMapManager {
                 mapName = Util.checkDuplicate(maps, mapName); // check and changes Name if there is a duplicate
                 SumoMapConfig newConfig = new SumoMapConfig(mapName, netFile, rouFile, file);
                 maps.put(mapName, newConfig); // put in list
-                System.out.println(maps.get(mapName));
-                System.out.println(netFile);
+                logger.log(Level.INFO, "New Sumo Config: " + maps.get(mapName));
             }
+        } else {
+            logger.log(Level.WARNING, "Failed to load Sumo Config file");
+            return;
         }
-
-        // should have output error messages
     }
 
     public List<String> getNames() {
