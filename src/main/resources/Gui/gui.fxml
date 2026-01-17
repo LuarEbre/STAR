@@ -62,7 +62,7 @@
                <children>
                   <TabPane fx:id="tabPane" layoutY="5.0" prefHeight="442.0" prefWidth="259.0" styleClass="dataTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                     <tabs>
-                      <Tab styleClass="Tab" text="Overall">
+                      <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Overall">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -157,7 +157,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                      <Tab styleClass="Tab" text="Selected">
+                      <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Selected">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -345,7 +345,7 @@
                                                 <Insets bottom="5.0" right="4.0" top="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField fx:id="TLposition" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                          <TextField fx:id="tlPosition" editable="false" layoutX="10.0" layoutY="48.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="rightText" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                              <GridPane.margin>
                                                 <Insets bottom="5.0" left="4.0" top="5.0" />
                                              </GridPane.margin>
@@ -376,7 +376,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                        <Tab styleClass="Tab" text="Filtered">
+                        <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Filtered">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -474,7 +474,7 @@
                                  </children></AnchorPane>
                            </content>
                         </Tab>
-                        <Tab styleClass="Tab" text="Graphs">
+                        <Tab onSelectionChanged="#updateDataPaneEvent" styleClass="Tab" text="Graphs">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>

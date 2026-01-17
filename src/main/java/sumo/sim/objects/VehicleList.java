@@ -28,7 +28,6 @@ public class VehicleList implements GenericList {
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     private int activeCount; // vehicles currently on the road network
-    // needs possible routes maybe? for car creation
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(VehicleList.class.getName());
@@ -42,17 +41,13 @@ public class VehicleList implements GenericList {
         this.con = con;
     }
 
-    public void setSpeedForAll(double speed) {
-
-    }
-
     /**
      * Adds n vehicles to the SUMO simulation {@link SumoTraciConnection} via the native {@link Vehicle#addFull(String, String, String, String, String, String, String, String, String, String, String, String, String, int, int)}
      * @param n number of desired vehicles
      * @param type vehicle type (e.g. STANDARD_VEH)
      * @param route desired route
      */
-    public void addVehicle(int n, String type, String route, Color color) { // more arguments later? maybe overloaded methods with different args.
+    public void addVehicle(int n, String type, String route, Color color) {
         ArrayList<VehicleWrap> newVehicles = new ArrayList<>(n);
         try {
             for (int i=0; i<n; i++) {
@@ -61,28 +56,14 @@ public class VehicleList implements GenericList {
                         "current", "max", "current", "",
                         "", "", 0, 0)
                 );
-                //vehicles.add(new VehicleWrap("v" + count, con, type, route, color)); // adds new vehicle
                 newVehicles.add(new VehicleWrap("v"+count, con, type, route, color));
-                count++; // increment to prevent identical car ids
+                count++; // increment counter to prevent identical car ids
             }
         } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to add vehicle", e);
+            logger.log(Level.WARNING, "Failed to add vehicle", e);
             throw new RuntimeException(e);
         }
-        vehicles.addAll(newVehicles); // thread save list is really slow
-    }
-
-    /**
-     * Returns a single {@link VehicleWrap} based on ID
-     * @param id Vehicle ID
-     */
-    public VehicleWrap getVehicle(String id) {
-        for (VehicleWrap v : vehicles) {
-            if (v.getID().equals(id)) { // searching through VehicleWrap objects
-                return v;
-            }
-        }
-        return null; // if not found
+        vehicles.addAll(newVehicles);
     }
 
     /**
@@ -90,47 +71,74 @@ public class VehicleList implements GenericList {
      * <p>Calls {@link VehicleWrap#updateVehicle()} for every vehicle currently on the road network</p>
      */
     public void updateAllVehicles() {
-        try {
-            SumoStringList list = (SumoStringList) con.do_job_get(Vehicle.getIDList());
-            HashSet<String> activeIDs = new HashSet<>(list); // much faster
-            this.activeCount = activeIDs.size();
-            for (VehicleWrap v : vehicles) {
-                if (activeIDs.contains(v.getID())) {
-                    try {
-                        v.updateVehicle();
-                        v.setExists(true);
-                        // if vehicle is present in activeIDs it is no longer queued, and assuredly is on the road network
-                        v.setQueued(false);
-                    } catch (Exception e) {
-                        logger.log(Level.FINE, "Failed to update all vehicles", e);
-                        v.setExists(false); // if vehicle despawns
-                    }
-                } else {
-                    v.setExists(false);
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to update all vehicles", e);
-            throw new RuntimeException(e);
-        }
-    }
 
-    /**
-     * @return {@link ArrayList} of {@link Point2D.Double} of all vehicles positions
-     */
-    public ArrayList<Point2D.Double> getAllPositions() {
-        ArrayList<Point2D.Double> positions = new ArrayList<>();
+        // get active vehicle's IDs from SUMO
+        HashSet<String> activeIDs = this.getIDListAsHashSet();
+
+        this.activeCount = activeIDs.size();
+
         for (VehicleWrap v : vehicles) {
-            if (v.exists() && v.getPosition() != null) {
-                positions.add(v.getPosition());
+            boolean isActive = activeIDs.contains(v.getID());
+            if (isActive) {
+                try {
+
+                    v.updateVehicle();
+                    // if vehicle is present in activeIDs it is no longer queued and assuredly is on the road network
+                    if (v.isQueued()) v.setQueued(false);
+
+                } catch (Exception e) {
+
+                    String errorMessage = "Failed to update vehicle (" + v.getID() + ")";
+                    logger.log(Level.FINE, errorMessage, e);
+                    isActive = false;
+
+                }
+
             }
+            v.setExists(isActive);
         }
-        return positions;
     }
 
+    /**
+     * Determines active vehicle count in case {@link VehicleList#updateAllVehicles()} fails or isn't called
+     */
+    public void determineActiveVehicleCount() {
+
+        // get active vehicle's IDs from SUMO
+        HashSet<String> activeIDs = this.getIDListAsHashSet();
+
+        this.activeCount = activeIDs.size();
+
+        for (VehicleWrap v : vehicles) {
+            v.setExists(activeIDs.contains(v.getID()));
+        }
+    }
 
     /**
-     * @return int - number of vehicles on the road network
+     * @return HashSet of all active vehicle's IDs
+     */
+    private HashSet<String> getIDListAsHashSet() {
+        try {
+            SumoStringList sumoIDList = (SumoStringList) con.do_job_get(Vehicle.getIDList());
+            HashSet<String> activeIDs = new HashSet<>(sumoIDList);
+            return activeIDs;
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to get IDList", e);
+            return null;
+        }
+    }
+
+    /**
+     * Used in Select Mode to deselect all other Vehicles once a Vehicle has been found
+     */
+    public void deselectAll() {
+        for(VehicleWrap v : vehicles) {
+            v.deselect();
+        }
+    }
+
+    /**
+     * @return number of vehicles on the road network
      */
     public int getExistingVehCount() {
         int r = 0;
@@ -140,15 +148,10 @@ public class VehicleList implements GenericList {
         return r;
     }
 
-    public List<Color> getAllColors() {
-        // experimental for filtering, needs null check, maybe string list return
-        List<Color> colors = new ArrayList<>();
-        for (VehicleWrap v : vehicles) {
-            colors.add(v.getColor());
-        }
-        return colors;
-    }
-
+    /**
+     * Used to render the density anchor, which shows the mean position of all current active vehicles
+     * @return {@link Point2D.Double} mean position of all current active vehicles
+     */
     public Point2D.Double getMeanPosition() {
         double meanX = 0;
         double meanY = 0;
@@ -178,13 +181,6 @@ public class VehicleList implements GenericList {
     }
     public void setVehicles(CopyOnWriteArrayList<VehicleWrap> vehicles) { this.vehicles = vehicles; }
 
-    public VehicleWrap getSelectedVehicle() {
-        for(VehicleWrap v : vehicles) {
-            if(v.isSelected()) return v;
-        }
-        return null;
-    }
-
     public int getActiveCount() { return activeCount; }
 
     public int getQueuedCount() {
@@ -211,18 +207,24 @@ public class VehicleList implements GenericList {
         return seconds;
     }
 
+    /**
+     * Calculates the current mean speed of all active vehicles in meters per second
+     * @return mean speed of all active vehicles in m/s. Returns 0.0 if no vehicles are active.
+     */
     public double getMeanSpeed() {
         double meanspeed = 0;
         if(this.activeCount == 0) return meanspeed;
         for(VehicleWrap v : vehicles) {
-            if(v.exists()) {
-                meanspeed += v.getSpeed();
-            }
+            if(v.exists()) meanspeed += v.getSpeed();
         }
         meanspeed /= this.activeCount;
         return meanspeed;
     }
 
+    /**
+     * Calculates the current standard deviation of speed within the current vehicles
+     * @return
+     */
     public double getSpeedStdDev() {
         // return 0.0 to avoid division by 0 down the line
         if(this.activeCount == 0) return 0.0;
@@ -235,38 +237,5 @@ public class VehicleList implements GenericList {
             }
         }
         return Math.sqrt(sumofsquares/this.activeCount);
-    }
-
-    public double getMeanSpeedFiltered() {
-        double meanspeed = 0;
-        int activeVehicles = getExistingVehCount();
-        if(activeVehicles == 0) return meanspeed;
-        for(VehicleWrap v : vehicles) {
-            if(v.exists()) {
-                meanspeed += v.getSpeed();
-            }
-        }
-        meanspeed /= activeVehicles;
-        return meanspeed;
-    }
-
-    public double getSpeedStdDevFiltered() {
-        int activeVehicles = getExistingVehCount();
-        if(activeVehicles == 0) return 0.0;
-        double meanspeed = this.getMeanSpeed();
-        double sumofsquares = 0;
-        for(VehicleWrap v : vehicles) {
-            if(v.exists()) {
-                double diff = v.getSpeed() - meanspeed;
-                sumofsquares += diff*diff;
-            }
-        }
-        return Math.sqrt(sumofsquares/activeVehicles);
-    }
-
-    public void deselectAll() {
-        for(VehicleWrap v : vehicles) {
-            v.deselect();
-        }
     }
 }
