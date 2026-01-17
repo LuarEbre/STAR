@@ -589,7 +589,7 @@
                         <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button fx:id="fileButtonReset" layoutX="15.0" layoutY="20.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Reset" />
+                  <Button fx:id="fileButtonReset" onAction="#onResetButton" layoutX="15.0" layoutY="20.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" styleClass="fileMenu" text="Reset" />
                </children>
                <padding>
                   <Insets bottom="5.0" left="15.0" right="15.0" top="10.0" />
