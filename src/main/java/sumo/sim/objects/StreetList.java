@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 public class StreetList {
     private final ArrayList<Street> streets = new ArrayList<>();
+    private SumoTraciConnection connection;
 
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(StreetList.class.getName());
@@ -28,7 +29,7 @@ public class StreetList {
         try {
             XML xml = new XML(WrapperController.getCurrentNet());
             Map<String, String[]> data = xml.readAllEdges();
-
+            this.connection = con;
             for (Map.Entry<String, String[]> entry : data.entrySet()) {
                 String id = entry.getKey();
                 String from = entry.getValue()[0];
@@ -72,12 +73,50 @@ public class StreetList {
         return null;
     }
 
-    public Street getStreetBasedOnLane(String laneID){
-        for(Street s : streets){
-            if(s.getStreetBasedOnLane(laneID) != null){
-                return s;
-            };
+    public String[] getSelectableStreets() {
+        String[] ret = new String[streets.size()];
+        for (int i = 0; i < streets.size(); i++) {
+            ret[i] = streets.get(i).getId();
+            System.out.println("fsafa");
         }
-        return null;
+        return ret;
+    }
+
+    /**
+     * Outdated method for debugging purposes, prints every Street's from and to Junction
+     */
+    public void testPrint() {
+        for (Street s : streets) {
+            System.out.println(s.getFromJunction());
+            System.out.println(s.getToJunction());
+        }
+    }
+
+    /**
+     * @return The densest Street inside the List
+     */
+    public Street getDensest(){
+        Street densest = new Street("", connection);
+        densest.setDensity(0);
+
+        for (Street s : streets) {
+            if(s.getDensity()>densest.getDensity()){
+                densest = s;
+            }
+        }
+        return densest;
+    }
+
+    /**
+     * Calculates the Mean Density of all Streets
+     * @return mean density
+     */
+    public double meanDensity(){
+        double mean = 0;
+        for (Street s : streets) {
+            mean += s.getDensity();
+        }
+        mean /= streets.size();
+        return mean;
     }
 }

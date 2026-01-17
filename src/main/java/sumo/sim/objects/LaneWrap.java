@@ -24,6 +24,8 @@ public class LaneWrap {
     private final double width;
     private final double length;
 
+    private double density;
+
     //Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(LaneWrap.class.getName());
 
@@ -72,4 +74,12 @@ public class LaneWrap {
         return width;
     }
     public double getLength(){return length;}
+
+    public LaneWrap getLane(String laneID){
+        if(laneID.equals(this.laneID)){
+            return this;
+        }
+        return null;
+    }
+
 }

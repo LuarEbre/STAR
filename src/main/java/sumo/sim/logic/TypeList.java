@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class TypeList {
     // has a list of all current (and newly created) Vehicle types
 
-    private final Map<String, Type> types = new HashMap<>(); // string key unique: type id
+    private final HashMap<String, Type> types = new HashMap<>(); // string key unique: type id
     private final SumoTraciConnection connection;
 
     //Logger
@@ -55,6 +55,10 @@ public class TypeList {
             i++;
         }
         return ret;
+    }
+
+    public HashMap<String, Type> getTypesAsMap() {
+        return types;
     }
 
     public Type getSpecificType(String id) {

@@ -8,6 +8,7 @@ import sumo.sim.gui.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.Util;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -261,11 +262,12 @@ public class WrapperController {
             }
             vehicleList.updateAllVehicles();
 
+            trafficLightList.updateAllCurrentState();
+
             //adaptive Traffic Lights
-            if (!adaptiveOn) {
-                trafficLightList.updateAllCurrentState();
-            } else {
-                trafficLightList.adaptiveUpdate();
+            if (adaptiveOn && (simTime % 10 == 0)) {
+                for (TrafficLightWrap t : trafficLightList.getTrafficlights())
+                    t.adaptiveStateUpdate();
             }
 
             streetList.updateStreets();
@@ -289,6 +291,10 @@ public class WrapperController {
                     }
                 });
             }
+        }catch (NullPointerException npe) {
+            logger.log(Level.WARNING, "adaptive Traffic Light got NullPointer as lane denstiy", npe);
+            guiController.doSimStep();
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Sim Step", e);
             terminate();
@@ -476,6 +482,8 @@ public class WrapperController {
     public String getCurrentMap() { return currentMap; }
     public void setAdaptiveOn(boolean adaptiveOn) { this.adaptiveOn = adaptiveOn; }
     public SumoTraciConnection getConnection() { return connection; }
+    public boolean isFilterApplied() { return filterApplied; }
+    public TypeList getTypeListAsTypeList() {return typeList;}
 
     // safe getter
     public String[] getTypeList() { return (typeList != null) ? typeList.getAllTypes() : new String[0]; } // returns empty array if null
