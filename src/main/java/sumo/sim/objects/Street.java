@@ -3,6 +3,9 @@ package sumo.sim.objects;
 import de.tudresden.sumo.cmd.Edge;
 import de.tudresden.sumo.util.SumoCommand;
 import it.polito.appeal.traci.SumoTraciConnection;
+import sumo.sim.data.XML;
+import sumo.sim.logic.WrapperController;
+import sumo.sim.util.ExportableData;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -12,7 +15,7 @@ import java.util.logging.Logger;
  * A wrapper of {@link Edge} allowing for instancing of individual Edges (Streets)
  * <p>Includes stats tracked by {@link SumoTraciConnection} but also client-side calculated stats like {@link Street#density}
  */
-public class Street extends SelectableObject {
+public class Street extends SelectableObject implements ExportableData {
     // connection
     private final SumoTraciConnection con;
     private final String id;
@@ -25,6 +28,14 @@ public class Street extends SelectableObject {
     // attributes
     private double density;
     private double minX,minY,maxX,maxY; // for rendering optimization
+    private XML xml;
+    // Data Export
+    private double sumDensity = 0.0;
+    private long stepStartOrReset = 0;
+    private double maxDensity = 0;
+    private WrapperController controller;
+
+
     private double meanPositionX;
     private double meanPositionY;
 
@@ -47,7 +58,8 @@ public class Street extends SelectableObject {
      * @param to Junction ID
      * @param con an instance of {@link SumoTraciConnection}
      */
-    public Street(String id, String from, String to, SumoTraciConnection con) {
+    public Street(String id, String from, String to, SumoTraciConnection con, WrapperController controller) {
+        this.controller = controller;
         this.id = id;
         this.con = con;
         this.fromJunction = from;
@@ -59,6 +71,37 @@ public class Street extends SelectableObject {
     /**
      * Gets the number of lanes within the Edge and fills the {@link ArrayList} of {@link Lane} with new objects
      */
+
+    @Override
+    public String getExportCategory() {
+        //header
+        return "Traffic Density";
+    }
+    @Override
+    public String[] getColumnHeaders() {
+        // header for rows
+        return new String[] {
+                "Street ID",
+                "Avg Density",
+                "Peak Density",
+                "measurement",
+                "from",
+                "to"
+        };
+    }
+    @Override
+    public String[] getRowData() {
+        long measurementSteps = getMeasurementDuration();
+        // data for columns
+        return new String[]{
+                this.id,
+                String.format(java.util.Locale.US, "%.2f", getAverageDensity()),
+                String.format(java.util.Locale.US, "%.2f", this.maxDensity),
+                String.valueOf(measurementSteps),
+                this.fromJunction != null ? this.fromJunction : "unknown",
+                this.toJunction != null ? this.toJunction : "unknown"
+        };
+    }
     public void initializeStreet() {
         try {
             int laneCount = (Integer) this.con.do_job_get(Edge.getLaneNumber(id));
@@ -120,11 +163,46 @@ public class Street extends SelectableObject {
         try {
             calcDensity();
             //this.noise = (double) this.con.do_job_get(Edge.getNoiseEmission(id));
+            this.sumDensity = this.sumDensity + this.density;
+                if(this.density > this.maxDensity) {
+                    this.maxDensity = this.density;
+                }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to update Street Data", e);
             this.density = 0;
             //this.noise = 0;
         }
+    }
+    //helper method
+    public long getMeasurementDuration() {
+        long duration = this.controller.getStepCounter() - this.stepStartOrReset;
+            if (duration < 0) {
+                duration = 0;
+            }
+        return duration;
+    }
+    /**
+     * Resets traffic data tracking for this street.
+     * <p>
+     * Clears cumulative density values and synchronizes the start step
+     * with the current simulation step to begin a new measurement interval.
+     */
+    public void resetDataTracking() {
+        //reset steps/measurement after traffic light changes
+        this.sumDensity = 0.0;
+        this.maxDensity = 0.0;
+        this.stepStartOrReset = this.controller.getStepCounter();
+    }
+    /**
+     * Calculates the average traffic density since the last reset.
+     * * @return The average density as a double, or 0.0 if no steps
+     * have passed since the last reset.
+     */
+    public double getAverageDensity() {
+        long duration = getMeasurementDuration();
+
+        if (duration <= 0) return 0.0;
+        return this.sumDensity / duration;
     }
 
     public void calculateBounds() {
@@ -150,7 +228,7 @@ public class Street extends SelectableObject {
     }
 
     // setter
-    public void setDensity(double den) { this.density = den; }
+
     // getter
 
     public Lane getLaneBasedOnID(String laneID){
@@ -162,10 +240,13 @@ public class Street extends SelectableObject {
         return null;
     }
 
+    public void setDensity(double den) { this.density = den; }
     public double getMinX() { return minX; }
     public double getMaxX() { return maxX; }
     public double getMinY() { return minY; }
     public double getMaxY() { return maxY; }
+    public double getSumDensity() {return sumDensity; }
+    public double getMaxDensity() {return maxDensity;}
     public double getMeanPositionX() { return meanPositionX; }
     public double getMeanPositionY() { return meanPositionY; }
     public ArrayList<Lane> getLanes() { return lanes; }
@@ -174,3 +255,4 @@ public class Street extends SelectableObject {
     public String getToJunction() { return toJunction; }
     public double getDensity() { return density; }
 }
+

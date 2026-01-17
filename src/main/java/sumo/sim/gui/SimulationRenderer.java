@@ -139,7 +139,7 @@ public class SimulationRenderer {
      * Main rendering method. Clears the canvas, applies transformations with {@link #transform()}, and triggers
      * the drawing of map layers {@link #renderTrafficLight()} {@link ()} {@link #renderVehicle()}  }
      * <p>
-     * This method is called by {@link GuiController#renderUpdate()} method ~60 times per second
+     * This method is called by {@link GuiController} method ~60 times per second
      * </p>
      */
     public void initRender() throws RenderingException {
