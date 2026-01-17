@@ -32,21 +32,12 @@ public class TrafficLightWrap extends SelectableObject {
     private final SumoTraciConnection con;
     private final String id;
     private final Set<Street> controlledStreets;
+    private List<TrafficLightPhase> phases; // G = green priority , g , y, r , u = red_yellow , o = off;
 
-    //Logger
+    // Logger
     private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLightWrap.class.getName());
 
-    private String type; // types: static, actuated, delay based, offline, special, rail signal
-    // program :
-    // offset : adjusts start time of phase cycle
-    // program id :
-    // <tlLogic id="J11" type="static" programID="0" offset="0"> ---> can have multiple of this with same TL id diff p id
-    //        <phase duration="42" state="GGrrrGGg"/>
-    //
-    // </tlLogic>
-
-    private List<TrafficLightPhase> phases; // G = green priority , g , y, r , u = red_yellow , o = off;
-    //String[] phaseNames = {"NS_Green", "EW_Green", "All_Red"}; <- North x south, east x west
+    // rendering
     private int duration; // time
     private final Point2D.Double position; // position as a junction
     private String [] stateArray;
@@ -107,13 +98,14 @@ public class TrafficLightWrap extends SelectableObject {
 
             if (programsMap != null && !programsMap.isEmpty()) {
                 // check if existent
-                SumoTLSProgram prog = programsMap.values().iterator().next();
+                SumoTLSProgram prog = programsMap.values().iterator().next(); // gets next available program
                 if (this.phases == null) {
                     this.phases = new ArrayList<>(); // if there is already a list
                 }
                 this.phases.clear(); // empty list
 
                 int index = 0;
+                // iterate sumo tl phase
                 for (SumoTLSPhase p : prog.phases) {
                     String rawString = p.toString(); // phase : "Grryrr#3#3" etc.
                     String cleanState = rawString.split("#")[0]; // cutting of everything after #
@@ -124,49 +116,8 @@ public class TrafficLightWrap extends SelectableObject {
             }
 
         } catch (Exception e) {
-            // needs catching
-        }
-    }
-
-    /**
-     * Should automatically adjust Traffic Light configurations based on Vehicle density and waiting time.
-     */
-    public void enableAdaptiveTrafficLightLogic() {
-        // based on numbers of vehicles and waiting time -> adjust tl timings
-    }
-
-    // setter
-
-    /**
-     * Constructs an array in this format:
-     *
-     * <p>
-     *     Array: [index0, lane controlled by index0...]
-     *     State e.g. of "Grr" state index 0 is "G" and its controlled lane {@link LaneWrap} is stored after wards by its id.
-     * </p>
-     *
-     *<p>
-     *     This is to ensure {@link SimulationRenderer} renders Traffic lights correctly.
-     *</p>
-     */
-    public void setCurrentState() {
-        int currentPhaseIndex = getPhaseNumber(); // which state the tl is in -> applies to all controlled tl
-        // -> state differs from index to index (index is controlled lanes that have tl)
-        String currentState;
-        // links.get(0).from
-        try {
-            currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
-        } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
+            logger.log(Level.SEVERE, "Failed to load TL phases", e);
             throw new RuntimeException(e);
-        }
-        stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
-        for (int i = 0; i < stateArray.length; i+=2 ) {
-            int sumoIndex = i/2; // to not skip values
-            stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
-            stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
-            //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
-            // [G, lane_G ,y , lane_y , r, lane_r ] format
         }
     }
 
@@ -206,6 +157,39 @@ public class TrafficLightWrap extends SelectableObject {
         }
     }
 
+    // setter
+
+    /**
+     * Constructs an array in this format:
+     *
+     * <p>
+     *     Array: [index0, lane controlled by index0...]
+     *     State e.g. of "Grr" state index 0 is "G" and its controlled lane {@link LaneWrap} is stored after wards by its id.
+     * </p>
+     *
+     *<p>
+     *     This is to ensure {@link SimulationRenderer} renders Traffic lights correctly.
+     *</p>
+     */
+    public void setCurrentState() {
+        // -> state differs from index to index (index is controlled lanes that have tl)
+        String currentState;
+        // links.get(0).from
+        try {
+            currentState = (String) con.do_job_get(Trafficlight.getRedYellowGreenState(this.id));
+        } catch (Exception e) {
+            logger.log(Level.FINE, "Failed to set Current State of Traffic Light", e);
+            throw new RuntimeException(e);
+        }
+        stateArray = new String[currentState.length()*2]; // saves state in arr -> to get indices
+        for (int i = 0; i < stateArray.length; i+=2 ) {
+            int sumoIndex = i/2; // to not skip values
+            stateArray[i] = currentState.charAt(sumoIndex) + ""; // every current state e.g = Grrryy (length definded)
+            stateArray[i+1] = controlledLinks.get(sumoIndex).from; // index i -> i+1 = lane
+            //System.out.println("Index " + (i) + stateArray[i] + " controls"  + stateArray[i+1]); // -> phase duration defined
+            // [G, lane_G ,y , lane_y , r, lane_r ] format
+        }
+    }
 
     /**
      * Sets the active phase of the traffic light to the specified index.
@@ -441,16 +425,4 @@ public class TrafficLightWrap extends SelectableObject {
         }
     }
 
-    /**
-     * Updates TL phase
-     */
-    public void updateTL() {
-        try {
-            //this.phase = (int) con.do_job_get(Trafficlight.getPhase(this.id));
-        } catch (Exception e) {
-            logger.log(Level.FINE, "Failed to update phase of Traffic Light", e);
-            throw new RuntimeException(e);
-        }
-
-    }
 }
