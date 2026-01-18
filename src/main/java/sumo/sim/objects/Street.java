@@ -21,7 +21,7 @@ public class Street extends SelectableObject implements ExportableData {
     private final String id;
 
     // List of <Lane> objects
-    private final ArrayList<LaneWrap> lanes = new ArrayList<>();
+    private final ArrayList<Lane> lanes = new ArrayList<>();
     private String fromJunction;
     private String toJunction;
 
@@ -69,7 +69,7 @@ public class Street extends SelectableObject implements ExportableData {
     }
 
     /**
-     * Gets the number of lanes within the Edge and fills the {@link ArrayList} of {@link LaneWrap} with new objects
+     * Gets the number of lanes within the Edge and fills the {@link ArrayList} of {@link Lane} with new objects
      */
 
     @Override
@@ -106,7 +106,7 @@ public class Street extends SelectableObject implements ExportableData {
         try {
             int laneCount = (Integer) this.con.do_job_get(Edge.getLaneNumber(id));
             for (int i = 0; i < laneCount; i++) {
-                lanes.add(new LaneWrap(this.id + "_" + i, this.con, this.id));
+                lanes.add(new Lane(this.id + "_" + i, this.con, this.id));
             }
             updateStreet();
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class Street extends SelectableObject implements ExportableData {
      */
     private void calcMeanPosition() {
         if (lanes.isEmpty()) return;
-        LaneWrap middleLane = lanes.get(lanes.size() / 2); // middle index
+        Lane middleLane = lanes.get(lanes.size() / 2); // middle index
 
         double[] rawX = middleLane.getShapeX();
         double[] rawY = middleLane.getShapeY();
@@ -211,7 +211,7 @@ public class Street extends SelectableObject implements ExportableData {
         minY = Double.MAX_VALUE;
         maxY = -Double.MAX_VALUE;
 
-        for (LaneWrap lane : lanes) {
+        for (Lane lane : lanes) {
             double[] xCoords = lane.getShapeX();
             double[] yCoords = lane.getShapeY();
 
@@ -231,8 +231,8 @@ public class Street extends SelectableObject implements ExportableData {
 
     // getter
 
-    public LaneWrap getLaneBasedOnID(String laneID){
-        for (LaneWrap lane : lanes) {
+    public Lane getLaneBasedOnID(String laneID){
+        for (Lane lane : lanes) {
             if (lane.getLaneID().equals(laneID)) {
                 return lane;
             }
@@ -249,7 +249,7 @@ public class Street extends SelectableObject implements ExportableData {
     public double getMaxDensity() {return maxDensity;}
     public double getMeanPositionX() { return meanPositionX; }
     public double getMeanPositionY() { return meanPositionY; }
-    public ArrayList<LaneWrap> getLanes() { return lanes; }
+    public ArrayList<Lane> getLanes() { return lanes; }
     public String getId() { return id; }
     public String getFromJunction() { return fromJunction; }
     public String getToJunction() { return toJunction; }

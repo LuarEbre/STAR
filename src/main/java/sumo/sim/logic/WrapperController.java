@@ -280,7 +280,7 @@ public class WrapperController {
 
             //adaptive Traffic Lights
             if (adaptiveOn && (simTime % 10 == 0)) {
-                for (TrafficLightWrap t : trafficLightList.getTrafficlights())
+                for (TrafficLight t : trafficLightList.getTrafficlights())
                     t.adaptiveStateUpdate();
             }
 
@@ -479,9 +479,9 @@ public class WrapperController {
      * <p>If a filter parameter is null, it is ignored.</p>
      * @return {@link CopyOnWriteArrayList} thread-safe list of vehicles matching the applied filters.
      */
-    private CopyOnWriteArrayList<VehicleWrap> filterVehicles() {
+    private CopyOnWriteArrayList<Vehicle> filterVehicles() {
         // collect streamed data to temporary List first
-        List<VehicleWrap> temp = this.vehicleList.getVehicles().stream()
+        List<Vehicle> temp = this.vehicleList.getVehicles().stream()
                 .filter(v -> this.typeFilter == null || v.getType().equals(this.typeFilter))
                 .filter(v -> this.routeFilter == null || v.getRouteID().equals(this.routeFilter))
                 .filter(v -> this.colorFilter == null || v.getColor().equals(this.colorFilter))
@@ -525,7 +525,7 @@ public class WrapperController {
      * @return e.g.: [g,r,y,80] -> state , last element is duration
      */
     public String[] getTlStateDuration(String tlID) {
-        TrafficLightWrap trafLight = trafficLightList.getTL(tlID);
+        TrafficLight trafLight = trafficLightList.getTL(tlID);
         String [] ret = new String[trafLight.getCurrentState().length/2 + 2]; // 2 extra values: dur, remain
         int j = 0;
         for (int i=0; i<ret.length-2; i++) {

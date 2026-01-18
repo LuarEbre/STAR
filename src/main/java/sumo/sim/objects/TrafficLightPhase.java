@@ -3,13 +3,12 @@ package sumo.sim.objects;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A helper class storing information about a {@link de.tudresden.sumo.objects.SumoTLSPhase}.
  *
  * <p>
- *     Created in {@link TrafficLightWrap} this class stores index, state and duration of one TrafficLight phase.
+ *     Created in {@link TrafficLight} this class stores index, state and duration of one TrafficLight phase.
  *     All phases of one TrafficLight are collected in a List.
  * </p>
  */
