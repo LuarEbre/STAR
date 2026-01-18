@@ -1,5 +1,8 @@
 package sumo.sim.objects;
 
+/**
+ * Abstract class that allows us to simply select an instance of SelectableObject instead of having to separate Vehicle and Traffic Light logic.
+ */
 public abstract class SelectableObject {
     protected boolean isSelected;
     protected int selectRadius;

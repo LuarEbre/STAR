@@ -4,8 +4,6 @@ import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
 import sumo.sim.logic.Type;
-
-
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
