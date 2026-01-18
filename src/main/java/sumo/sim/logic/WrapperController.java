@@ -4,11 +4,13 @@ import de.tudresden.sumo.cmd.Simulation;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import sumo.sim.Main;
 import sumo.sim.gui.GuiController;
 import sumo.sim.objects.*;
 import sumo.sim.util.SimulationException;
 import sumo.sim.util.Util;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +58,7 @@ public class WrapperController {
     public static String currentNet = null;
     public static String currentRou = null;
     public String sumoBinary;
+    public String mapConfigFile;
 
     // filtering
     private boolean filterApplied;
@@ -76,17 +79,27 @@ public class WrapperController {
         sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
                 ? "src/main/resources/Binaries/sumo.exe"
-                : "src/main/resources/Binaries/sumo";
+                : "/usr/bin/sumo";
+
 
         // config knows both .rou and .net XMLs
-        mapConfig = mapManager.getConfig("Frankfurt1"); // Frankfurt, TestMap
-        currentMap = mapConfig.getName();
-        String configFile = mapConfig.getConfigPath().toString();
-        currentNet = mapConfig.getNetPath().toString();
-        currentRou = mapConfig.getRouPath().toString();
+        try {
+            mapConfig = mapManager.getConfig("Frankfurt1");
+
+            if (this.mapConfig == null) {
+                throw new RuntimeException("Couldn't find Frankfurt1 config file");
+            }
+
+            mapConfigFile = mapConfig.getConfigPath().getAbsolutePath();
+            currentNet = mapConfig.getNetPath().getAbsolutePath();
+            currentRou = mapConfig.getRouPath().getAbsolutePath();
+
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error loading SumoConfig", e);
+        }
 
         // create new connection with the binary and map config file
-        this.connection = new SumoTraciConnection(sumoBinary, configFile);
+        this.connection = new SumoTraciConnection(sumoBinary, mapConfigFile);
         this.guiController = guiController;
         this.mapManager = mapManager;
         this.terminated = false;

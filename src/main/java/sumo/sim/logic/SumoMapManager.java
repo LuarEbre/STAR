@@ -32,20 +32,28 @@ public class SumoMapManager {
     /**
      * Loads all Default Maps with hardcoded paths
      */
-    private void loadDefaultMaps(){
-        maps.put("Frankfurt1", new SumoMapConfig(
-                "Frankfurt1",
-                new File("src/main/resources/SumoConfig/Frankfurt1/frankfurt1_fixed.net.xml"),
-                new File("src/main/resources/SumoConfig/Frankfurt1/frankfurt1_fixed.rou.xml"),
-                new File("src/main/resources/SumoConfig/Frankfurt1/frankfurt1_fixed.sumocfg")
-        ));
+    private void loadDefaultMaps() {
+        try {
+            String jarPath = new File(SumoMapManager.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
 
-        maps.put("Frankfurt2", new SumoMapConfig(
-                "Frankfurt2",
-                new File ("src/main/resources/SumoConfig/Frankfurt2/frankfurt2.net.xml"),
-                new File ("src/main/resources/SumoConfig/Frankfurt2/frankfurt2.rou.xml"),
-                new File ("src/main/resources/SumoConfig/Frankfurt2/frankfurt2.sumocfg")
-        ));
+            File frankfurtDir = new File(jarPath, "SumoConfig/Frankfurt1");
+            maps.put("Frankfurt1", new SumoMapConfig(
+                    "Frankfurt1",
+                    new File(frankfurtDir, "frankfurt1_fixed.net.xml"),
+                    new File(frankfurtDir, "frankfurt1_fixed.rou.xml"),
+                    new File(frankfurtDir, "frankfurt1_fixed.sumocfg")
+            ));
+
+            File frankfurt2Dir = new File(jarPath, "SumoConfig/Frankfurt2");
+            maps.put("Frankfurt2", new SumoMapConfig(
+                    "Frankfurt2",
+                    new File(frankfurt2Dir, "frankfurt2.net.xml"),
+                    new File(frankfurt2Dir, "frankfurt2.rou.xml"),
+                    new File(frankfurt2Dir, "frankfurt2.sumocfg")
+            ));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Konnte Basis-Pfad für Maps nicht bestimmen", e);
+        }
     }
 
     public void chooseFile(Stage stage) {
