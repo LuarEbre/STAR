@@ -48,6 +48,8 @@ import sumo.sim.logic.TypeList;
 import sumo.sim.logic.WrapperController;
 import sumo.sim.objects.*;
 import sumo.sim.util.RenderingException;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -1828,8 +1830,6 @@ public class GuiController {
 
         meanStreetDensitySeries.getData().clear();
         meanDensityChart.getData().add(meanStreetDensitySeries);
-
-        meanDensityChart.getData().clear();
 
         meanDensityChart.setAnimated(false);
 
