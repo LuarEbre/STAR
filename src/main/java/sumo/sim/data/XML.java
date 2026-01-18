@@ -5,6 +5,7 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import sumo.sim.util.MapLoadingException;
 
 import javax.xml.stream.*;
 import java.io.File;
@@ -36,75 +37,17 @@ public class XML {
      * @param path
      * @throws Exception
      */
-    public XML(String path) throws Exception{
+    public XML(String path) throws MapLoadingException {
         this.path = path;
-        file = new FileInputStream(path);
-        factory = XMLInputFactory.newInstance();
-
-    }
-
-    /**
-     * Sets the Duration of a specific Traffic Light of a Junction
-     * This then overwrites the <phase><duration></duration></phase> segment of the .net.xml
-     * @param id
-     * @param phaseIndex
-     * @param newDuration
-     * @param programID
-     */
-    public void setPhaseDuration(String id, String programID, int phaseIndex, double newDuration){
         try {
-            SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(path);
-            Element root = doc.getRootElement();
-
-            for(Element tlLogic : root.getChildren("tlLlogic")) {
-                if(!(tlLogic.getAttributeValue("id").equals(id)&&tlLogic.getAttributeValue("programID").equals(programID))) {
-                    continue;
-                }
-
-                List<Element> phases = tlLogic.getChildren("phase");
-                phases.get(phaseIndex).setAttribute("duration", String.valueOf(newDuration));
-            }
-
-            new XMLOutputter(Format.getPrettyFormat()).output(doc, new FileOutputStream(path));
-
-        }catch (Exception e){
-            logger.log(Level.FINE, "Failed to set phase duration in .net.xml", e);
-            throw new RuntimeException(e.getMessage());
+            file = new FileInputStream(path);
+            factory = XMLInputFactory.newInstance();
+        } catch (Exception e) {
+            throw new MapLoadingException("Error parsing XML: " + path, e);
         }
     }
 
-    /**
-     * Sets the Phase Duration of one Specific TrafficLight by its Phase state
-     * @param id ID of Junction that has the TrafficLights
-     * @param programID ProgrammID, needed for identification in xml
-     * @param state State of the Phase you want to change
-     * @param newDuration New Duration wanted for the phase
-     */
-    public void setPhaseDurationByState(String id, String programID, String state, double newDuration){
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(path);
-            Element root = doc.getRootElement();
-
-            for(Element tlLogic : root.getChildren("tlLlogic")) {
-                if(!(tlLogic.getAttributeValue("id").equals(id)&&tlLogic.getAttributeValue("programID").equals(programID))) {
-                    continue;
-                }
-                List<Element> phases = tlLogic.getChildren("phase");
-                for(Element phase : phases) {
-                    if(phase.getAttributeValue("state").equals(state)){
-                        phase.setAttribute("duration", String.valueOf(newDuration));
-                    }
-                }
-            }
-        }catch (Exception e){
-            logger.log(Level.FINE, "Failed to set phase duration in .net.xml", e);
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    public Map<String, String> getConfigInputs() {
+    public Map<String, String> getConfigInputs() throws MapLoadingException {
         Map<String, String> inputs = new HashMap<>();
 
         try {
@@ -130,8 +73,7 @@ public class XML {
             }
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to load config inputs", e);
-            throw new RuntimeException("Error reading input file");
+            throw new MapLoadingException("Error parsing XML inputs" + path, e);
         }
 
         return inputs;
