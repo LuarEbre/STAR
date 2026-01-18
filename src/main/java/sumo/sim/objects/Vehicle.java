@@ -75,12 +75,14 @@ public class Vehicle extends SelectableObject implements ExportableData {
         // assume any newly created Vehicle is queued, only setting to false if Vehicle is confirmed to exist
         this.queued = true;
     }
+
     /**
      * Returns the export category for vehicle data.
      * @return A string header for the vehicle data section.
      */
     @Override
     public String getExportCategory() {return "Vehicles: "; }
+
     /**
      * Defines the table headers for the vehicle export.
      * @return An array of strings including the new Route column.
@@ -96,6 +98,7 @@ public class Vehicle extends SelectableObject implements ExportableData {
                 "Max Speed"
         };
     }
+
     /**
      * Formats the vehicle's performance metrics and route information for export.
      * <p>
@@ -174,6 +177,7 @@ public class Vehicle extends SelectableObject implements ExportableData {
             this.exists = false;
         }
     }
+
     /**
      * Allows for setting individual vehicle's speed.
      * @param speed desired speed in m/s
@@ -186,6 +190,7 @@ public class Vehicle extends SelectableObject implements ExportableData {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * @return The current speed of the vehicle in m/s.
      */
