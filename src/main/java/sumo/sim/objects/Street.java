@@ -69,14 +69,20 @@ public class Street extends SelectableObject implements ExportableData {
     }
 
     /**
-     * Gets the number of lanes within the Edge and fills the {@link ArrayList} of {@link Lane} with new objects
+     * This string serves as the header for the street statistics section
+     * in the generated simulation report.
+     * * @return The export category string "Traffic Density".
      */
-
     @Override
     public String getExportCategory() {
         //header
         return "Traffic Density";
     }
+    /**
+     * Defines the table column headers.
+     * * @return A String array containing the column titles: Street ID, Avg Density,
+     * Peak Density, measurement, from, and to.
+     */
     @Override
     public String[] getColumnHeaders() {
         // header for rows
@@ -89,6 +95,14 @@ public class Street extends SelectableObject implements ExportableData {
                 "to"
         };
     }
+    /**
+     * Aggregates and formats the specific data of this street for a single row
+     * in the export report.
+     * Calculates the measurement steps since the last reset and formats floating-point
+     * values to two decimal places. Ensures that junction IDs return "unknown"
+     * if the information is missing.
+     * * @return A String array representing a row of street data for the export table.
+     */
     @Override
     public String[] getRowData() {
         long measurementSteps = getMeasurementDuration();

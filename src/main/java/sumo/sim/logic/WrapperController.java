@@ -83,7 +83,7 @@ public class WrapperController {
         sumoBinary = Util.getOSType().equals("Windows")
                 // using sumo-gui for visualisation now, will later be replaced by our own rendered map
                 ? "src/main/resources/Binaries/sumo.exe"
-                : "src/main/resources/Binaries/sumo";
+                : "/usr/local/bin/sumo";
 
         // config knows both .rou and .net XMLs
         mapConfig = mapManager.getConfig("Frankfurt1"); // Frankfurt, TestMap
@@ -427,7 +427,7 @@ public class WrapperController {
         }
 
         List<ExportableData> exportList = new ArrayList<>();
-        List<VehicleWrap> storedVehicles;
+        List<Vehicle> storedVehicles;
 
         if (useFilterCheckbox) {
             storedVehicles = this.filterVehicles();
@@ -435,7 +435,7 @@ public class WrapperController {
             storedVehicles = this.vehicleList.getVehicles();
         }
 
-        List<VehicleWrap> exportedVehicles = storedVehicles.stream()
+        List<Vehicle> exportedVehicles = storedVehicles.stream()
                 .filter(v -> v.getTotalLifetime() > 0)
                 .collect(Collectors.toList());
 
