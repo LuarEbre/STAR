@@ -1,4 +1,4 @@
-package sumo.sim;
+package sumo.sim.data;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
@@ -7,7 +7,6 @@ import com.lowagie.text.pdf.PdfWriter;
 import sumo.sim.util.ExportableData;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

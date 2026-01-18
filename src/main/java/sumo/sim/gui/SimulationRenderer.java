@@ -15,6 +15,7 @@ import sumo.sim.util.RenderingException;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -70,7 +71,7 @@ public class SimulationRenderer {
     private double viewMaxY;
 
     //Logger
-    //private static final Logger logger = java.util.logging.Logger.getLogger(SimulationRenderer.class.getName());
+    private static final Logger logger = java.util.logging.Logger.getLogger(SimulationRenderer.class.getName());
 
     /**
      * Constructs a new SimulationRenderer called by {@link GuiController}
@@ -344,7 +345,7 @@ public class SimulationRenderer {
             if (this.selectMode) renderSelectableObjects();
 
         } catch (Exception e) {
-            // throw new RenderingException(e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -578,7 +579,7 @@ public class SimulationRenderer {
             javafx.geometry.Point2D worldPos = currentTransform.inverseTransform(x, y);
             return new java.awt.geom.Point2D.Double(worldPos.getX(), worldPos.getY());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RenderingException("Failed to transfer screen to world coordinates" + e);
         }
     }
 

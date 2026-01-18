@@ -12,6 +12,7 @@ import java.util.Map;
 // XML parser
 
 import sumo.sim.data.XML;
+import sumo.sim.util.MapLoadingException;
 import sumo.sim.util.Util;
 
 // Logger
@@ -49,7 +50,7 @@ public class SumoMapManager {
 
     }
 
-    public void chooseFile(Stage stage) {
+    public void chooseFile(Stage stage) throws MapLoadingException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Sumo Config");
         // limits choosable files
@@ -61,10 +62,9 @@ public class SumoMapManager {
         checkFile(file);
     }
 
-    private void checkFile(File file) {
+    private void checkFile(File file) throws MapLoadingException {
         if (file==null || !file.exists()) {
-            // file does not exist
-            return;
+            throw new MapLoadingException("Could not find map file");
         }
 
         // Scanning for .rou / .net in Config
@@ -94,10 +94,11 @@ public class SumoMapManager {
                 SumoMapConfig newConfig = new SumoMapConfig(mapName, netFile, rouFile, file);
                 maps.put(mapName, newConfig); // put in list
                 logger.log(Level.INFO, "New Sumo Config: " + maps.get(mapName));
+            } else {
+                throw new MapLoadingException(" Net, Rou files not found.");
             }
         } else {
-            logger.log(Level.WARNING, "Failed to load Sumo Config file");
-            return;
+            throw new MapLoadingException("Sumo files not complete.");
         }
     }
 

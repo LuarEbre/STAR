@@ -5,7 +5,7 @@ import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import sumo.sim.gui.GuiController;
-import sumo.sim.DataExport;
+import sumo.sim.data.DataExport;
 import sumo.sim.objects.*;
 import sumo.sim.util.ExportableData;
 import sumo.sim.util.SimulationException;
@@ -13,19 +13,15 @@ import sumo.sim.util.Util;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -135,14 +131,13 @@ public class WrapperController {
             trafficLightList.updateAllCurrentState(); // important for rendering
             if (streetList != null && streetList.getStreets() != null) {
                 streetList.getStreets().forEach(Street::resetDataTracking);
-                logger.log(Level.INFO, "Reset stepCounter for data tarcking.");
+                logger.log(Level.INFO, "Reset stepCounter for data tracking.");
             }
             start();
 
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to start Sumo Simulation", e);
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new SimulationException("Failed to start Sumo Simulation" + e);
         }
     }
 
@@ -202,7 +197,6 @@ public class WrapperController {
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to close connection", e);
                 System.err.println("Error while closing connection: " + e.getMessage());
-                throw new RuntimeException();
             }
         }
     }
@@ -223,7 +217,9 @@ public class WrapperController {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                logger.log(Level.WARNING, "Changing delay failed", e);
+                Thread.currentThread().interrupt();
+                terminate();
             }
         }
         terminated = false;
@@ -302,7 +298,7 @@ public class WrapperController {
                 });
             }
         } catch (NullPointerException npe) {
-            logger.log(Level.WARNING, "adaptive Traffic Light got NullPointer as lane denstiy", npe);
+            logger.log(Level.WARNING, "Adaptive Traffic Light got NullPointer as lane density", npe);
             guiController.doSimStep();
 
         } catch (SimulationException simE) {
@@ -330,7 +326,8 @@ public class WrapperController {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                // should have something here
+                Thread.currentThread().interrupt();
+                return;
             }
 
             // load new config
@@ -431,11 +428,13 @@ public class WrapperController {
 
         List<ExportableData> exportList = new ArrayList<>();
         List<VehicleWrap> storedVehicles;
-            if (useFilterCheckbox) {
-                storedVehicles = this.filterVehicles();
-            } else {
-                storedVehicles = this.vehicleList.getVehicles();
-            }
+
+        if (useFilterCheckbox) {
+            storedVehicles = this.filterVehicles();
+        } else {
+            storedVehicles = this.vehicleList.getVehicles();
+        }
+
         List<VehicleWrap> exportedVehicles = storedVehicles.stream()
                 .filter(v -> v.getTotalLifetime() > 0)
                 .collect(Collectors.toList());
@@ -452,6 +451,7 @@ public class WrapperController {
         if (trafficLightList != null) {
             exportList.addAll(trafficLightList.getTrafficlights());
         }
+
         // export starts if data is available(always the case because of traffic lights)
         if (!exportList.isEmpty()) {
             try {
@@ -466,7 +466,10 @@ public class WrapperController {
                     System.out.println("PDF-Export done.");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "Error while trying to export data", e);
+                Platform.runLater(() ->
+                        guiController.showErrorAlert("Export failed", "File could not be saved: " + e.getMessage())
+                );
             }
         }
     }
