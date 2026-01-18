@@ -1,6 +1,5 @@
 package sumo.sim.objects;
 
-import de.tudresden.sumo.cmd.Lane;
 import de.tudresden.sumo.cmd.Trafficlight;
 import de.tudresden.sumo.objects.SumoLink;
 import de.tudresden.sumo.objects.SumoTLSController;
@@ -29,7 +28,7 @@ import java.util.logging.Logger;
  * </p>
  *
  */
-public class TrafficLightWrap extends SelectableObject implements ExportableData {
+public class TrafficLight extends SelectableObject implements ExportableData {
 
     private final SumoTraciConnection con;
     private final String id;
@@ -38,7 +37,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
     private final List<String> changeTlHistory = new ArrayList<>();
 
     // Logger
-    private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLightWrap.class.getName());
+    private static final Logger logger = java.util.logging.Logger.getLogger(TrafficLight.class.getName());
 
     // rendering
     private int duration; // time
@@ -60,7 +59,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
      * @param con  The active SumoTraciConnection object created in {@link WrapperController}.
      * @throws RuntimeException if there is an error parsing data or communicating with TraCI.
      */
-    public TrafficLightWrap(String id, Map<String,String> Data, SumoTraciConnection con, WrapperController controller, StreetList streetList) {
+    public TrafficLight(String id, Map<String,String> Data, SumoTraciConnection con, WrapperController controller, StreetList streetList) {
         super();
         this.id = id;
         this.con = con;
@@ -202,7 +201,7 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
      *
      * <p>
      *     Array: [index0, lane controlled by index0...]
-     *     State e.g. of "Grr" state index 0 is "G" and its controlled lane {@link LaneWrap} is stored after wards by its id.
+     *     State e.g. of "Grr" state index 0 is "G" and its controlled lane {@link Lane} is stored after wards by its id.
      * </p>
      *
      *<p>
@@ -257,8 +256,8 @@ public class TrafficLightWrap extends SelectableObject implements ExportableData
             for (String laneID : greenLanesID) {
 
                 try {
-                    double veh = (int) con.do_job_get(Lane.getLastStepVehicleNumber(laneID));
-                    double len = (double) con.do_job_get(Lane.getLength(laneID));
+                    double veh = (int) con.do_job_get(de.tudresden.sumo.cmd.Lane.getLastStepVehicleNumber(laneID));
+                    double len = (double) con.do_job_get(de.tudresden.sumo.cmd.Lane.getLength(laneID));
 
                     double maxVeh = len / 7.5;
                     double density = veh / Math.max(1.0, maxVeh);

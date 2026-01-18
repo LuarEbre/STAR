@@ -12,7 +12,6 @@ import javafx.scene.paint.Paint;
 import sumo.sim.objects.*;
 import sumo.sim.util.RenderingException;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.logging.Level;
@@ -133,7 +132,7 @@ public class SimulationRenderer {
         for (Street s: sl.getStreets()) {
             s.calculateBounds();
         }
-        for (JunctionWrap j: jl.getJunctions()) {
+        for (Junction j: jl.getJunctions()) {
             j.calculateBounds();
         }
     }
@@ -264,7 +263,7 @@ public class SimulationRenderer {
             }
 
             // rendering lanes
-            for (LaneWrap l : s.getLanes()) {
+            for (Lane l : s.getLanes()) {
 
                 double[] rawX = l.getShapeX();
                 double[] rawY = l.getShapeY();
@@ -306,7 +305,7 @@ public class SimulationRenderer {
     }
 
     private void renderJunctions() {
-        for (JunctionWrap jw : jl.getJunctions()) { // every junction in junction list
+        for (Junction jw : jl.getJunctions()) { // every junction in junction list
             if (jw.getMaxX() < viewMinX || jw.getMinX() > viewMaxX // skip if not visible
                     || jw.getMaxY() < viewMinY || jw.getMinY() > viewMaxY) continue;
             gcStatic.setFill(Color.rgb(54,53,57));
@@ -379,7 +378,7 @@ public class SimulationRenderer {
         gcDynamic.setTextBaseline(VPos.CENTER);
         gcDynamic.setFont(tlFont);
 
-        for (TrafficLightWrap tl : tls.getTrafficlights()) {
+        for (TrafficLight tl : tls.getTrafficlights()) {
             // save and restore context, as each traffic light gets a unique translation
             gcDynamic.save();
 
@@ -404,30 +403,30 @@ public class SimulationRenderer {
         float width = tls.getTrafficlights().getFirst().getSelectRadius()*2;
         gcDynamic.setFill(Color.rgb(66,245,245,0.5));
         if(!this.filterApplied) {
-            for (VehicleWrap v : vl.getVehicles()) {
+            for (Vehicle v : vl.getVehicles()) {
                 if (v.exists()) {
                     gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
                 }
             }
         } else {
-            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+            for (Vehicle v : filteredVehicles.getVehicles()) {
                 if (v.exists()) {
                     gcDynamic.fillRect(v.getPosition().x - width / 2, v.getPosition().y - width / 2, width, width);
                 }
             }
         }
-        for(TrafficLightWrap tl : tls.getTrafficlights()) {
+        for(TrafficLight tl : tls.getTrafficlights()) {
             gcDynamic.fillRect(tl.getPosition().x-width/2, tl.getPosition().y-width/2, width, width);
         }
     }
 
 
     /**
-     * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(VehicleWrap, double, double)} for every vehicle (still on the map)
+     * Iterates {@link VehicleList} and calls {@link #drawTriangleCar(Vehicle, double, double)} for every vehicle (still on the map)
      */
     private void renderVehicle() throws RenderingException {
         if(!filterApplied) {
-            for (VehicleWrap v : vl.getVehicles()) {
+            for (Vehicle v : vl.getVehicles()) {
                 if (!v.exists()) continue;
 
                 var pos = v.getPosition();
@@ -444,7 +443,7 @@ public class SimulationRenderer {
             }
         }
         else {
-            for (VehicleWrap v : filteredVehicles.getVehicles()) {
+            for (Vehicle v : filteredVehicles.getVehicles()) {
                 if (!v.exists()) continue;
 
                 var pos = v.getPosition();
@@ -470,7 +469,7 @@ public class SimulationRenderer {
      * @param width  Half-width of the vehicle base.
      * @param length Distance from center to front/back.
      */
-    private void drawTriangleCar(VehicleWrap v, double width, double length) {
+    private void drawTriangleCar(Vehicle v, double width, double length) {
         if (v.exists()) {
             gcDynamic.save(); // saves previous gc state
             gcDynamic.translate(v.getPosition().getX(), v.getPosition().getY()); // new offset
@@ -489,12 +488,12 @@ public class SimulationRenderer {
      * Renders the status of traffic lights by drawing colored lines at the end of controlled lanes.
      * <p>
      * It matches the current light state string (e.g., "GrGr") to the controlled lanes
-     * by checking if the controlled lanes are equivalent to {@link LaneWrap} ids. If they are, rendering is performed
-     * and a line is drawn at the end of the lane with the corresponding color using {@link TrafficLightWrap#getCurrentState()}
+     * by checking if the controlled lanes are equivalent to {@link Lane} ids. If they are, rendering is performed
+     * and a line is drawn at the end of the lane with the corresponding color using {@link TrafficLight#getCurrentState()}
      * </p>
      */
     private void renderTrafficLight() {
-        for (TrafficLightWrap tl : tls.getTrafficlights()) {
+        for (TrafficLight tl : tls.getTrafficlights()) {
             //tl.setCurrentState();
             String[] state = tl.getCurrentState(); // [R, lane_R ,y , lane_y , r, lane_r ] format
             if (state == null) continue; // protection
@@ -506,7 +505,7 @@ public class SimulationRenderer {
                     tl.getPosition().y < viewMinY || tl.getPosition().y > viewMaxY) continue;
 
             for (Street controlledStreet : tl.getControlledStreets()) {
-                for (LaneWrap l : controlledStreet.getLanes()) { // lanes of streets , maybe performance hashmap
+                for (Lane l : controlledStreet.getLanes()) { // lanes of streets , maybe performance hashmap
                     for (int j = 0; j < state.length; j += 2) {
                         if (state[j + 1] == null) continue;
                         if (state[j + 1].equals(l.getLaneID())) { //  maybe performance hashmap
@@ -527,7 +526,7 @@ public class SimulationRenderer {
         }
     }
 
-    private void calculateTrafficLightRender(LaneWrap l, GraphicsContext gc) {
+    private void calculateTrafficLightRender(Lane l, GraphicsContext gc) {
         double[] rawX = l.getShapeX();
         double[] rawY = l.getShapeY();
 
@@ -618,7 +617,7 @@ public class SimulationRenderer {
     }
 
     public void renderTrafficLightPreview(String id, String[] streets, String phase, Canvas canvas, GraphicsContext gcTL) {
-        TrafficLightWrap tl = tls.getTL(id);
+        TrafficLight tl = tls.getTL(id);
         if (tl == null) return;
 
         // filter irrelevant information of streets array
@@ -644,7 +643,7 @@ public class SimulationRenderer {
         gcTL.setTransform(transform);
 
         // render junctions
-        JunctionWrap jw = jl.getJunction(id); // id of tl = junction id
+        Junction jw = jl.getJunction(id); // id of tl = junction id
         if (jw != null) {
             // should check shape mean to determine camera?
             double[] jx = jw.getShapeX();
@@ -660,7 +659,7 @@ public class SimulationRenderer {
         gcTL.setLineWidth(3.5);
 
         for (Street controlledStreet : tl.getControlledStreets()) {
-            for (LaneWrap l : controlledStreet.getLanes()) {
+            for (Lane l : controlledStreet.getLanes()) {
                 for (int i = 0; i < streetsOnly.length; i++) {
                     if (streetsOnly[i] == null) continue;
                     if (streetsOnly[i].equals(l.getLaneID())) { //  maybe performance hashmap

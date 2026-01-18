@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -50,6 +49,8 @@ import sumo.sim.logic.WrapperController;
 import sumo.sim.objects.*;
 import sumo.sim.util.MapLoadingException;
 import sumo.sim.util.RenderingException;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 
 /**
  * Main JavaFX controller for the simulation GUI and gui.fxml.
@@ -970,7 +971,7 @@ public class GuiController {
     /**
      * Triggered when enabling the adaptive Checkbox in Traffic Light Control Menu
      * Starts to update Traffic Light States based on adaptive algorithm
-     * @see TrafficLightWrap
+     * @see TrafficLight
      * @see TrafficLightPhase
      */
     @FXML
@@ -1004,9 +1005,9 @@ public class GuiController {
     @FXML
     private void onExportCharts() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Export charts");
+        fileChooser.setTitle("Export Charts");
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("PNG ", "*.png")
+                new FileChooser.ExtensionFilter("PNG image", "*.png")
         );
         fileChooser.setInitialFileName("charts.png");
 
@@ -1021,7 +1022,10 @@ public class GuiController {
             file = new File(file.getAbsolutePath() + ".png");
         }
 
-        WritableImage writableImage = chartVbox.snapshot(new SnapshotParameters(), null);
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+
+        WritableImage writableImage = chartVbox.snapshot(params, null);
 
         BufferedImage bufferedImage = new BufferedImage(
                 (int) writableImage.getWidth(),
@@ -1327,7 +1331,7 @@ public class GuiController {
                 if(notSelectedLabel1.isVisible()) notSelectedLabel1.setVisible(false);
 
                 // display Vehicle data
-                if (this.selectedObject instanceof VehicleWrap v) {
+                if (this.selectedObject instanceof Vehicle v) {
 
                     // switch between GridPanes which display the data
                     if(!SelectedGrid.isVisible()) {
@@ -1357,7 +1361,7 @@ public class GuiController {
                     this.Stops.setText(Integer.toString(v.getNumberOfStops()));
 
                     // display Traffic Light data
-                } else if (selectedObject instanceof TrafficLightWrap tl) {
+                } else if (selectedObject instanceof TrafficLight tl) {
 
                     // switch between GridPanes which display the data
                     if (!SelectedGridTL.isVisible()) {
@@ -1507,7 +1511,7 @@ public class GuiController {
      */
     private SelectableObject findClickableObject(double worldX, double worldY) {
         if(!sr.isFilterApplied()) {
-            for (VehicleWrap v : wrapperController.getVehicles().getVehicles()) {
+            for (Vehicle v : wrapperController.getVehicles().getVehicles()) {
                 var pos = v.getPosition();
                 int radius = v.getSelectRadius();
                 double minX = pos.x - radius;
@@ -1519,7 +1523,7 @@ public class GuiController {
                 }
             }
         } else {
-            for (VehicleWrap v : wrapperController.getFilteredVehicles().getVehicles()) {
+            for (Vehicle v : wrapperController.getFilteredVehicles().getVehicles()) {
                 var pos = v.getPosition();
                 int radius = v.getSelectRadius();
                 double minX = pos.x - radius;
@@ -1531,7 +1535,7 @@ public class GuiController {
                 }
             }
         }
-        for(TrafficLightWrap tl : wrapperController.getTrafficLights().getTrafficlights()) {
+        for(TrafficLight tl : wrapperController.getTrafficLights().getTrafficlights()) {
             var pos = tl.getPosition();
             int radius = tl.getSelectRadius();
             double minX = pos.x - radius;
@@ -1602,7 +1606,7 @@ public class GuiController {
                         selectButton.setSelected(false);
                         this.onSelect();
 
-                        if(so instanceof TrafficLightWrap tl) {
+                        if(so instanceof TrafficLight tl) {
                             // if selected object is a TrafficLight, also open the Traffic Light menu and set the selected Traffic Light as the one currently being manipulated
                             if(!trafficLightButton.isSelected()) onTrafficLight();
                             trafficLightButton.setSelected(true);
@@ -1832,8 +1836,6 @@ public class GuiController {
 
         meanStreetDensitySeries.getData().clear();
         meanDensityChart.getData().add(meanStreetDensitySeries);
-
-        meanDensityChart.getData().clear();
 
         meanDensityChart.setAnimated(false);
 

@@ -1,6 +1,5 @@
 package sumo.sim.objects;
 
-import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.sumo.objects.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 import javafx.scene.paint.Color;
@@ -16,14 +15,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Manages a {@link CopyOnWriteArrayList} of {@link VehicleWrap} objects.
+ * Manages a {@link CopyOnWriteArrayList} of {@link Vehicle} objects.
  * <p>
  * This makes the class thread-safe (immune to race conditions), allowing the simulation
  * to iterate over vehicles while another thread tries to add or remove vehicles.
  * </p>
  */
 public class VehicleList {
-    private CopyOnWriteArrayList<VehicleWrap> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
+    private CopyOnWriteArrayList<Vehicle> vehicles = new CopyOnWriteArrayList<>(); // List of Vehicles
     private final SumoTraciConnection con;// main connection created in main wrapper
     private int count; // vehicles in list, latest car number: "v"+ count
     private int activeCount; // vehicles currently on the road network
@@ -41,21 +40,21 @@ public class VehicleList {
     }
 
     /**
-     * Adds n vehicles to the SUMO simulation {@link SumoTraciConnection} via the native {@link Vehicle#addFull(String, String, String, String, String, String, String, String, String, String, String, String, String, int, int)}
+     * Adds n vehicles to the SUMO simulation {@link SumoTraciConnection} via the native {@link de.tudresden.sumo.cmd.Vehicle#addFull(String, String, String, String, String, String, String, String, String, String, String, String, String, int, int)}
      * @param n number of desired vehicles
      * @param type vehicle type (e.g. STANDARD_VEH)
      * @param route desired route
      */
     public void addVehicle(int n, String type, String route, Color color) {
-        ArrayList<VehicleWrap> newVehicles = new ArrayList<>(n);
+        ArrayList<Vehicle> newVehicles = new ArrayList<>(n);
         try {
             for (int i=0; i<n; i++) {
-                con.do_job_set(Vehicle.addFull("v" + count, route, type, // ids -> latest car id
+                con.do_job_set(de.tudresden.sumo.cmd.Vehicle.addFull("v" + count, route, type, // ids -> latest car id
                         "now", "0", "0", "0",
                         "current", "max", "current", "",
                         "", "", 0, 0)
                 );
-                newVehicles.add(new VehicleWrap("v"+count, con, type, route, color));
+                newVehicles.add(new Vehicle("v"+count, con, type, route, color));
                 count++; // increment counter to prevent identical car ids
             }
         } catch (Exception e) {
@@ -66,8 +65,8 @@ public class VehicleList {
     }
 
     /**
-     * <p></p>Calls {@link VehicleWrap#setExists(boolean)} for each vehicle based on whether they are on the road network or not</p>
-     * <p>Calls {@link VehicleWrap#updateVehicle()} for every vehicle currently on the road network</p>
+     * <p></p>Calls {@link Vehicle#setExists(boolean)} for each vehicle based on whether they are on the road network or not</p>
+     * <p>Calls {@link Vehicle#updateVehicle()} for every vehicle currently on the road network</p>
      */
     public void updateAllVehicles() {
 
@@ -76,7 +75,7 @@ public class VehicleList {
 
         this.activeCount = activeIDs.size();
 
-        for (VehicleWrap v : vehicles) {
+        for (Vehicle v : vehicles) {
             boolean isActive = activeIDs.contains(v.getID());
             if (isActive) {
                 try {
@@ -108,7 +107,7 @@ public class VehicleList {
 
         this.activeCount = activeIDs.size();
 
-        for (VehicleWrap v : vehicles) {
+        for (Vehicle v : vehicles) {
             v.setExists(activeIDs.contains(v.getID()));
         }
     }
@@ -117,12 +116,12 @@ public class VehicleList {
      * Used in Select Mode to deselect all other Vehicles once a Vehicle has been found
      */
     public void deselectAll() {
-        for(VehicleWrap v : vehicles) {
+        for(Vehicle v : vehicles) {
             v.deselect();
         }
     }
 
-    public void setVehicles(CopyOnWriteArrayList<VehicleWrap> vehicles) { this.vehicles = vehicles; }
+    public void setVehicles(CopyOnWriteArrayList<Vehicle> vehicles) { this.vehicles = vehicles; }
 
     // getter
 
@@ -131,7 +130,7 @@ public class VehicleList {
      */
     public int getExistingVehCount() {
         int r = 0;
-        for (VehicleWrap v : vehicles) {
+        for (Vehicle v : vehicles) {
             if (v.exists()) r++;
         }
         return r;
@@ -142,7 +141,7 @@ public class VehicleList {
      */
     private HashSet<String> getIDListAsHashSet() {
         try {
-            SumoStringList sumoIDList = (SumoStringList) con.do_job_get(Vehicle.getIDList());
+            SumoStringList sumoIDList = (SumoStringList) con.do_job_get(de.tudresden.sumo.cmd.Vehicle.getIDList());
             HashSet<String> activeIDs = new HashSet<>(sumoIDList);
             return activeIDs;
         } catch (Exception e) {
@@ -158,7 +157,7 @@ public class VehicleList {
     public Point2D.Double getMeanPosition() {
         double meanX = 0;
         double meanY = 0;
-        for (VehicleWrap v : this.vehicles) {
+        for (Vehicle v : this.vehicles) {
             if(v.exists()) {
                 meanX += v.getPosition().x;
                 meanY += v.getPosition().y;
@@ -171,7 +170,7 @@ public class VehicleList {
 
     public int getQueuedCount() {
         int count = 0;
-        for(VehicleWrap v : vehicles) {
+        for(Vehicle v : vehicles) {
             if(v.isQueued()) count++;
         }
         return count;
@@ -179,7 +178,7 @@ public class VehicleList {
 
     public int getStoppedCount() {
         int count = 0;
-        for(VehicleWrap v : vehicles) {
+        for(Vehicle v : vehicles) {
             if(v.exists() && v.isCurrentlyStopped()) count++;
         }
         return count;
@@ -187,7 +186,7 @@ public class VehicleList {
 
     public int getStoppedTime() {
         int seconds = 0;
-        for(VehicleWrap v : vehicles) {
+        for(Vehicle v : vehicles) {
             if(v.exists()) seconds+= v.getWaitingTime();
         }
         return seconds;
@@ -200,7 +199,7 @@ public class VehicleList {
     public double getMeanSpeed() {
         double meanspeed = 0;
         if(this.activeCount == 0) return meanspeed;
-        for(VehicleWrap v : vehicles) {
+        for(Vehicle v : vehicles) {
             if(v.exists()) meanspeed += v.getSpeed();
         }
         meanspeed /= this.activeCount;
@@ -216,7 +215,7 @@ public class VehicleList {
         if(this.activeCount == 0) return 0.0;
         double meanspeed = this.getMeanSpeed();
         double sumofsquares = 0;
-        for(VehicleWrap v : vehicles) {
+        for(Vehicle v : vehicles) {
             if(v.exists()) {
                 double diff = v.getSpeed() - meanspeed;
                 sumofsquares += diff*diff;
@@ -228,7 +227,7 @@ public class VehicleList {
     public int getCount() {
         return count;
     }
-    public CopyOnWriteArrayList<VehicleWrap> getVehicles() {
+    public CopyOnWriteArrayList<Vehicle> getVehicles() {
         return vehicles;
     }
     public int getActiveCount() { return activeCount; }
@@ -238,7 +237,7 @@ public class VehicleList {
         if(activeVehicles == 0) return 0.0;
         double meanspeed = this.getMeanSpeed();
         double sumofsquares = 0;
-        for(VehicleWrap v : vehicles) {
+        for(Vehicle v : vehicles) {
             if(v.exists()) {
                 double diff = v.getSpeed() - meanspeed;
                 sumofsquares += diff*diff;
@@ -253,8 +252,8 @@ public class VehicleList {
      * @return amount of Vehicles int
      */
     public int getVehiclesAmountByType(Type type) {
-        List<VehicleWrap> vehiclesWithType = new ArrayList<>();
-        for(VehicleWrap v : vehicles) {
+        List<Vehicle> vehiclesWithType = new ArrayList<>();
+        for(Vehicle v : vehicles) {
             if(v.getType().equals(type.getId())) {
                 vehiclesWithType.add(v);
             }
