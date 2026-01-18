@@ -47,6 +47,7 @@ import sumo.sim.logic.Type;
 import sumo.sim.logic.TypeList;
 import sumo.sim.logic.WrapperController;
 import sumo.sim.objects.*;
+import sumo.sim.util.MapLoadingException;
 import sumo.sim.util.RenderingException;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -523,7 +524,10 @@ public class GuiController {
         } catch(Exception e) {
             color = null;
             // if user is trying to filter for color and color is not selected, return
-            if(filterColor.isSelected()) return;
+            if(filterColor.isSelected()) {
+                logger.log(Level.WARNING, "No color selected");
+                return;
+            }
         }
 
         if(!speedRangeLower.getText().isEmpty() && !speedRangeUpper.getText().isEmpty()) {
@@ -681,10 +685,9 @@ public class GuiController {
             editor.setText(String.valueOf(val));
 
         } catch (NumberFormatException e) { // catches exception
-            logger.log(Level.WARNING, "Invalid input", e);
+            logger.log(Level.WARNING, "Invalid input");
             delaySelect.getValueFactory().setValue(defaultDelay); // value of spinner resets
             editor.setText(String.valueOf(defaultDelay)); // displayed value resets to default
-            throw new RuntimeException(e);
         }
     }
 
@@ -1039,8 +1042,9 @@ public class GuiController {
 
         try {
             ImageIO.write(bufferedImage, "png", file);
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Error writing charts.png", ex);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error writing charts.png", e);
+            showErrorAlert("Failed to export charts" , e.getMessage());
         } finally {
             writableImage = null;
             bufferedImage = null;
@@ -1670,6 +1674,8 @@ public class GuiController {
                 try{
                     renderUpdate();
                 } catch (RenderingException e) {
+                    stop();
+                    showErrorAlert("Graphics error", "Simulation stopped due to a rendering issue.");
                     return;
                 }
             }
@@ -1993,10 +1999,13 @@ public class GuiController {
 
     @FXML
     private void importMap() {
-        mapManager.chooseFile(stage);
-        updateImportedMaps();
+        try {
+            mapManager.chooseFile(stage);
+            updateImportedMaps();
+        } catch (MapLoadingException e) {
+            showErrorAlert("Import failed!", e.getMessage());
+        }
     }
-
     private void updateImportedMaps() {
         importMapSelector.setItems(FXCollections.observableArrayList(mapManager.getAllImportedMaps()));
     }
@@ -2053,6 +2062,20 @@ public class GuiController {
         String[] controlledStreets = wrapperController.getTLCurrentState(id); // current state , used for: controlledLanes
         GraphicsContext gcTL = tlCanvas.getGraphicsContext2D();
         sr.renderTrafficLightPreview(tlSelector.getValue(), controlledStreets, phase, tlCanvas, gcTL );
+    }
+
+    public void showErrorAlert(String header, String content) {
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        // prevents full screen closure
+        if (this.stage != null) {
+            alert.initOwner(this.stage);
+        }
+
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
 
