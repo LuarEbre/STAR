@@ -80,10 +80,26 @@ public class WrapperController {
      */
     public WrapperController(GuiController guiController, SumoMapManager mapManager) {
         // Select Windows (.exe) or UNIX binary based on static function Util.getOSType()
-        sumoBinary = Util.getOSType().equals("Windows")
-                // using sumo-gui for visualisation now, will later be replaced by our own rendered map
-                ? "src/main/resources/Binaries/sumo.exe"
-                : "/usr/local/bin/sumo";
+
+        String os = Util.getOSType();
+        String binaryName = os.equals("Windows") ? "sumo.exe" : "sumo"; // sumo binary name
+
+        // for .exe -> binaries folder should be beside executable
+        String baseDir = System.getProperty("user.dir");
+        File releaseBinary = new File(baseDir + File.separator + "Binaries" + File.separator + binaryName);
+
+        File devBinary = new File("src/main/resources/Binaries/" + binaryName);
+
+        if (releaseBinary.exists()) {
+            this.sumoBinary = releaseBinary.getAbsolutePath();
+            logger.log(Level.INFO, "Release mode: " + this.sumoBinary);
+        } else if (devBinary.exists()) {
+            this.sumoBinary = devBinary.getAbsolutePath();
+            logger.log(Level.INFO, "Dev mode: " + this.sumoBinary);
+        } else {
+            logger.log(Level.SEVERE, "Could not find SUMO Binary .");
+            throw new RuntimeException("SUMO Binary not found in: " + releaseBinary.getAbsolutePath());
+        }
 
         // config knows both .rou and .net XMLs
         mapConfig = mapManager.getConfig("Frankfurt1"); // Frankfurt, TestMap
